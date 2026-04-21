@@ -64,11 +64,13 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { useLightingEngine } from "../../composables/useLightingEngine";
-import type { NavTab } from "../../types/index";
-import { LightingPhase } from "../../types/index";
-import { NAV_TABS as tabs } from "../../data/portfolio";
 import NavWindow from "./NavWindow.vue";
+import { useLightingEngine } from "../../composables/useLightingEngine";
+import { NAV_TABS as tabs } from "../../data/portfolio";
+import { LightingPhase } from "../../types/index";
+
+// Protect from aggressive linting
+const _nav = NavWindow;
 
 const { setPhase } = useLightingEngine();
 const trackEl = ref<HTMLElement | null>(null);

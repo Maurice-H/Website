@@ -1,4 +1,4 @@
-import { reactive, onMounted, onUnmounted } from "vue";
+import { reactive } from "vue";
 
 interface ViewportOffset {
 	left: number;
@@ -11,7 +11,9 @@ interface ComponentRegistration {
 }
 
 // Singleton state
-const registeredComponents = reactive<Map<string, ComponentRegistration>>(new Map());
+const registeredComponents = reactive<Map<string, ComponentRegistration>>(
+	new Map(),
+);
 const mousePosition = reactive({ x: 0, y: 0 });
 
 /**
@@ -80,7 +82,10 @@ export function initGlobalViewportService() {
 		document.documentElement.style.setProperty("--spotlight-y-raw", `${yPct}%`);
 	};
 
-	window.addEventListener("scroll", updateAll, { passive: true, capture: true });
+	window.addEventListener("scroll", updateAll, {
+		passive: true,
+		capture: true,
+	});
 	window.addEventListener("resize", updateAll, { passive: true });
 	window.addEventListener("mousemove", handleMouseMove, { passive: true });
 

@@ -6,14 +6,22 @@ This capability defines the automated testing and code quality standards for the
 ## Requirements
 
 ### Requirement: Static Code Quality Analysis
-The system SHALL employ Biome to format all source files and lint against modern JavaScript and Vue best practices to prevent runtime bugs and formatting discrepancies.
+The system SHALL employ Biome to format and lint all source files, enforcing alphabetical import sorting and zero-unused-import policies.
 
-#### Scenario: Pre-commit or pipeline failure
-- **WHEN** a developer attempts to commit code with messy formatting, unused variables, or bad typing assignments
-- **THEN** Biome SHALL flag these errors via the CLI execution, and if run in CI, fail the build pipeline.
+#### Scenario: Alphabetical Import Check
+- **WHEN** the `biome check` command is executed
+- **THEN** it SHALL flag any imports or exports that are not alphabetically ordered within their respective groups.
+
+#### Scenario: Zero Unused Imports
+- **WHEN** an import statement is not referenced in the component logic or template
+- **THEN** Biome SHALL report an error and, if run with `--write`, automatically remove the statement.
 
 ### Requirement: Granular Component Testing
-The system SHALL utilize Vitest to execute component-level isolated tests, particularly for complex logic like global state systems (e.g., Theme/Lighting Config).
+Test files SHALL remain isolated and SHALL NOT export variables or functions to the rest of the application.
+
+#### Scenario: Test File Export Check
+- **WHEN** a `.spec.ts` or `.test.ts` file contains a named or default export
+- **THEN** the linting check SHALL fail, requiring the export to be removed or moved to a shared utility.
 
 #### Scenario: Vitest execution against a Vue Component
 - **WHEN** the `npm run test:unit` script is executed
@@ -46,3 +54,10 @@ The system SHALL maintain E2E test coverage for the `<FusedReveal>` component to
 #### Scenario: Content Parity Check
 - **WHEN** the Playwright suite inspects a Fused component
 - **THEN** it SHALL verify that the text content of the Blueprint layer matches the text content of the Finished layer exactly.
+
+### Requirement: Type Strictness
+The system SHALL NOT use the `any` type for variable declarations, function parameters, or return types.
+
+#### Scenario: specific typing enforcement
+- **WHEN** a developer uses `any` in a TypeScript file
+- **THEN** the compiler or linter SHALL flag it, requiring a specific type or interface to be defined.

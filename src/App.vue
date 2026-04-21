@@ -1,7 +1,7 @@
 <template>
   <SpotlightMask>
     <!-- Navigation Phase -->
-    <div v-if="state.phase === LightingPhase.NAV" class="h-screen w-full relative">
+    <div v-if="state.phase === phases.NAV" class="h-screen w-full relative">
       <!-- Fused Background Text -->
       <div 
         class="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -19,7 +19,7 @@
       <div class="max-w-7xl mx-auto flex flex-col gap-6">
         <header class="w-full flex justify-between items-center px-6 mb-8">
           <button 
-            @click="setPhase(LightingPhase.NAV)"
+            @click="setPhase(phases.NAV)"
             class="px-4 py-2 border border-[var(--finished-border)] box-shadow-[var(--finished-glow)] rounded-xl bg-finished-bg hover:scale-105 transition-transform text-xs uppercase tracking-widest text-finished-accent"
           >
             Back to Navigation
@@ -45,21 +45,22 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import ContactForm from "./components/features/ContactForm.vue";
+import HeroSection from "./components/features/HeroSection.vue";
+import ProjectsSection from "./components/features/ProjectsSection.vue";
+import SkillsAbout from "./components/features/SkillsAbout.vue";
+import NavConveyor from "./components/navigation/NavConveyor.vue";
+import SpotlightMask from "./components/layout/SpotlightMask.vue";
+import BentoLayout from "./components/layout/BentoLayout.vue";
+import ThemeToggle from "./components/navigation/ThemeToggle.vue";
 import { useLightingEngine } from "./composables/useLightingEngine";
 import { initGlobalViewportService } from "./composables/useViewportStore";
 import { LightingPhase } from "./types";
 
-// UI Components organized by domain
-import SpotlightMask from "./components/layout/SpotlightMask.vue";
-import BentoLayout from "./components/layout/BentoLayout.vue";
-import NavConveyor from "./components/navigation/NavConveyor.vue";
-import ThemeToggle from "./components/navigation/ThemeToggle.vue";
-import HeroSection from "./components/features/HeroSection.vue";
-import SkillsAbout from "./components/features/SkillsAbout.vue";
-import ProjectsSection from "./components/features/ProjectsSection.vue";
-import ContactForm from "./components/features/ContactForm.vue";
-
 const { state, setPhase } = useLightingEngine();
+
+// Reference for template use
+const phases = LightingPhase;
 
 onMounted(() => {
 	console.log("App Mounted in Fused Single-Layer Mode");

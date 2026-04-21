@@ -1,9 +1,15 @@
-import type { HeroData, NavTab, PortfolioProject, SkillSection } from "../types";
+import type {
+	HeroData,
+	NavTab,
+	PortfolioProject,
+	SkillSection,
+} from "../types";
 
 export const HERO_DATA: HeroData = {
 	name: "Alex",
 	roles: ["Developer", "Architect", "Creator"],
-	tagline: "A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.",
+	tagline:
+		"A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.",
 };
 
 export const NAV_TABS: NavTab[] = [
@@ -36,7 +42,8 @@ export const SKILL_SECTIONS: SkillSection[] = [
 	{
 		id: "bio",
 		title: "Discovery Path",
-		content: "I bridge the gap between creative design and robust engineering. My journey is defined by a relentless pursuit of performance and pixel perfection.",
+		content:
+			"I bridge the gap between creative design and robust engineering. My journey is defined by a relentless pursuit of performance and pixel perfection.",
 		skills: [],
 	},
 	{

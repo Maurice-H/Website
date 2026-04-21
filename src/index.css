@@ -26,21 +26,6 @@
 	--blueprint-border: rgba(255, 255, 255, 0.08);
 }
 
-/* Blueprint mode overrides — applied via ThemeToggle */
-[data-theme="blueprint"] {
-	--finished-bg: #0a1628;
-	--finished-text: #93c5fd;
-	--finished-accent: #3b82f6;
-	--finished-border: rgba(59, 130, 246, 0.2);
-	--finished-glow: 0 0 25px rgba(59, 130, 246, 0.2);
-	--spotlight-size: 350px;
-}
-
-[data-theme="blueprint"] body {
-	background: #0a1628;
-	color: #93c5fd;
-}
-
 *,
 *::before,
 *::after {
@@ -58,6 +43,21 @@ body {
 	min-height: 100vh;
 	outline: none;
 	box-shadow: none;
+}
+
+/* Blueprint mode overrides — applied via ThemeToggle */
+[data-theme="blueprint"] {
+	--finished-bg: #0a1628;
+	--finished-text: #93c5fd;
+	--finished-accent: #3b82f6;
+	--finished-border: rgba(59, 130, 246, 0.2);
+	--finished-glow: 0 0 25px rgba(59, 130, 246, 0.2);
+	--spotlight-size: 350px;
+}
+
+[data-theme="blueprint"] body {
+	background: #0a1628;
+	color: #93c5fd;
 }
 
 /* Flash Transition Effect */

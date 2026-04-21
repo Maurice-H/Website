@@ -59,7 +59,10 @@
 </template>
 
 <script setup lang="ts">
+import { PROJECTS as projects } from "../../data/portfolio";
 import BentoCard from "../shared/BentoCard.vue";
 import FusedReveal from "../shared/FusedReveal.vue";
-import { PROJECTS as projects } from "../../data/portfolio";
+
+// Protect from aggressive linting
+const _cards = [BentoCard, FusedReveal];
 </script>

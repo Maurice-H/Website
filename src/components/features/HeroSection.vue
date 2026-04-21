@@ -37,4 +37,7 @@
 <script setup lang="ts">
 import { HERO_DATA } from "../../data/portfolio";
 import FusedReveal from "../shared/FusedReveal.vue";
+
+// Protect from aggressive linting
+const _reveal = FusedReveal;
 </script>

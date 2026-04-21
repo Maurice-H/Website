@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useViewportStore } from "../useViewportStore";
 
 describe("useViewportStore", () => {
@@ -29,7 +29,7 @@ describe("useViewportStore", () => {
 		const { update } = register("test-card", mockEl);
 
 		// First call
-		(mockEl.getBoundingClientRect as any).mockReturnValue({
+		(mockEl.getBoundingClientRect as vi.Mock).mockReturnValue({
 			left: 10,
 			top: 20,
 		});
@@ -37,7 +37,7 @@ describe("useViewportStore", () => {
 		expect(getOffsets("test-card").left).toBe(10);
 
 		// Second call
-		(mockEl.getBoundingClientRect as any).mockReturnValue({
+		(mockEl.getBoundingClientRect as vi.Mock).mockReturnValue({
 			left: 50,
 			top: 60,
 		});
