@@ -9,7 +9,7 @@
     </div>
 
     <!-- Conveyor Belt (drag-scrollable) -->
-    <div 
+    <div
       class="conveyor-track mask-fused"
       ref="trackEl"
       @mousedown="startDrag"
@@ -17,7 +17,7 @@
       @scroll="handleScroll"
     >
       <NavWindow
-        v-for="tab in tabs" 
+        v-for="tab in tabs"
         :key="tab.id"
         :theme="tab.theme"
         :label="tab.label"
@@ -25,12 +25,14 @@
         @click="selectTab(tab.id)"
       >
         <div v-if="tab.theme === 'career'" class="content-terminal">
-          <div class="code-line"><span class="text-finished-accent">></span> experience.list()</div>
+          <div class="code-line">
+            <span class="text-finished-accent">></span> experience.list()
+          </div>
           <div class="code-line opacity-50">Loading data...</div>
           <div class="code-line text-xs">2024: Frontend Dev</div>
           <div class="cursor">_</div>
         </div>
-        
+
         <div v-else-if="tab.theme === 'about'" class="content-profile">
           <div class="profile-circle"></div>
           <div class="profile-lines">
@@ -38,11 +40,11 @@
             <div class="line w-3/4"></div>
           </div>
         </div>
-        
+
         <div v-else-if="tab.theme === 'projects'" class="content-grid">
           <div class="grid-box" v-for="i in 4" :key="i"></div>
         </div>
-        
+
         <div v-else-if="tab.theme === 'contact'" class="content-envelope">
           <div class="envelope-back">
             <div class="envelope-flap"></div>
@@ -63,94 +65,93 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import NavWindow from "./NavWindow.vue";
-import { useLightingEngine } from "../../composables/useLightingEngine";
-import { NAV_TABS as tabs } from "../../data/portfolio";
-import { LightingPhase } from "../../types/index";
-
-// Protect from aggressive linting
-const _nav = NavWindow;
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useLightingEngine } from '../../composables/useLightingEngine';
+import { NAV_TABS as tabs } from '../../data/portfolio';
+import { LightingPhase } from '../../types/index';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import NavWindow from './NavWindow.vue';
 
 const { setPhase } = useLightingEngine();
 const trackEl = ref<HTMLElement | null>(null);
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const conveyorRoot = ref<HTMLElement | null>(null);
 
-const scrollX = ref(0);
-const activeId = ref("about");
+const activeId = ref('about');
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
 let startX = 0;
 let scrollLeft = 0;
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const startDrag = (e: MouseEvent) => {
-	if (!trackEl.value) return;
-	isDragging = true;
-	startX = e.pageX - trackEl.value.offsetLeft;
-	scrollLeft = trackEl.value.scrollLeft;
-	trackEl.value.style.cursor = "grabbing";
+  if (!trackEl.value) return;
+  isDragging = true;
+  startX = e.pageX - trackEl.value.offsetLeft;
+  scrollLeft = trackEl.value.scrollLeft;
+  trackEl.value.style.cursor = 'grabbing';
 };
 
 const onDrag = (e: MouseEvent) => {
-	if (!isDragging || !trackEl.value) return;
-	e.preventDefault();
-	const x = e.pageX - trackEl.value.offsetLeft;
-	const walk = (x - startX) * 2; // speed multiplier
-	trackEl.value.scrollLeft = scrollLeft - walk;
+  if (!isDragging || !trackEl.value) return;
+  e.preventDefault();
+  const x = e.pageX - trackEl.value.offsetLeft;
+  const walk = (x - startX) * 2; // speed multiplier
+  trackEl.value.scrollLeft = scrollLeft - walk;
 };
 
 const stopDrag = () => {
-	isDragging = false;
-	if (trackEl.value) trackEl.value.style.cursor = "grab";
+  isDragging = false;
+  if (trackEl.value) trackEl.value.style.cursor = 'grab';
 };
 
 const handleScroll = () => {
-	if (!trackEl.value) return;
-	const scrollPos = trackEl.value.scrollLeft;
-	const center = scrollPos + window.innerWidth / 2;
+  if (!trackEl.value) return;
 
-	// Find which tab is closest to center
-	const elements = trackEl.value.querySelectorAll(".nav-window");
-	let closestId = tabs[0].id;
-	let minDistance = Infinity;
+  // Find which tab is closest to center
+  const elements = trackEl.value.querySelectorAll('.nav-window');
+  let closestId = tabs[0].id;
+  let minDistance = Infinity;
 
-	elements.forEach((el, index) => {
-		const rect = el.getBoundingClientRect();
-		const elCenter = rect.left + rect.width / 2;
-		const distance = Math.abs(window.innerWidth / 2 - elCenter);
+  elements.forEach((el, index) => {
+    const rect = el.getBoundingClientRect();
+    const elCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(window.innerWidth / 2 - elCenter);
 
-		if (distance < minDistance) {
-			minDistance = distance;
-			closestId = tabs[index].id;
-		}
-	});
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestId = tabs[index].id;
+    }
+  });
 
-	activeId.value = closestId;
+  activeId.value = closestId;
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const onWheel = (e: WheelEvent) => {
-	if (!trackEl.value) return;
-	trackEl.value.scrollLeft += e.deltaY;
+  if (!trackEl.value) return;
+  trackEl.value.scrollLeft += e.deltaY;
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const selectTab = (id: string) => {
-	if (isDragging) return; // ignore click after drag
-	if (id !== activeId.value) {
-		// Scroll to it first?
-		return;
-	}
-	setPhase(LightingPhase.CONTENT);
+  if (isDragging) return; // ignore click after drag
+  if (id !== activeId.value) {
+    // Scroll to it first?
+    return;
+  }
+  setPhase(LightingPhase.CONTENT);
 };
 
 onMounted(() => {
-	window.addEventListener("mousemove", onDrag);
-	window.addEventListener("mouseup", stopDrag);
-	handleScroll(); // Initial check
+  window.addEventListener('mousemove', onDrag);
+  window.addEventListener('mouseup', stopDrag);
+  handleScroll(); // Initial check
 });
 onUnmounted(() => {
-	window.removeEventListener("mousemove", onDrag);
-	window.removeEventListener("mouseup", stopDrag);
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('mouseup', stopDrag);
 });
 </script>
 
@@ -198,7 +199,7 @@ onUnmounted(() => {
 }
 
 .lamp-housing::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 50%;
@@ -213,7 +214,7 @@ onUnmounted(() => {
   height: 14px;
   border-radius: 50%;
   background: radial-gradient(circle, #fff 30%, var(--finished-accent) 100%);
-  box-shadow: 
+  box-shadow:
     0 0 12px var(--finished-accent),
     0 0 32px var(--finished-accent),
     0 0 80px rgba(74, 222, 128, 0.4);
@@ -239,7 +240,9 @@ onUnmounted(() => {
   mask-image: var(--reveal-mask);
   -webkit-mask-image: var(--reveal-mask);
 }
-.conveyor-track::-webkit-scrollbar { display: none; }
+.conveyor-track::-webkit-scrollbar {
+  display: none;
+}
 
 /* ---- Hint ---- */
 .drag-hint {

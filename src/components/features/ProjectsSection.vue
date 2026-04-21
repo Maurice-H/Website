@@ -59,10 +59,10 @@
 </template>
 
 <script setup lang="ts">
-import { PROJECTS as projects } from "../../data/portfolio";
-import BentoCard from "../shared/BentoCard.vue";
-import FusedReveal from "../shared/FusedReveal.vue";
-
-// Protect from aggressive linting
-const _cards = [BentoCard, FusedReveal];
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import { PROJECTS as projects } from '../../data/portfolio';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import BentoCard from '../shared/BentoCard.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import FusedReveal from '../shared/FusedReveal.vue';
 </script>

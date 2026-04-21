@@ -51,13 +51,14 @@
 </template>
 
 <script setup lang="ts">
-import { SKILL_SECTIONS } from "../../data/portfolio";
-import BentoCard from "../shared/BentoCard.vue";
-import FusedReveal from "../shared/FusedReveal.vue";
+import { SKILL_SECTIONS } from '../../data/portfolio';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import BentoCard from '../shared/BentoCard.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import FusedReveal from '../shared/FusedReveal.vue';
 
-// Protect from aggressive linting
-const _ui = [BentoCard, FusedReveal];
-
-const bio = SKILL_SECTIONS.find((s) => s.id === "bio") || SKILL_SECTIONS[0];
-const stack = SKILL_SECTIONS.find((s) => s.id === "stack") || SKILL_SECTIONS[1];
+// biome-ignore lint/correctness/noUnusedVariables: template-use
+const bio = SKILL_SECTIONS.find((s) => s.id === 'bio') || SKILL_SECTIONS[0];
+// biome-ignore lint/correctness/noUnusedVariables: template-use
+const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[1];
 </script>

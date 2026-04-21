@@ -44,27 +44,36 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import ContactForm from "./components/features/ContactForm.vue";
-import HeroSection from "./components/features/HeroSection.vue";
-import ProjectsSection from "./components/features/ProjectsSection.vue";
-import SkillsAbout from "./components/features/SkillsAbout.vue";
-import NavConveyor from "./components/navigation/NavConveyor.vue";
-import SpotlightMask from "./components/layout/SpotlightMask.vue";
-import BentoLayout from "./components/layout/BentoLayout.vue";
-import ThemeToggle from "./components/navigation/ThemeToggle.vue";
-import { useLightingEngine } from "./composables/useLightingEngine";
-import { initGlobalViewportService } from "./composables/useViewportStore";
-import { LightingPhase } from "./types";
+import { onMounted } from 'vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import ContactForm from './components/features/ContactForm.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import HeroSection from './components/features/HeroSection.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import ProjectsSection from './components/features/ProjectsSection.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import SkillsAbout from './components/features/SkillsAbout.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import BentoLayout from './components/layout/BentoLayout.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import SpotlightMask from './components/layout/SpotlightMask.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import NavConveyor from './components/navigation/NavConveyor.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import ThemeToggle from './components/navigation/ThemeToggle.vue';
+import { useLightingEngine } from './composables/useLightingEngine';
+import { initGlobalViewportService } from './composables/useViewportStore';
+import { LightingPhase } from './types';
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const { state, setPhase } = useLightingEngine();
 
-// Reference for template use
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const phases = LightingPhase;
 
 onMounted(() => {
-	console.log("App Mounted in Fused Single-Layer Mode");
-	initGlobalViewportService();
+  console.log('App Mounted in Fused Single-Layer Mode');
+  initGlobalViewportService();
 });
 </script>
 

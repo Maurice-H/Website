@@ -35,9 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import { HERO_DATA } from "../../data/portfolio";
-import FusedReveal from "../shared/FusedReveal.vue";
-
-// Protect from aggressive linting
-const _reveal = FusedReveal;
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import { HERO_DATA } from '../../data/portfolio';
+// biome-ignore lint/correctness/noUnusedImports: template-use
+import FusedReveal from '../shared/FusedReveal.vue';
 </script>

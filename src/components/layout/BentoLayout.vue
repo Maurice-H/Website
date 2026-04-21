@@ -6,6 +6,6 @@
 
 <script setup lang="ts">
 defineProps<{
-	isBlueprint?: boolean;
+  isBlueprint?: boolean;
 }>();
 </script>

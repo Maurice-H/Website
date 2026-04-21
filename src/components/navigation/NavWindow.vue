@@ -27,12 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import type { NavWindowTheme } from "../../types";
+import type { NavWindowTheme } from '../../types';
 
 defineProps<{
-	theme: NavWindowTheme;
-	label: string;
-	active?: boolean;
+  theme: NavWindowTheme;
+  label: string;
+  active?: boolean;
 }>();
 </script>
 

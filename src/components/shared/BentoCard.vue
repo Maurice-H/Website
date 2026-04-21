@@ -21,13 +21,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useViewportStore } from "../../composables/useViewportStore";
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useViewportStore } from '../../composables/useViewportStore';
 
 const props = defineProps<{
-	id: string; // Required for centralized tracking
-	colSpan?: number;
-	rowSpan?: number;
+  id: string; // Required for centralized tracking
+  colSpan?: number;
+  rowSpan?: number;
 }>();
 
 const cardRef = ref<HTMLElement | null>(null);
@@ -36,58 +36,61 @@ let unregisterFn: (() => void) | null = null;
 
 const offsets = computed(() => getOffsets(props.id));
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const borderOverlayStyle = computed(() => {
-	const { left, top } = offsets.value;
-	return {
-		maskImage: "var(--reveal-mask)",
-		WebkitMaskImage: "var(--reveal-mask)",
-		maskSize: "100vw 100vh",
-		WebkitMaskSize: "100vw 100vh",
-		maskRepeat: "no-repeat",
-		WebkitMaskRepeat: "no-repeat",
-		maskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
-		WebkitMaskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
-		border: "1px solid var(--finished-border)",
-		boxShadow: "inset 0 0 20px var(--finished-glow)",
-	};
+  const { left, top } = offsets.value;
+  return {
+    maskImage: 'var(--reveal-mask)',
+    WebkitMaskImage: 'var(--reveal-mask)',
+    maskSize: '100vw 100vh',
+    WebkitMaskSize: '100vw 100vh',
+    maskRepeat: 'no-repeat',
+    WebkitMaskRepeat: 'no-repeat',
+    maskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
+    WebkitMaskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
+    border: '1px solid var(--finished-border)',
+    boxShadow: 'inset 0 0 20px var(--finished-glow)',
+  };
 });
 
 // Grid classes
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const colSpanClass = computed(() => {
-	switch (props.colSpan) {
-		case 2:
-			return "md:col-span-2";
-		case 3:
-			return "md:col-span-2 lg:col-span-3";
-		case 4:
-			return "md:col-span-2 lg:col-span-4";
-		default:
-			return "col-span-1";
-	}
+  switch (props.colSpan) {
+    case 2:
+      return 'md:col-span-2';
+    case 3:
+      return 'md:col-span-2 lg:col-span-3';
+    case 4:
+      return 'md:col-span-2 lg:col-span-4';
+    default:
+      return 'col-span-1';
+  }
 });
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const rowSpanClass = computed(() => {
-	switch (props.rowSpan) {
-		case 2:
-			return "row-span-2";
-		case 3:
-			return "row-span-3";
-		case 4:
-			return "row-span-4";
-		default:
-			return "row-span-1";
-	}
+  switch (props.rowSpan) {
+    case 2:
+      return 'row-span-2';
+    case 3:
+      return 'row-span-3';
+    case 4:
+      return 'row-span-4';
+    default:
+      return 'row-span-1';
+  }
 });
 
 onMounted(() => {
-	if (cardRef.value) {
-		const { unregister } = register(props.id, cardRef.value);
-		unregisterFn = unregister;
-	}
+  if (cardRef.value) {
+    const { unregister } = register(props.id, cardRef.value);
+    unregisterFn = unregister;
+  }
 });
 
 onUnmounted(() => {
-	unregisterFn?.();
+  unregisterFn?.();
 });
 </script>
 

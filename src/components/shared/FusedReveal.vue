@@ -20,11 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useViewportStore } from "../../composables/useViewportStore";
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useViewportStore } from '../../composables/useViewportStore';
 
 const props = defineProps<{
-	id: string;
+  id: string;
 }>();
 
 const containerRef = ref<HTMLElement | null>(null);
@@ -36,29 +36,30 @@ const offsets = computed(() => getOffsets(props.id));
 // Viewport-synchronized mask: gradient center is at 50% 50% of a 100vw×100vh mask.
 // We offset by -50vw/-50vh so the gradient center aligns with the mouse cursor,
 // then subtract the component's viewport position to map coordinates correctly.
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const finalMaskStyle = computed(() => {
-	const { left, top } = offsets.value;
-	return {
-		maskImage: "var(--reveal-mask)",
-		WebkitMaskImage: "var(--reveal-mask)",
-		maskSize: "100vw 100vh",
-		WebkitMaskSize: "100vw 100vh",
-		maskRepeat: "no-repeat",
-		WebkitMaskRepeat: "no-repeat",
-		maskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
-		WebkitMaskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
-	};
+  const { left, top } = offsets.value;
+  return {
+    maskImage: 'var(--reveal-mask)',
+    WebkitMaskImage: 'var(--reveal-mask)',
+    maskSize: '100vw 100vh',
+    WebkitMaskSize: '100vw 100vh',
+    maskRepeat: 'no-repeat',
+    WebkitMaskRepeat: 'no-repeat',
+    maskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
+    WebkitMaskPosition: `calc(var(--mask-x) - ${left}px - 50vw) calc(var(--mask-y) - ${top}px - 50vh)`,
+  };
 });
 
 onMounted(() => {
-	if (containerRef.value) {
-		const { unregister } = register(props.id, containerRef.value);
-		unregisterFn = unregister;
-	}
+  if (containerRef.value) {
+    const { unregister } = register(props.id, containerRef.value);
+    unregisterFn = unregister;
+  }
 });
 
 onUnmounted(() => {
-	unregisterFn?.();
+  unregisterFn?.();
 });
 </script>
 

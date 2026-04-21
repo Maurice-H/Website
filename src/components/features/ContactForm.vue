@@ -103,8 +103,8 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from "../shared/BentoCard.vue";
-import FusedReveal from "../shared/FusedReveal.vue";
+import BentoCard from '../shared/BentoCard.vue';
+import FusedReveal from '../shared/FusedReveal.vue';
 
 // Protect from aggressive linting
 const _ui = [BentoCard, FusedReveal];
