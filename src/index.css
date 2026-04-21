@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+	--color-finished-bg: var(--finished-bg);
+	--color-finished-text: var(--finished-text);
+	--color-finished-accent: var(--finished-accent);
+	--color-finished-border: var(--finished-border);
+	--color-blueprint-border: var(--blueprint-border);
+}
+
+:root {
+	/* Spotlight Configuration */
+	--spotlight-x: 50%;
+	--spotlight-y: 50%;
+	--spotlight-size: 450px;
+	--lighting-transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+	/* Finished Product Theme */
+	--finished-bg: #000000;
+	--finished-text: #e8e8ed;
+	--finished-accent: #4ade80;
+	--finished-border: #1a1a1a;
+	--finished-glow: 0 0 25px rgba(74, 222, 128, 0.15);
+
+	/* Blueprint Theme */
+	--blueprint-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Blueprint mode overrides — applied via ThemeToggle */
+[data-theme="blueprint"] {
+	--finished-bg: #0a1628;
+	--finished-text: #93c5fd;
+	--finished-accent: #3b82f6;
+	--finished-border: rgba(59, 130, 246, 0.2);
+	--finished-glow: 0 0 25px rgba(59, 130, 246, 0.2);
+	--spotlight-size: 350px;
+}
+
+[data-theme="blueprint"] body {
+	background: #0a1628;
+	color: #93c5fd;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	background: #000;
+	color: #fff;
+	font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+	overflow-x: hidden;
+	min-height: 100vh;
+	outline: none;
+	box-shadow: none;
+}
+
+/* Flash Transition Effect */
+.flash-overlay {
+	position: fixed;
+	inset: 0;
+	background: white;
+	z-index: 9999;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 150ms ease-out;
+}
+.flash-active {
+	opacity: 0.5;
+}
