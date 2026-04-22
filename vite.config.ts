@@ -1,7 +1,8 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
-import tailwindcss from '@tailwindcss/vite'
+
+import tailwindcss from '@tailwindcss/vite';
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vitest/config';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,6 +10,6 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', 'tests/**']
-  }
-})
+    exclude: ['**/node_modules/**', '**/dist/**', 'tests/**'],
+  },
+});

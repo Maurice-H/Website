@@ -103,8 +103,8 @@
 </template>
 
 <script setup lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoCard from '../shared/BentoCard.vue';
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import FusedReveal from '../shared/FusedReveal.vue';
-
-
 </script>

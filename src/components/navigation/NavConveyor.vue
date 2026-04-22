@@ -75,7 +75,6 @@ import NavWindow from './NavWindow.vue';
 const { setPhase } = useLightingEngine();
 const trackEl = ref<HTMLElement | null>(null);
 
-
 const activeId = ref('about');
 
 // ---------- Drag-to-scroll ----------
