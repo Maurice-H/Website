@@ -1,5 +1,5 @@
 <template>
-  <div class="nav-conveyor" ref="conveyorRoot">
+  <div class="nav-conveyor">
     <!-- Physical Lamp Fixture -->
     <div class="lamp-fixture">
       <div class="lamp-wire"></div>
@@ -74,8 +74,7 @@ import NavWindow from './NavWindow.vue';
 
 const { setPhase } = useLightingEngine();
 const trackEl = ref<HTMLElement | null>(null);
-// biome-ignore lint/correctness/noUnusedVariables: template-use
-const conveyorRoot = ref<HTMLElement | null>(null);
+
 
 const activeId = ref('about');
 

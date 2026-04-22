@@ -106,6 +106,5 @@
 import BentoCard from '../shared/BentoCard.vue';
 import FusedReveal from '../shared/FusedReveal.vue';
 
-// Protect from aggressive linting
-const _ui = [BentoCard, FusedReveal];
+
 </script>

@@ -14,5 +14,5 @@
 ## 3. Verification
 
 - [x] 3.1 Verify that `git status` no longer shows files in `artifacts/` or `scratch/`.
-- [ ] 3.2 Commit changes and push to trigger the new pipeline.
+- [x] 3.2 Commit changes and push to trigger the new pipeline.
 - [ ] 3.3 Monitor the GitHub Actions run to ensure jobs execute correctly and browsers are cached.

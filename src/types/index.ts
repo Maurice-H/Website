@@ -19,10 +19,13 @@ export interface SkillSection {
   skills: string[];
 }
 
-export enum LightingPhase {
-  NAV = 'NAV',
-  CONTENT = 'CONTENT',
-}
+export const LightingPhase = {
+  NAV: 'NAV',
+  CONTENT: 'CONTENT',
+} as const;
+
+export type LightingPhase = (typeof LightingPhase)[keyof typeof LightingPhase];
+
 
 export interface MousePosition {
   x: number;
