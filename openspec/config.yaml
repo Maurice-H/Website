@@ -32,3 +32,8 @@ rules:
     - Always include a preliminary step for defining TypeScript interfaces/types before writing the template logic.
     - Include explicit tasks for adding Unit and/or E2E tests for new logic/flows.
     - E2E tests must follow the Page Object Model (POM) pattern.
+    - "PRE-FLIGHT: Before generating or modifying any code for a task, the agent MUST read and apply all guidelines located in the `.docs/skills/` directory."
+    - "POST-FLIGHT / DEFINITION OF DONE: Before marking any task as complete, the agent MUST execute the following commands and autonomously fix any resulting errors:"
+    - "1. Run Biome linter/formatter (e.g., `npm run lint`, `npm run format` or `biome check .`)."
+    - "2. Run Vitest unit/component tests (e.g., `npm run test:unit`)."
+    - "3. Run Playwright E2E tests if UI flows were affected (e.g., `npm run test:e2e`)."
