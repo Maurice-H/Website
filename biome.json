@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/.docs"]
+    "includes": [
+      "src/**/*",
+      "tests/**/*",
+      "package.json",
+      "biome.json",
+      "tsconfig*.json",
+      "vite.config.ts",
+      "playwright.config.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
