@@ -1,14 +1,14 @@
+import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { useViewportStore } from '../useViewportStore';
 
 describe('useViewportStore', () => {
-  const { register, getOffsets, registeredComponents } = useViewportStore();
-
   beforeEach(() => {
-    registeredComponents.clear();
+    setActivePinia(createPinia());
   });
 
   it('should register a component and calculate initial offsets', () => {
+    const { register, getOffsets } = useViewportStore();
     const mockEl = {
       getBoundingClientRect: vi.fn(() => ({ left: 100, top: 200 })),
     } as unknown as HTMLElement;
@@ -18,10 +18,10 @@ describe('useViewportStore', () => {
     const offsets = getOffsets('test-card');
     expect(offsets.left).toBe(100);
     expect(offsets.top).toBe(200);
-    expect(registeredComponents.has('test-card')).toBe(true);
   });
 
   it('should update offsets when requested', () => {
+    const { register, getOffsets } = useViewportStore();
     const mockEl = {
       getBoundingClientRect: vi.fn(() => ({ left: 0, top: 0 })),
     } as unknown as HTMLElement;
@@ -47,18 +47,21 @@ describe('useViewportStore', () => {
   });
 
   it('should unregister a component', () => {
+    const { register } = useViewportStore();
     const mockEl = {
       getBoundingClientRect: vi.fn(() => ({ left: 0, top: 0 })),
     } as unknown as HTMLElement;
 
     const { unregister } = register('temp-card', mockEl);
-    expect(registeredComponents.has('temp-card')).toBe(true);
+    const store = useViewportStore();
+    expect(store.registeredComponents.has('temp-card')).toBe(true);
 
     unregister();
-    expect(registeredComponents.has('temp-card')).toBe(false);
+    expect(store.registeredComponents.has('temp-card')).toBe(false);
   });
 
   it('should return zeros for non-existent-ids', () => {
+    const { getOffsets } = useViewportStore();
     const offsets = getOffsets('ghost');
     expect(offsets).toEqual({ left: 0, top: 0 });
   });

@@ -1,9 +1,11 @@
+import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { LightingPhase } from '../../types';
 import { getFusedMaskStyle, useLightingEngine } from '../useLightingEngine';
 
 describe('Lighting Engine tests', () => {
   beforeEach(() => {
+    setActivePinia(createPinia());
     // Mock the document.documentElement.style.setProperty to avoid DOM errors in Node tests
     document.documentElement.style.setProperty = vi.fn();
   });

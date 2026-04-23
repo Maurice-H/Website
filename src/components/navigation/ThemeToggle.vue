@@ -1,11 +1,12 @@
 <template>
   <button 
+    type="button"
     @click="toggleTheme" 
-    class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border"
+    class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95"
     :class="[
       isBlueprint 
-        ? 'border-blue-500 border-dashed text-blue-600 hover:bg-blue-50' 
-        : 'border-white/10 text-green-400 bg-white/5 hover:bg-white/10 shadow-[var(--shadow-neon)] hover:border-green-400/30'
+        ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]' 
+        : 'border-finished-border text-finished-accent bg-finished-bg/5 hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30'
     ]"
     aria-label="Toggle Theme"
   >
@@ -17,8 +18,7 @@
       stroke-width="2" 
       stroke-linecap="round" 
       stroke-linejoin="round"
-      class="w-10 h-10 transition-all duration-[var(--theme-transition-duration)]"
-      :class="[isBlueprint ? 'opacity-70 scale-95' : 'opacity-100 scale-100 drop-shadow-[0_0_15px_rgba(74,222,128,0.9)]']"
+      class="w-10 h-10 transition-all duration-[var(--theme-transition-duration)] drop-shadow-[0_0_15px_currentColor]"
     >
       <path d="M9 18h6" />
       <path d="M10 22h4" />

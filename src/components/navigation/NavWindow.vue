@@ -7,18 +7,13 @@
     ]"
   >
     <!-- Window Frame -->
-    <div class="window-frame">
-      <div class="window-header">
-        <div class="window-controls">
-          <span></span><span></span><span></span>
+    <div class="window-container">
+      <WindowFrame :title="label">
+        <!-- Content Area (Slot-based) -->
+        <div class="window-content">
+          <slot></slot>
         </div>
-        <div class="window-title">{{ label }}</div>
-      </div>
-      
-      <!-- Content Area (Slot-based) -->
-      <div class="window-content">
-        <slot></slot>
-      </div>
+      </WindowFrame>
     </div>
     
     <!-- Label Below -->
@@ -28,6 +23,7 @@
 
 <script setup lang="ts">
 import type { NavWindowTheme } from '../../types';
+import WindowFrame from '../shared/WindowFrame.vue';
 
 defineProps<{
   theme: NavWindowTheme;
@@ -39,7 +35,7 @@ defineProps<{
 <style scoped>
 .nav-window {
   flex-shrink: 0;
-  width: 280px;
+  width: 480px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -52,11 +48,11 @@ defineProps<{
   transform: scale(1.15);
 }
 
-.window-frame {
+.window-container {
   width: 100%;
-  aspect-ratio: 4/3;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  aspect-ratio: 16/10;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -65,124 +61,98 @@ defineProps<{
   transition: all 0.4s var(--lighting-transition);
 }
 
-.is-active .window-frame {
-  border-color: var(--finished-accent);
+.is-active .window-container {
+  border-color: rgba(16, 185, 129, 0.5);
   box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(74, 222, 128, 0.1);
-}
-
-.window-header {
-  height: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  gap: 10px;
-}
-
-.window-controls {
-  display: flex;
-  gap: 4px;
-}
-.window-controls span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.window-title {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.4;
+    0 10px 40px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(16, 185, 129, 0.15);
 }
 
 .window-content {
   flex: 1;
-  padding: 16px;
+  padding: 24px;
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  background: #000;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
 }
 
 .window-label {
   font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-weight: 800;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
+  letter-spacing: 0.4em;
+  font-weight: 900;
+  opacity: 0.15;
+  transition: all 0.3s ease;
+  margin-top: 12px;
+  color: white;
 }
 
 .is-active .window-label {
   opacity: 1;
-  color: var(--finished-text);
+  color: var(--finished-accent);
+  text-shadow: 0 0 10px var(--finished-accent);
 }
 
-/* --- Theme Specific Content --- */
+/* --- Theme Specific Content (High-Fidelity) --- */
 :deep(.content-terminal) {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.8;
+  color: rgba(16, 185, 129, 0.8);
+}
+:deep(.code-line) {
+  display: flex;
+  gap: 8px;
 }
 :deep(.cursor) {
   display: inline-block;
+  width: 6px;
+  height: 14px;
+  background: var(--finished-accent);
+  margin-left: 2px;
   animation: blink 1s infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
 
 :deep(.content-profile) {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+:deep(.profile-header) {
+  display: flex;
   align-items: center;
   gap: 12px;
 }
 :deep(.profile-circle) {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--finished-accent), transparent);
+  border: 1px solid var(--finished-accent);
+  opacity: 0.6;
 }
 :deep(.profile-lines) .line {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-  margin-bottom: 6px;
-}
-
-:deep(.content-grid) {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-:deep(.grid-box) {
-  aspect-ratio: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  height: 4px;
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: 2px;
+  margin-bottom: 8px;
 }
 
 :deep(.content-envelope) {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
 }
-:deep(.envelope-back) {
-  width: 60px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  position: relative;
-  border-radius: 2px;
-}
-:deep(.envelope-flap) {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-left: 30px solid transparent;
-  border-right: 30px solid transparent;
-  border-top: 20px solid rgba(255, 255, 255, 0.1);
+:deep(.comm-link) {
+  padding: 8px;
+  border: 1px dashed rgba(255,255,255,0.1);
+  font-family: monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
 }
 </style>

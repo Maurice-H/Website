@@ -8,6 +8,14 @@ Continue working on a change by creating the next artifact.
 
 **Steps**
 
+0. **Check Project Skills (MANDATORY)**
+
+   Before creating the next artifact, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills for the current phase (Phase 1 or 2).
+   Ensure the artifact follows:
+   - `.docs/skills/project-bridge.md` (Architecture)
+   - `creative-design/ui-ux-pro-max` (Visual standards)
+   - Any other relevant skill listed in the index.
+
 1. **If no change name provided, prompt for selection**
 
    Run `openspec list --json` to get available changes sorted by most recently modified. Then use the **AskUserQuestion tool** to let the user select which change to work on.

@@ -1,48 +1,10 @@
-import { reactive } from 'vue';
-import type { LightingState } from '../types';
-import { LightingPhase } from '../types';
-
-const state = reactive<LightingState>({
-  phase: LightingPhase.NAV,
-  isFlashActive: false,
-});
-
-// Attach listeners once on module load
-if (typeof window !== 'undefined') {
-  const updateMask = (e: MouseEvent) => {
-    document.documentElement.style.setProperty('--mask-x', `${e.clientX}px`);
-    document.documentElement.style.setProperty('--mask-y', `${e.clientY}px`);
-  };
-
-  window.addEventListener('mousemove', updateMask);
-
-  // Mobile fallback
-  if (window.matchMedia('(hover: none)').matches) {
-    document.documentElement.style.setProperty('--mask-x', '50%');
-    document.documentElement.style.setProperty('--mask-y', '50%');
-  }
-}
+import { useLightingStore } from '../stores/lighting';
 
 export function useLightingEngine() {
-  const setPhase = (newPhase: LightingPhase) => {
-    state.isFlashActive = true;
-
-    // Simulate flash duration
-    setTimeout(() => {
-      state.phase = newPhase;
-      state.isFlashActive = false;
-
-      if (newPhase === LightingPhase.NAV) {
-        // Reset to center beam for Nav
-        document.documentElement.style.setProperty('--mask-x', '50%');
-        document.documentElement.style.setProperty('--mask-y', '50%');
-      }
-    }, 300);
-  };
-
+  const store = useLightingStore();
   return {
-    state,
-    setPhase,
+    state: store,
+    setPhase: store.setPhase,
   };
 }
 

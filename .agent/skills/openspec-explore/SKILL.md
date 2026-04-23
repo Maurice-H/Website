@@ -81,7 +81,11 @@ You have full context of the OpenSpec system. Use it naturally, don't force it.
 
 ### Check for context
 
-At the start, quickly check what exists:
+At the start, you MUST check the project's core guidelines:
+1.  **Check Project Skills**: Read `.docs/skills/SKILLS_INDEX.md` and follow the guidelines for the current phase (usually **Phase 1: Explore & Propose**).
+2.  **Verify Standards**: Ensure your thinking aligns with `.docs/skills/project-bridge.md` (Architecture) and `creative-design/ui-ux-pro-max` (Visual standards).
+
+Then, check the OpenSpec state:
 ```bash
 openspec list --json
 ```

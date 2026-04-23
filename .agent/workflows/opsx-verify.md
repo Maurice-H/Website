@@ -8,6 +8,16 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
 **Steps**
 
+0. **Check Project Skills (MANDATORY)**
+
+   Before starting verification, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 3: Verify & Archive**.
+   Ensure your verification report evaluates the implementation against:
+   - `.docs/skills/project-bridge.md` (Definition of Done checklist)
+   - `development/test-driven-development` (Vitest coverage)
+   - `development/webapp-testing` (Playwright E2E)
+   - `web-development/web-performance-optimization` (Transition timings)
+   - Any other relevant skill listed in the index.
+
 1. **If no change name provided, prompt for selection**
 
    Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.

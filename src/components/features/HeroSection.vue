@@ -1,42 +1,37 @@
 <template>
-  <header class="py-20 px-8 relative">
-    <div class="max-w-7xl mx-auto relative min-h-[300px]">
-      <FusedReveal id="hero">
-        <template #blueprint>
-          <div class="flex flex-col gap-6 select-none opacity-20">
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white">
-              Hi. I'm <span class="text-blue-500">{{ HERO_DATA.name }}</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-white/50 max-w-2xl leading-relaxed">
-              {{ HERO_DATA.tagline }}
-            </p>
-            <div class="flex gap-4 mt-4 font-mono text-sm text-blue-500/30 uppercase tracking-[0.2em]">
-              <span>[ {{ HERO_DATA.roles.join(' / ') }} ]</span>
-            </div>
-          </div>
-        </template>
-
-        <template #finished>
-          <div class="flex flex-col gap-6 select-none">
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white">
-              Hi. I'm <span class="text-finished-accent">{{ HERO_DATA.name }}</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-finished-text/70 max-w-2xl leading-relaxed">
-              {{ HERO_DATA.tagline }}
-            </p>
-            <div class="flex gap-4 mt-4 font-mono text-sm text-finished-accent/50 uppercase tracking-[0.2em]">
-              <span>[ {{ HERO_DATA.roles.join(' / ') }} ]</span>
-            </div>
-          </div>
-        </template>
-      </FusedReveal>
+  <div class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-40 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
+    <div class="mb-6 text-[10px] md:text-xs tracking-[0.6em] font-mono text-[var(--finished-accent)] uppercase opacity-60">
+      [ IDENTITY_PROTOCOL_LOADED ]
     </div>
-  </header>
+
+    <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white mb-6 leading-[1.1] select-none">
+      Hi. I'm <span class="text-[var(--finished-accent)]">Alex</span>
+    </h1>
+    
+    <p class="max-w-xl text-xl md:text-2xl text-white/60 leading-relaxed mb-12 font-sans font-light">
+      A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.
+    </p>
+    
+    <div class="flex flex-wrap items-center gap-8 text-[10px] md:text-xs tracking-[0.4em] font-mono text-white/30 uppercase">
+      <div class="flex items-center gap-2">
+        <span class="w-1 h-1 bg-[var(--finished-accent)] rounded-full"></span>
+        DEVELOPER
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-1 h-1 bg-[var(--finished-accent)] rounded-full"></span>
+        ARCHITECT
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-1 h-1 bg-[var(--finished-accent)] rounded-full"></span>
+        CREATOR
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// biome-ignore lint/correctness/noUnusedImports: template-use
-import { HERO_DATA } from '../../data/portfolio';
-// biome-ignore lint/correctness/noUnusedImports: template-use
-import FusedReveal from '../shared/FusedReveal.vue';
 </script>
+
+<style scoped>
+/* Technical lines and minimalist feel */
+</style>

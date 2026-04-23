@@ -15,6 +15,15 @@ Implement tasks from an OpenSpec change.
 
 **Steps**
 
+0. **Check Project Skills (MANDATORY)**
+
+   Before implementing any code, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 2: Apply & Tasks**.
+   Ensure your implementation strictly adheres to the standards in:
+   - `.docs/skills/project-bridge.md` (Senior Frontend standards)
+   - `development/typescript-expert` (No `any` types)
+   - `creative-design/ui-ux-pro-max` (CSS Variables, Transitions)
+   - Any other relevant skill listed in the index.
+
 1. **Select the change**
 
    If a name is provided, use it. Otherwise:

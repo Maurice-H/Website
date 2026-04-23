@@ -14,16 +14,40 @@
   --mask-y: 50%;
   --spotlight-size: 450px;
   --lighting-transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition-duration: 400ms;
 
-  /* Finished Product Theme */
-  --finished-bg: #000000;
-  --finished-text: #e8e8ed;
-  --finished-accent: #4ade80;
-  --finished-border: #1a1a1a;
-  --finished-glow: 0 0 25px rgba(74, 222, 128, 0.15);
+  /* Cosmic Void Theme (Premium V2) */
+  --finished-bg: #020205;
+  --finished-text: #f0f0f5;
+  --finished-accent: #10b981; /* Emerald/teal accent for cosmic feel */
+  --finished-border: rgba(16, 185, 129, 0.15);
+  --finished-glow: 0 0 40px rgba(16, 185, 129, 0.1);
+  --accent-bright: #22d3ee; /* Bright cyan for lamp highlights */
+
+  /* Glassmorphism Defaults */
+  --glass-blur: blur(20px);
+  --glass-bg: rgba(16, 185, 129, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-reflection: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
 
   /* Blueprint Theme */
   --blueprint-border: rgba(255, 255, 255, 0.08);
+}
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 1;
 }
 
 *,
@@ -36,28 +60,25 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #000;
-  color: #fff;
+  background: var(--finished-bg);
+  color: var(--finished-text);
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
   outline: none;
   box-shadow: none;
+  transition: background-color var(--theme-transition-duration) ease-in-out;
 }
 
 /* Blueprint mode overrides — applied via ThemeToggle */
 [data-theme="blueprint"] {
-  --finished-bg: #0a1628;
-  --finished-text: #93c5fd;
-  --finished-accent: #3b82f6;
-  --finished-border: rgba(59, 130, 246, 0.2);
-  --finished-glow: 0 0 25px rgba(59, 130, 246, 0.2);
+  --finished-bg: #0a1628; /* Deeper technical blue */
+  --finished-text: #7dd3fc;
+  --finished-accent: #38bdf8; /* Blue-teal for blueprint mode */
+  --finished-border: rgba(56, 189, 248, 0.2);
+  --finished-glow: 0 0 40px rgba(56, 189, 248, 0.15);
+  --accent-bright: #67e8f9;
   --spotlight-size: 350px;
-}
-
-[data-theme="blueprint"] body {
-  background: #0a1628;
-  color: #93c5fd;
 }
 
 /* Flash Transition Effect */

@@ -8,6 +8,11 @@ Archive a completed change in the experimental workflow.
 
 **Steps**
 
+0. **Check Project Skills (MANDATORY)**
+
+   Before archiving, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills (Phase 3).
+   Verify that the implementation meets the **Definition of Done** in `.docs/skills/project-bridge.md`.
+
 1. **If no change name provided, prompt for selection**
 
    Run `openspec list --json` to get available changes. Use the **AskUserQuestion tool** to let the user select.

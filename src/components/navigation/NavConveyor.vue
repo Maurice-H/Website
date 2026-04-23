@@ -1,11 +1,27 @@
 <template>
   <div class="nav-conveyor">
-    <!-- Physical Lamp Fixture -->
+    <!-- Grid Background -->
+    <div class="nav-grid"></div>
+
+    <!-- High-Fidelity Industrial Lamp Fixture -->
     <div class="lamp-fixture">
       <div class="lamp-wire"></div>
-      <div class="lamp-housing">
+      <div class="lamp-head">
+        <div class="lamp-top-cap"></div>
+        <div class="lamp-dome">
+          <!-- Ridges for the dome -->
+          <div class="ridge ridge-1"></div>
+          <div class="ridge ridge-2"></div>
+          <div class="ridge ridge-3"></div>
+        </div>
+        <div class="lamp-rim"></div>
+        <!-- Inner bulb glow -->
         <div class="lamp-bulb"></div>
       </div>
+      <!-- Volumetric light cone -->
+      <div class="cone-light"></div>
+      <!-- Core beam -->
+      <div class="cone-core"></div>
     </div>
 
     <!-- Conveyor Belt (drag-scrollable) -->
@@ -24,42 +40,59 @@
         :active="activeId === tab.id"
         @click="selectTab(tab.id)"
       >
-        <div v-if="tab.theme === 'career'" class="content-terminal">
-          <div class="code-line">
-            <span class="text-finished-accent">></span> experience.list()
-          </div>
-          <div class="code-line opacity-50">Loading data...</div>
-          <div class="code-line text-xs">2024: Frontend Dev</div>
-          <div class="cursor">_</div>
-        </div>
-
-        <div v-else-if="tab.theme === 'about'" class="content-profile">
-          <div class="profile-circle"></div>
-          <div class="profile-lines">
-            <div class="line"></div>
-            <div class="line w-3/4"></div>
+        <!-- The mockup has a large title inside the card for EXPERIENCE -->
+        <div v-if="tab.theme === 'career'" class="content-terminal flex flex-col items-center justify-center h-full">
+          <h2 class="text-2xl font-bold tracking-[0.2em] mb-6 text-[var(--finished-accent)] drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+            EXPERIENCE
+          </h2>
+          <div class="w-full text-left">
+            <div class="code-line"><span class="opacity-30">></span> system.boot_sequence(91)...</div>
+            <div class="code-line">LOADING DATA...</div>
+            <div class="code-line">2024: FRONTEND DEV - SYSTEM ARCHITECT...</div>
+            <div class="cursor mt-2"></div>
           </div>
         </div>
 
-        <div v-else-if="tab.theme === 'projects'" class="content-grid">
-          <div class="grid-box" v-for="i in 4" :key="i"></div>
+        <div v-else-if="tab.theme === 'about'" class="content-terminal flex flex-col items-center justify-center h-full">
+          <h2 class="text-2xl font-bold tracking-[0.2em] mb-6 text-white/80">
+            ABOUT ME
+          </h2>
+          <div class="w-full text-left">
+            <div class="code-line"><span class="opacity-30">></span> fetch_profile(maurice)...</div>
+            <div class="code-line">STATUS: ONLINE</div>
+            <div class="code-line">LOCATION: GERMANY</div>
+            <div class="cursor mt-2"></div>
+          </div>
         </div>
 
-        <div v-else-if="tab.theme === 'contact'" class="content-envelope">
-          <div class="envelope-back">
-            <div class="envelope-flap"></div>
+        <div v-else-if="tab.theme === 'projects'" class="content-terminal flex flex-col items-center justify-center h-full">
+          <h2 class="text-2xl font-bold tracking-[0.2em] mb-6 text-white/80">
+            PROJECTS
+          </h2>
+          <div class="w-full text-left">
+            <div class="code-line"><span class="opacity-30">></span> ls -la /works</div>
+            <div class="code-line">FOUND: 42 REPOSITORIES</div>
+            <div class="code-line">STACK: VUE3 / TS / NODE</div>
+            <div class="cursor mt-2"></div>
+          </div>
+        </div>
+
+        <div v-else-if="tab.theme === 'contact'" class="content-terminal flex flex-col items-center justify-center h-full">
+          <h2 class="text-2xl font-bold tracking-[0.2em] mb-6 text-white/80">
+            GET IN TOUCH
+          </h2>
+          <div class="w-full text-left flex justify-center">
+            <svg class="w-12 h-12 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
           </div>
         </div>
       </NavWindow>
     </div>
 
-    <!-- Hint -->
+    <!-- Hint matching the mockup 'TECHNICAL DNA' text -->
     <div class="drag-hint">
-      <span v-if="activeId === 'about'">← Explore My Story</span>
-      <span v-else-if="activeId === 'projects'">Browse My Work</span>
-      <span v-else-if="activeId === 'skills'">Technical DNA</span>
-      <span v-else-if="activeId === 'contact'">Let's Connect →</span>
-      <span v-else>← drag or scroll to browse →</span>
+      TECHNICAL DNA
     </div>
   </div>
 </template>
@@ -75,7 +108,7 @@ import NavWindow from './NavWindow.vue';
 const { setPhase } = useLightingEngine();
 const trackEl = ref<HTMLElement | null>(null);
 
-const activeId = ref('about');
+const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
@@ -136,7 +169,7 @@ const onWheel = (e: WheelEvent) => {
 const selectTab = (id: string) => {
   if (isDragging) return; // ignore click after drag
   if (id !== activeId.value) {
-    // Scroll to it first?
+    // Optionally auto-scroll to it, but for now we just require it to be centered to click
     return;
   }
   setPhase(LightingPhase.CONTENT);
@@ -145,7 +178,19 @@ const selectTab = (id: string) => {
 onMounted(() => {
   window.addEventListener('mousemove', onDrag);
   window.addEventListener('mouseup', stopDrag);
-  handleScroll(); // Initial check
+  // Initial scroll to EXPERIENCE
+  if (trackEl.value) {
+    // Find the skills tab
+    const index = tabs.findIndex((t) => t.id === 'skills');
+    if (index >= 0) {
+      setTimeout(() => {
+        if (!trackEl.value) return;
+        const targetScroll = index * 600 - window.innerWidth / 2 + 240;
+        trackEl.value.scrollLeft = Math.max(0, targetScroll);
+        handleScroll();
+      }, 100);
+    }
+  }
 });
 onUnmounted(() => {
   window.removeEventListener('mousemove', onDrag);
@@ -163,66 +208,152 @@ onUnmounted(() => {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  background: #080b0e; /* Deep dark background */
 }
 
-/* ---- Lamp Fixture ---- */
+/* ---- Background Grid ---- */
+.nav-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- High-Fidelity Industrial Lamp Fixture ---- */
 .lamp-fixture {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 30;
+  pointer-events: none;
 }
 
 .lamp-wire {
-  width: 2px;
-  height: 40px;
-  background: linear-gradient(to bottom, #333, #555);
+  width: 4px;
+  height: 60px;
+  background: linear-gradient(to right, #0a0a0a, #333, #0a0a0a);
+  box-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-.lamp-housing {
-  width: 60px;
-  height: 34px;
-  background: linear-gradient(to bottom, #2a2a2a, #111);
-  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 5px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+.lamp-head {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.lamp-housing::before {
-  content: "";
+.lamp-top-cap {
+  width: 40px;
+  height: 15px;
+  background: linear-gradient(to bottom, #222, #111);
+  border-radius: 5px 5px 0 0;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.1);
+}
+
+.lamp-dome {
+  width: 180px;
+  height: 70px;
+  background: linear-gradient(180deg, #2a2a2a 0%, #111 100%);
+  border-radius: 100px 100px 0 0;
+  position: relative;
+  box-shadow: 
+    inset 0 2px 5px rgba(255,255,255,0.05),
+    0 10px 30px rgba(0,0,0,0.9);
+  overflow: hidden;
+}
+
+/* Decorative ridges on the lamp dome */
+.ridge {
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 4px;
-  background: #333;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.05);
+}
+.ridge-1 { bottom: 15px; }
+.ridge-2 { bottom: 30px; }
+.ridge-3 { bottom: 45px; }
+
+.lamp-rim {
+  width: 190px;
+  height: 6px;
+  background: #000;
+  border-radius: 3px;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.6);
+  box-shadow: 
+    0 2px 10px rgba(16, 185, 129, 0.4),
+    inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  z-index: 2;
 }
 
 .lamp-bulb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 30%, var(--finished-accent) 100%);
-  box-shadow:
-    0 0 12px var(--finished-accent),
-    0 0 32px var(--finished-accent),
-    0 0 80px rgba(74, 222, 128, 0.4);
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  background: #fff;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 
+    0 0 30px 10px rgba(16, 185, 129, 0.8),
+    0 0 60px 20px rgba(16, 185, 129, 0.4);
+  z-index: 1;
+}
+
+/* Volumetric light cones */
+.cone-light {
+  position: absolute;
+  top: 145px; /* right below the lamp rim */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 90vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(16, 185, 129, 0.25) 0%,
+    rgba(16, 185, 129, 0.05) 60%,
+    transparent 100%
+  );
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+  z-index: 50; /* over the track but behind cards technically, but cards are inside track */
+}
+
+.cone-core {
+  position: absolute;
+  top: 145px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 30vh;
+  background: conic-gradient(
+    from 45deg at bottom,
+    rgba(16, 185, 129, 0.4) 0%,
+    rgba(16, 185, 129, 0.1) 35%,
+    transparent 100%
+  );
+  clip-path: polygon(45% 0, 55% 0, 80% 100%, 20% 100%);
+  filter: blur(350px);
+  pointer-events: none;
+  z-index: 51;
 }
 
 /* ---- Conveyor Track ---- */
 .conveyor-track {
   display: flex;
-  gap: 80px;
-  padding: 60px calc(50vw - 140px); /* Vertical padding prevents clipping during scale-up */
+  gap: 120px;
+  padding: 60px calc(50vw - 240px);
   width: 100%;
   height: min-content;
   align-self: flex-start;
@@ -233,11 +364,15 @@ onUnmounted(() => {
   -ms-overflow-style: none;
   scrollbar-width: none;
   align-items: center;
+  position: relative;
+  z-index: 60; /* bring cards in front of the light base but inside the glow */
 }
-.conveyor-track.mask-fused {
-  mask-image: var(--reveal-mask);
-  -webkit-mask-image: var(--reveal-mask);
+/* Ensure the active card is illuminated and inactive ones are dark */
+:deep(.nav-window:not(.is-active)) {
+  opacity: 0.3;
+  filter: brightness(0.5) contrast(1.2);
 }
+
 .conveyor-track::-webkit-scrollbar {
   display: none;
 }
@@ -245,12 +380,15 @@ onUnmounted(() => {
 /* ---- Hint ---- */
 .drag-hint {
   position: absolute;
-  bottom: 60px;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
+  bottom: 40px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  opacity: 0.25;
-  color: var(--finished-text);
+  opacity: 0.4;
+  color: #fff;
   pointer-events: none;
+  z-index: 10;
 }
 </style>
+

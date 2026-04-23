@@ -1,64 +1,33 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Biography / Path -->
-    <BentoCard id="bio" :colSpan="2" :rowSpan="2" class="relative group">
-      <FusedReveal id="bio-reveal">
-        <template #blueprint>
-          <div class="flex flex-col h-full text-white/5 select-none opacity-20">
-            <h3 class="text-3xl font-bold mb-6">{{ bio.title }}</h3>
-            <p class="text-lg leading-relaxed mb-6">{{ bio.content }}</p>
-          </div>
-        </template>
-        <template #finished>
-          <div class="flex flex-col h-full select-none">
-            <h3 class="text-3xl font-bold mb-6 text-finished-accent">{{ bio.title }}</h3>
-            <p class="text-lg leading-relaxed mb-6 text-finished-text/70">{{ bio.content }}</p>
-          </div>
-        </template>
-      </FusedReveal>
-    </BentoCard>
+  <!-- About Tile (Discovery Path) -->
+  <BentoCard id="about-discovery" class="md:col-span-3 md:row-span-1" with-window title="Discovery Path">
+    <div class="p-10 flex flex-col h-full">
+      <p class="text-white/50 text-lg leading-relaxed max-w-2xl">
+        {{ bio.content }}
+      </p>
+    </div>
+  </BentoCard>
 
-    <!-- Tech Stack / Artifacts -->
-    <BentoCard id="stack" :colSpan="1" :rowSpan="2" class="group relative">
-      <FusedReveal id="stack-reveal">
-        <template #blueprint>
-          <div class="flex flex-col h-full text-white/5 select-none opacity-20">
-            <h3 class="text-2xl font-bold mb-6 italic uppercase tracking-widest">[ {{ stack.title }} ]</h3>
-            <div class="flex flex-wrap gap-3">
-              <span v-for="skill in stack.skills" :key="skill" class="px-3 py-1 border border-dashed border-white/5 rounded-full text-sm">
-                {{ skill }}
-              </span>
-            </div>
-          </div>
-        </template>
-        <template #finished>
-          <div class="flex flex-col h-full select-none">
-            <h3 class="text-2xl font-bold mb-6 italic uppercase tracking-widest text-finished-accent">[ {{ stack.title }} ]</h3>
-            <div class="flex flex-wrap gap-3">
-              <span 
-                v-for="skill in stack.skills" 
-                :key="skill" 
-                class="px-3 py-1 border border-finished-border bg-finished-bg/50 backdrop-blur-md rounded-full text-sm text-finished-accent shadow-[0_0_10px_rgba(34,211,238,0.2)]"
-              >
-                {{ skill }}
-              </span>
-            </div>
-          </div>
-        </template>
-      </FusedReveal>
-    </BentoCard>
-  </div>
+  <!-- Skills Tile (STACK) -->
+  <BentoCard id="skills-stack" class="md:col-span-1 md:row-span-1" with-window title="Stack">
+    <div class="p-10 flex flex-col h-full">
+      <div class="flex flex-wrap gap-3">
+        <span 
+          v-for="skill in stack.skills" 
+          :key="skill"
+          class="px-3 py-1.5 border border-white/5 bg-white/[0.03] rounded-full text-[10px] uppercase tracking-widest text-white/40 hover:border-[var(--accent-color)]/30 hover:text-white/80 transition-all duration-300"
+        >
+          {{ skill }}
+        </span>
+      </div>
+    </div>
+  </BentoCard>
 </template>
 
 <script setup lang="ts">
 import { SKILL_SECTIONS } from '../../data/portfolio';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoCard from '../shared/BentoCard.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
-import FusedReveal from '../shared/FusedReveal.vue';
 
-// biome-ignore lint/correctness/noUnusedVariables: template-use
-const bio = SKILL_SECTIONS.find((s) => s.id === 'bio') || SKILL_SECTIONS[0];
-// biome-ignore lint/correctness/noUnusedVariables: template-use
-const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[1];
+const bio = SKILL_SECTIONS.find((s) => s.id === 'bio')!;
+const stack = SKILL_SECTIONS.find((s) => s.id === 'stack')!;
 </script>

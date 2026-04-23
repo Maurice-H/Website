@@ -7,10 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies & Build
+node_modules/
+dist/
+dist-ssr/
 *.local
+
+# TypeScript Cache
+*.tsbuildinfo
+
+# Environment Variables (SICHERHEIT!)
+.env
+.env.*
+!.env.example
+
+# Testing
+playwright-report/
+test-results/
+coverage/
 
 # Editor directories and files
 .vscode/*
@@ -23,12 +37,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Playwright
-playwright-report
-test-results
-
 # Agent / Debugging
 artifacts/
 scratch/
 .stitch_project_id
-
