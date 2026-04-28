@@ -19,7 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type CSSProperties } from 'vue';
+import type { CSSProperties } from 'vue';
+import { computed } from 'vue';
+
 import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
