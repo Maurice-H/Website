@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { useViewportStore } from '../useViewportStore';
 
 describe('useViewportStore', () => {
@@ -64,5 +64,58 @@ describe('useViewportStore', () => {
     const { getOffsets } = useViewportStore();
     const offsets = getOffsets('ghost');
     expect(offsets).toEqual({ left: 0, top: 0 });
+  });
+
+  describe('init', () => {
+    let setPropertySpy: MockInstance;
+    let addEventListenerSpy: MockInstance;
+
+    beforeEach(() => {
+      setPropertySpy = vi.spyOn(document.documentElement.style, 'setProperty');
+      addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('should initialize correctly when called for the first time', () => {
+      const { init } = useViewportStore();
+
+      init();
+
+      expect(setPropertySpy).toHaveBeenCalledWith('--mask-x', '50vw');
+      expect(setPropertySpy).toHaveBeenCalledWith('--mask-y', '50vh');
+      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-x-raw', '50%');
+      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-y-raw', '50%');
+
+      expect(addEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function), {
+        passive: true,
+        capture: true,
+      });
+      expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function), {
+        passive: true,
+      });
+      expect(addEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function), {
+        passive: true,
+      });
+    });
+
+    it('should not initialize multiple times if already listening', () => {
+      const { init } = useViewportStore();
+
+      init();
+
+      expect(setPropertySpy).toHaveBeenCalledTimes(4);
+      expect(addEventListenerSpy).toHaveBeenCalledTimes(3);
+
+      setPropertySpy.mockClear();
+      addEventListenerSpy.mockClear();
+
+      init(); // Second call
+
+      expect(setPropertySpy).not.toHaveBeenCalled();
+      expect(addEventListenerSpy).not.toHaveBeenCalled();
+    });
   });
 });
