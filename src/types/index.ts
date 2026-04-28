@@ -31,11 +31,6 @@ export interface MousePosition {
   y: number;
 }
 
-export interface LightingState {
-  phase: LightingPhase;
-  isFlashActive: boolean;
-}
-
 export interface BentoGridItem {
   colSpan?: number;
   rowSpan?: number;
