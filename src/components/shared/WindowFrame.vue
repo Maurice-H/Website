@@ -26,7 +26,7 @@ const props = defineProps<{
 }>();
 
 // If the title naturally has brackets (like "[ STACK ]"), format it monospace
-const isBracketed = computed(() => {
+const _isBracketed = computed(() => {
   if (!props.title) return false;
   return props.title.trim().startsWith('[') || props.title.toLowerCase() === 'stack';
 });

@@ -25,9 +25,4 @@
 </template>
 
 <script setup lang="ts">
-import { SKILL_SECTIONS } from '../../data/portfolio';
-import BentoCard from '../shared/BentoCard.vue';
-
-const bio = SKILL_SECTIONS.find((s) => s.id === 'bio')!;
-const stack = SKILL_SECTIONS.find((s) => s.id === 'stack')!;
 </script>

@@ -41,7 +41,7 @@ interface BootLine {
 const activeLines = ref<BootLine[]>([]);
 const progress = ref(0);
 
-const getTimestamp = () => {
+const _getTimestamp = () => {
   return new Date().toLocaleTimeString('en-US', {
     hour12: false,
     hour: '2-digit',
@@ -50,7 +50,7 @@ const getTimestamp = () => {
   });
 };
 
-const getTypeClass = (type: string) => {
+const _getTypeClass = (type: string) => {
   switch (type) {
     case 'success':
       return 'text-emerald-400 font-bold';

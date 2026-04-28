@@ -37,7 +37,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useViewportStore } from '../../stores/viewport';
-import WindowFrame from './WindowFrame.vue';
 
 interface Props {
   id?: string;
@@ -59,14 +58,14 @@ const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
 let unregisterFn: (() => void) | null = null;
 
-const revealStyle = computed(() => {
+const _revealStyle = computed(() => {
   return {
     opacity: 1, // Full opacity for the content, global mask will handle the reveal
   };
 });
 
 // Grid classes
-const colSpanClass = computed(() => {
+const _colSpanClass = computed(() => {
   switch (props.colSpan) {
     case 2:
       return 'md:col-span-2';
@@ -79,7 +78,7 @@ const colSpanClass = computed(() => {
   }
 });
 
-const rowSpanClass = computed(() => {
+const _rowSpanClass = computed(() => {
   switch (props.rowSpan) {
     case 2:
       return 'row-span-2';

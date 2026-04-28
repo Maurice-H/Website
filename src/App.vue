@@ -69,7 +69,7 @@ import { LightingPhase } from './types';
 // Use the store directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
 
-const handleBackToNav = () => {
+const _handleBackToNav = () => {
   lighting.setPhase(LightingPhase.NAV);
 };
 

@@ -29,6 +29,4 @@
 </template>
 
 <script setup lang="ts">
-import { PROJECTS as projects } from '../../data/portfolio';
-import BentoCard from '../shared/BentoCard.vue';
 </script>

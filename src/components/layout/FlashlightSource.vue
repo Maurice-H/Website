@@ -30,7 +30,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
-const containerStyle = computed(() => {
+const _containerStyle = computed(() => {
   return {
     right: '100px',
     bottom: '-50px',

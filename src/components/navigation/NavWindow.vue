@@ -23,7 +23,6 @@
 
 <script setup lang="ts">
 import type { NavWindowTheme } from '../../types';
-import WindowFrame from '../shared/WindowFrame.vue';
 
 defineProps<{
   theme: NavWindowTheme;

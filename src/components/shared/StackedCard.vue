@@ -27,26 +27,25 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import BentoCard from './BentoCard.vue';
 
 const rotation = ref({ x: 0, y: 0 });
 
-const handleMouseMove = (e: MouseEvent) => {
+const _handleMouseMove = (e: MouseEvent) => {
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
   const x = (e.clientX - rect.left) / rect.width - 0.5;
   const y = (e.clientY - rect.top) / rect.height - 0.5;
   rotation.value = { x: -y * 20, y: x * 20 };
 };
 
-const resetRotation = () => {
+const _resetRotation = () => {
   rotation.value = { x: 0, y: 0 };
 };
 
-const containerStyle = computed(() => ({
+const _containerStyle = computed(() => ({
   transform: `rotateX(${rotation.value.x}deg) rotateY(${rotation.value.y}deg)`,
 }));
 
-const getStackLayerStyle = (index: number) => {
+const _getStackLayerStyle = (index: number) => {
   return {
     transform: `translateZ(${-index * 20}px) translateY(${index * 10}px) scale(${1 - index * 0.05})`,
     opacity: 1 - index * 0.2,

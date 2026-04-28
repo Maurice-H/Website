@@ -13,7 +13,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
-const gridStyle = computed(() => {
+const _gridStyle = computed(() => {
   const isNav = lighting.phase === 'NAV';
 
   // Grid is visible in BOTH phases — NAV centered below lamp, CONTENT following flashlight

@@ -24,7 +24,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
-const beamContainerStyle = computed(() => {
+const _beamContainerStyle = computed(() => {
   return {
     right: '100px',
     bottom: '110px',
@@ -38,7 +38,7 @@ const beamContainerStyle = computed(() => {
   };
 });
 
-const beamInnerStyle = computed(() => {
+const _beamInnerStyle = computed(() => {
   return {
     background: `linear-gradient(to bottom, 
       var(--finished-accent) 0%, 

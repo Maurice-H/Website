@@ -33,13 +33,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
-import FlashlightSource from './FlashlightSource.vue';
-import PerspectiveGrid from './PerspectiveGrid.vue';
-import VolumetricBeam from './VolumetricBeam.vue';
 
 const lighting = useLightingStore();
 
-const overlayStyle = computed(() => {
+const _overlayStyle = computed(() => {
   const isNav = lighting.phase === 'NAV';
 
   // NAV phase: Static overhead lamp — softer, wider illumination
