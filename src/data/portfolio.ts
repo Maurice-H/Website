@@ -1,11 +1,4 @@
-import type { HeroData, NavTab, PortfolioProject, SkillSection } from '../types';
-
-export const HERO_DATA: HeroData = {
-  name: 'Alex',
-  roles: ['Developer', 'Architect', 'Creator'],
-  tagline:
-    'A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.',
-};
+import type { NavTab, PortfolioProject, SkillSection } from '../types';
 
 export const NAV_TABS: NavTab[] = [
   { id: 'about', label: 'About Me', theme: 'about' },
