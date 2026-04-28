@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, afterEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { useLightingStore } from '../../stores/lighting';
 import { LightingPhase } from '../../types';
 import { useViewportStore } from '../useViewportStore';
