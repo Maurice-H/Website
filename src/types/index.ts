@@ -26,7 +26,6 @@ export const LightingPhase = {
 
 export type LightingPhase = (typeof LightingPhase)[keyof typeof LightingPhase];
 
-
 export interface LightingState {
   phase: LightingPhase;
   isFlashActive: boolean;
