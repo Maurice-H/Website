@@ -24,6 +24,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const beamContainerStyle = computed(() => {
   return {
     right: '100px',
@@ -38,6 +39,7 @@ const beamContainerStyle = computed(() => {
   };
 });
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const beamInnerStyle = computed(() => {
   return {
     background: `linear-gradient(to bottom, 
@@ -53,7 +55,7 @@ const beamInnerStyle = computed(() => {
     marginLeft: '-500px',
     filter: 'blur(50px)',
     opacity: '0.85',
-    position: 'absolute',
+    position: 'absolute' as const,
   };
 });
 </script>

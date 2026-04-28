@@ -33,12 +33,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import FlashlightSource from './FlashlightSource.vue';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import PerspectiveGrid from './PerspectiveGrid.vue';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import VolumetricBeam from './VolumetricBeam.vue';
 
 const lighting = useLightingStore();
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const overlayStyle = computed(() => {
   const isNav = lighting.phase === 'NAV';
 

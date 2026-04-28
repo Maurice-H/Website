@@ -37,6 +37,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useViewportStore } from '../../stores/viewport';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import WindowFrame from './WindowFrame.vue';
 
 interface Props {
@@ -59,6 +60,7 @@ const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
 let unregisterFn: (() => void) | null = null;
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const revealStyle = computed(() => {
   return {
     opacity: 1, // Full opacity for the content, global mask will handle the reveal
@@ -66,6 +68,7 @@ const revealStyle = computed(() => {
 });
 
 // Grid classes
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const colSpanClass = computed(() => {
   switch (props.colSpan) {
     case 2:
@@ -79,6 +82,7 @@ const colSpanClass = computed(() => {
   }
 });
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const rowSpanClass = computed(() => {
   switch (props.rowSpan) {
     case 2:

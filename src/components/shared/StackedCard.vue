@@ -27,10 +27,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import BentoCard from './BentoCard.vue';
 
 const rotation = ref({ x: 0, y: 0 });
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const handleMouseMove = (e: MouseEvent) => {
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
   const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -38,14 +40,17 @@ const handleMouseMove = (e: MouseEvent) => {
   rotation.value = { x: -y * 20, y: x * 20 };
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const resetRotation = () => {
   rotation.value = { x: 0, y: 0 };
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const containerStyle = computed(() => ({
   transform: `rotateX(${rotation.value.x}deg) rotateY(${rotation.value.y}deg)`,
 }));
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const getStackLayerStyle = (index: number) => {
   return {
     transform: `translateZ(${-index * 20}px) translateY(${index * 10}px) scale(${1 - index * 0.05})`,

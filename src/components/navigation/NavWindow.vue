@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
 import type { NavWindowTheme } from '../../types';
+// biome-ignore lint/correctness/noUnusedImports: template use
 import WindowFrame from '../shared/WindowFrame.vue';
 
 defineProps<{

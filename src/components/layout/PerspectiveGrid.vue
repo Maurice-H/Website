@@ -13,6 +13,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const gridStyle = computed(() => {
   const isNav = lighting.phase === 'NAV';
 

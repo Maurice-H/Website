@@ -41,6 +41,7 @@ interface BootLine {
 const activeLines = ref<BootLine[]>([]);
 const progress = ref(0);
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const getTimestamp = () => {
   return new Date().toLocaleTimeString('en-US', {
     hour12: false,
@@ -50,6 +51,7 @@ const getTimestamp = () => {
   });
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const getTypeClass = (type: string) => {
   switch (type) {
     case 'success':

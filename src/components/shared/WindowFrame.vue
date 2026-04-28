@@ -7,7 +7,7 @@
         class="window-title text-xl md:text-2xl font-bold tracking-wide"
         :class="isBracketed ? 'text-white/70 font-mono tracking-widest text-lg' : 'text-[var(--finished-accent)]'"
       >
-        {{ isBracketed ? `[ ${title.replace(/[\[\]]/g, '').trim()} ]` : title }}
+        {{ isBracketed ? `[ ${(title || '').replace(/[\[\]]/g, '').trim()} ]` : (title || '') }}
       </div>
     </div>
     
@@ -26,9 +26,10 @@ const props = defineProps<{
 }>();
 
 // If the title naturally has brackets (like "[ STACK ]"), format it monospace
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const isBracketed = computed(() => {
   if (!props.title) return false;
-  return props.title.trim().startsWith('[') || props.title.toLowerCase() === 'stack';
+  return (props.title || "").trim().startsWith('[') || (props.title || "").toLowerCase() === 'stack';
 });
 </script>
 

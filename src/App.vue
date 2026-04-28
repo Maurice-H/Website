@@ -69,6 +69,7 @@ import { LightingPhase } from './types';
 // Use the store directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
 
+// biome-ignore lint/correctness/noUnusedVariables: template use
 const handleBackToNav = () => {
   lighting.setPhase(LightingPhase.NAV);
 };
