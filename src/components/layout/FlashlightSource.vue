@@ -30,6 +30,7 @@ import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
 const containerStyle = computed(() => {
   return {
     right: '100px',

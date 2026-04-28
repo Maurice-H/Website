@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { LightingPhase } from '../types';
 import { useViewportStore } from './viewport';
 

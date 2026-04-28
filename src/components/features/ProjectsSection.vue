@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import { PROJECTS as projects } from '../../data/portfolio';
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoCard from '../shared/BentoCard.vue';
 </script>

@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoCard from '../shared/BentoCard.vue';
 </script>
 

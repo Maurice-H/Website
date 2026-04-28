@@ -26,8 +26,13 @@
 
 <script setup lang="ts">
 import { SKILL_SECTIONS } from '../../data/portfolio';
+// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoCard from '../shared/BentoCard.vue';
 
+// biome-ignore lint/correctness/noUnusedVariables: template-use
+// biome-ignore lint/style/noNonNullAssertion: guaranteed by data
 const bio = SKILL_SECTIONS.find((s) => s.id === 'bio')!;
+// biome-ignore lint/correctness/noUnusedVariables: template-use
+// biome-ignore lint/style/noNonNullAssertion: guaranteed by data
 const stack = SKILL_SECTIONS.find((s) => s.id === 'stack')!;
 </script>
