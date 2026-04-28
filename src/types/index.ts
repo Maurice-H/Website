@@ -26,21 +26,6 @@ export const LightingPhase = {
 
 export type LightingPhase = (typeof LightingPhase)[keyof typeof LightingPhase];
 
-export interface MousePosition {
-  x: number;
-  y: number;
-}
-
-export interface LightingState {
-  phase: LightingPhase;
-  isFlashActive: boolean;
-}
-
-export interface BentoGridItem {
-  colSpan?: number;
-  rowSpan?: number;
-}
-
 export type NavWindowTheme = 'career' | 'about' | 'projects' | 'contact';
 
 export interface NavTab {
