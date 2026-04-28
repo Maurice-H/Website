@@ -40,14 +40,14 @@ export class AppPage {
 
   /** Transition from NAV → CONTENT by clicking the first nav window. */
   async enterContentPhase() {
-    // Ensure the windows are present in the DOM
-    await this.navWindows.first().waitFor({ state: 'attached', timeout: 10000 });
-
-    const firstWindow = this.navWindows.first();
+    // We must click the CURRENTLY ACTIVE window to enter the phase.
+    const activeWindow = this.page.locator('.nav-window.is-active');
+    await activeWindow.waitFor({ state: 'attached', timeout: 10000 });
 
     // The Fused Portfolio uses a selection mechanic.
-    // If already active, one click enters the phase.
-    await firstWindow.click();
+    // We dispatch a direct click event to avoid triggering the mousedown drag logic
+    // which might set isDragging to true and block the click handler.
+    await activeWindow.dispatchEvent('click');
 
     // Wait for the content phase layout to appear AND be ready for interaction.
     // Check for attachment and visibility to ensure reliable interaction.
