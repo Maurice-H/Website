@@ -49,8 +49,9 @@ export class AppPage {
     // If already active, one click enters the phase.
     await firstWindow.click();
 
-    // Wait for the content phase layout to appear.
-    // Increased timeout to account for the 300ms flash transition.
+    // Wait for the content phase layout to appear AND be ready for interaction.
+    // Check for attachment and visibility to ensure reliable interaction.
+    await this.themeToggleBtn.waitFor({ state: 'attached', timeout: 15000 });
     await this.themeToggleBtn.waitFor({ state: 'visible', timeout: 15000 });
   }
 
