@@ -7,7 +7,7 @@
         class="window-title text-xl md:text-2xl font-bold tracking-wide"
         :class="isBracketed ? 'text-white/70 font-mono tracking-widest text-lg' : 'text-[var(--finished-accent)]'"
       >
-        {{ isBracketed ? `[ ${title.replace(/[\[\]]/g, '').trim()} ]` : title }}
+        {{ isBracketed ? `[ ${title?.replace(/[\[\]]/g, '').trim() || ''} ]` : title }}
       </div>
     </div>
     

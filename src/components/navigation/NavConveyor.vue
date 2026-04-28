@@ -102,7 +102,6 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { useLightingEngine } from '../../composables/useLightingEngine';
 import { NAV_TABS as tabs } from '../../data/portfolio';
 import { LightingPhase } from '../../types/index';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import NavWindow from './NavWindow.vue';
 
 const { setPhase } = useLightingEngine();
@@ -115,7 +114,6 @@ let isDragging = false;
 let startX = 0;
 let scrollLeft = 0;
 
-// biome-ignore lint/correctness/noUnusedVariables: template-use
 const startDrag = (e: MouseEvent) => {
   if (!trackEl.value) return;
   isDragging = true;
@@ -159,13 +157,11 @@ const handleScroll = () => {
   activeId.value = closestId;
 };
 
-// biome-ignore lint/correctness/noUnusedVariables: template-use
 const onWheel = (e: WheelEvent) => {
   if (!trackEl.value) return;
   trackEl.value.scrollLeft += e.deltaY;
 };
 
-// biome-ignore lint/correctness/noUnusedVariables: template-use
 const selectTab = (id: string) => {
   if (isDragging) return; // ignore click after drag
   if (id !== activeId.value) {

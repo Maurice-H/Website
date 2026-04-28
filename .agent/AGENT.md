@@ -24,3 +24,7 @@ Derived from Andrej Karpathy's observations on LLM coding pitfalls. All AI agent
 - **Define success criteria**: Transform imperative tasks into verifiable goals.
 - **Loop until verified**: Use a clear plan with verification steps (e.g., `1. [Step] -> verify: [check]`).
 - **Align with OpenSpec**: Ensure that any changes map directly to defined OpenSpec tasks and delta specs.
+
+## 5. Strict Quality & No Bypasses
+- **Fix, never bypass**: NEVER use comments or commands to suppress linter, type, or test errors (e.g., `// biome-ignore`, `@ts-ignore`, `@ts-expect-error`, `test.skip()`). 
+- **Solve the root cause**: If the linter or compiler complains, fix the underlying architectural or typing issue, or adjust the global configuration appropriately. Do not pollute the codebase with inline ignores.

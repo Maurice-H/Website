@@ -19,12 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, type CSSProperties } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
-const beamContainerStyle = computed(() => {
+const beamContainerStyle = computed<CSSProperties>(() => {
   return {
     right: '100px',
     bottom: '110px',
@@ -38,7 +38,7 @@ const beamContainerStyle = computed(() => {
   };
 });
 
-const beamInnerStyle = computed(() => {
+const beamInnerStyle = computed<CSSProperties>(() => {
   return {
     background: `linear-gradient(to bottom, 
       var(--finished-accent) 0%, 

@@ -37,6 +37,5 @@
 <script setup lang="ts">
 import { useTheme } from '../../composables/useTheme';
 
-// biome-ignore lint/correctness/noUnusedVariables: template-use
 const { isBlueprint, toggleTheme } = useTheme();
 </script>

@@ -46,21 +46,13 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import ContactForm from './components/features/ContactForm.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import HeroSection from './components/features/HeroSection.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import ProjectsSection from './components/features/ProjectsSection.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import SkillsAbout from './components/features/SkillsAbout.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import BentoLayout from './components/layout/BentoLayout.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import SpotlightMask from './components/layout/SpotlightMask.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import NavConveyor from './components/navigation/NavConveyor.vue';
-// biome-ignore lint/correctness/noUnusedImports: template-use
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
 import { initGlobalViewportService } from './composables/useViewportStore';
 import { useLightingStore } from './stores/lighting';

@@ -36,7 +36,6 @@ const offsets = computed(() => getOffsets(props.id));
 // Viewport-synchronized mask: gradient center is at 50% 50% of a 100vw×100vh mask.
 // We offset by -50vw/-50vh so the gradient center aligns with the mouse cursor,
 // then subtract the component's viewport position to map coordinates correctly.
-// biome-ignore lint/correctness/noUnusedVariables: template-use
 const finalMaskStyle = computed(() => {
   const { left, top } = offsets.value;
   return {

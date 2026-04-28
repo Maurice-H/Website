@@ -36,6 +36,19 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["*.vue", "**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ],
   "css": {
     "parser": {
       "cssModules": false,

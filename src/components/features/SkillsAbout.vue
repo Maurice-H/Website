@@ -28,6 +28,6 @@
 import { SKILL_SECTIONS } from '../../data/portfolio';
 import BentoCard from '../shared/BentoCard.vue';
 
-const bio = SKILL_SECTIONS.find((s) => s.id === 'bio')!;
-const stack = SKILL_SECTIONS.find((s) => s.id === 'stack')!;
+const bio = SKILL_SECTIONS.find((s) => s.id === 'bio') || SKILL_SECTIONS[0];
+const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[0];
 </script>
