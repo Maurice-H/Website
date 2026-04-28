@@ -28,6 +28,7 @@ When ready to implement, run /opsx:apply
 
    Before creating any artifacts, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 1: Explore & Propose**. 
    Ensure your proposal and design strictly follow the architectural and UI/UX rules defined in:
+   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
    - `.docs/skills/project-bridge.md`
    - `creative-design/ui-ux-pro-max` (if UI/UX related)
    - Any other relevant skill listed in the index.

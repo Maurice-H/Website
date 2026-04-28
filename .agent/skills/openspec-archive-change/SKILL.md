@@ -18,7 +18,7 @@ Archive a completed change in the experimental workflow.
 0. **Check Project Skills (MANDATORY)**
 
    Before archiving, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills (Phase 3).
-   Verify that the implementation meets the **Definition of Done** in `.docs/skills/project-bridge.md`.
+   Verify that the implementation meets the AI Behavioral Guidelines in `.agent/AGENT.md` and the **Definition of Done** in `.docs/skills/project-bridge.md`.
 
 1. **If no change name provided, prompt for selection**
 

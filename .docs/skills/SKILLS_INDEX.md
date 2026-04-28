@@ -2,6 +2,10 @@
 
 This index guides the AI agent on which skills to activate during specific OpenSpec phases for the Premium Portfolio project.
 
+## 🌍 Global Baseline (MANDATORY)
+*Applies to ALL phases and tasks.*
+- `.agent/AGENT.md`: Karpathy AI Behavioral Guidelines (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution).
+
 ## 🧭 Phase 1: Explore & Propose (Architecture & UI/UX)
 *When brainstorming, planning, or creating `proposal.md` and `design.md`.*
 - `creative-design/ui-ux-pro-max`: Use for designing the "Finished Product" vs "Blueprint" dual-state theme.

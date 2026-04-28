@@ -21,6 +21,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    Before syncing specs, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any relevant skills.
    Ensure the updated main specs align with:
+   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
    - `.docs/skills/project-bridge.md` (Core principles)
    - `creative-design/ui-ux-pro-max` (Visual standards)
 

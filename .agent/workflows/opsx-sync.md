@@ -13,7 +13,8 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 0. **Check Project Skills (MANDATORY)**
 
    Before syncing specs, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any relevant skills.
-   Ensure the updated main specs align with:
+   Ensure your sync process adheres to:
+   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
    - `.docs/skills/project-bridge.md` (Core principles)
    - `creative-design/ui-ux-pro-max` (Visual standards)
 

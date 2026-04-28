@@ -2,6 +2,7 @@
 
 ## Context
 You are applying your senior development skills to a specific Vue 3 / Vite portfolio. Generic solutions must be adapted to the following strict project domains.
+**MANDATORY BASELINE:** You MUST strictly adhere to the AI Behavioral Guidelines defined in `.agent/AGENT.md` (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution) for all tasks.
 
 ## 1. Theme Engine & Styling (CRITICAL)
 - **CSS Variables over Tailwind:** While Tailwind will be used for utility spacing, layout, and typography, the core color theming and complex visual states (neon glows, dashed layout borders, graph paper backgrounds) will be purely managed by native CSS variables defined at the `:root` and `[data-theme="blueprint"]` levels. 

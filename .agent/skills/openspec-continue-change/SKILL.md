@@ -19,6 +19,7 @@ Continue working on a change by creating the next artifact.
 
    Before creating the next artifact, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills for the current phase (Phase 1 or 2).
    Ensure the artifact follows:
+   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
    - `.docs/skills/project-bridge.md` (Architecture)
    - `creative-design/ui-ux-pro-max` (Visual standards)
    - Any other relevant skill listed in the index for the specific artifact type.

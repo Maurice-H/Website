@@ -12,6 +12,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    Before starting verification, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 3: Verify & Archive**.
    Ensure your verification report evaluates the implementation against:
+   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
    - `.docs/skills/project-bridge.md` (Definition of Done checklist)
    - `development/test-driven-development` (Vitest coverage)
    - `development/webapp-testing` (Playwright E2E)
