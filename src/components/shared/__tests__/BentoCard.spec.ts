@@ -61,12 +61,4 @@ describe('BentoCard.vue', () => {
     expect(registerSpy).toHaveBeenCalledWith('test-card', expect.any(HTMLElement));
   });
 
-  it('sets isHovered to true on mouseenter', async () => {
-    const wrapper = mount(BentoCard);
-
-    await wrapper.trigger('mouseenter');
-    // We cannot easily test internal composable state, but we can verify if tiltStyle changes
-    // Wait for the next tick for reactive styles
-    expect(wrapper.attributes('style')).toContain('perspective(1000px)');
-  });
 });

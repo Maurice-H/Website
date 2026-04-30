@@ -3,7 +3,6 @@
     ref="cardRef"
     class="bento-card relative rounded-2xl p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass]"
-    
   >
     <!-- Background Layer (Base) -->
     <div class="absolute inset-0 bg-finished-bg/40 z-[-1]"></div>
@@ -43,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useMouseTilt } from '../../composables/useMouseTilt';
+import { useMouseGlare } from '../../composables/useMouseGlare';
 import { useViewportStore } from '../../stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
@@ -67,7 +66,7 @@ const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
 let unregisterFn: (() => void) | null = null;
 
-const { glareStyle } = useMouseTilt(cardRef);
+const { glareStyle } = useMouseGlare(cardRef);
 
 const revealStyle = computed(() => {
   return {
