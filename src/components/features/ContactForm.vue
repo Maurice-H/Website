@@ -8,26 +8,26 @@
           <input 
             type="text" 
             placeholder="Name" 
-            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-all"
+            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors"
           />
         </div>
         <div class="input-wrapper">
           <input 
             type="email" 
             placeholder="Email" 
-            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-all"
+            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors"
           />
         </div>
         <div class="input-wrapper flex-1">
           <textarea 
             placeholder="Message" 
-            class="contact-input w-full h-full min-h-[120px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-all resize-none"
+            class="contact-input w-full h-full min-h-[120px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors resize-none"
           ></textarea>
         </div>
         
         <button 
           type="submit" 
-          class="w-full py-4 px-6 bg-[var(--finished-accent)] text-finished-bg font-bold text-[10px] uppercase tracking-[0.3em] rounded border border-finished-text/10 hover:brightness-125 active:scale-[0.98] transition-all"
+          class="w-full py-4 px-6 bg-[var(--finished-accent)] text-finished-bg font-bold text-[10px] uppercase tracking-[0.3em] rounded border border-finished-text/10 hover:brightness-125 active:scale-[0.98] transition-[filter,transform,colors]"
         >
           Send Transmission
         </button>

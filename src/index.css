@@ -25,7 +25,7 @@
   --accent-bright: #22d3ee; /* Bright cyan for lamp highlights */
 
   /* Glassmorphism Defaults */
-  --glass-blur: blur(20px);
+  --glass-blur: blur(16px);
   --glass-bg: rgba(16, 185, 129, 0.03);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-reflection: linear-gradient(
