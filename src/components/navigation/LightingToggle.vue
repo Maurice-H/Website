@@ -8,7 +8,7 @@
         ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
         : 'border-finished-border text-finished-accent bg-finished-bg/5 hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30',
     ]"
-    aria-label="Toggle Lighting Effects"
+    :aria-pressed="lightingEnabled"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

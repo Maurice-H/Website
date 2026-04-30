@@ -25,35 +25,53 @@ export const useViewportStore = defineStore('viewport', () => {
       const rect = reg.el.getBoundingClientRect();
       reg.offsets.left = rect.left;
       reg.offsets.top = rect.top;
+      reg.el.style.setProperty('--card-left', `${rect.left}px`);
+      reg.el.style.setProperty('--card-top', `${rect.top}px`);
     }
   };
 
+  let rafId: number | null = null;
+
   const handleMouseMove = (e: MouseEvent) => {
-    mousePosition.x = e.clientX;
-    mousePosition.y = e.clientY;
+    const cx = e.clientX;
+    const cy = e.clientY;
 
-    // Skip all lighting-related tracking when effects are disabled
-    if (!themeStore.lightingEnabled) return;
+    // We only need to store these if other things still read them
+    mousePosition.x = cx;
+    mousePosition.y = cy;
 
-    // Update global mask variables only in CONTENT phase
-    if (lighting.phase === 'CONTENT') {
-      document.documentElement.style.setProperty('--mask-x', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--mask-y', `${e.clientY}px`);
+    if (rafId !== null) return;
 
-      const xPct = (e.clientX / window.innerWidth) * 100;
-      const yPct = (e.clientY / window.innerHeight) * 100;
-      document.documentElement.style.setProperty('--spotlight-x-raw', `${xPct}%`);
-      document.documentElement.style.setProperty('--spotlight-y-raw', `${yPct}%`);
+    rafId = requestAnimationFrame(() => {
+      // Skip all lighting-related tracking when effects are disabled
+      if (themeStore.lightingEnabled && lighting.phase === 'CONTENT') {
+        document.documentElement.style.setProperty('--mouse-x', `${cx}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${cy}px`);
 
-      // Delegate to lighting store
-      lighting.updateFlashlightRotation();
-    }
+        // Keep these for any components that haven't migrated to translate3d yet
+        document.documentElement.style.setProperty('--mask-x', `${cx}px`);
+        document.documentElement.style.setProperty('--mask-y', `${cy}px`);
+
+        const xPct = (cx / window.innerWidth) * 100;
+        const yPct = (cy / window.innerHeight) * 100;
+        document.documentElement.style.setProperty('--spotlight-x-raw', `${xPct}%`);
+        document.documentElement.style.setProperty('--spotlight-y-raw', `${yPct}%`);
+
+        // Delegate to lighting store (updates reactive ref + CSS custom property)
+        lighting.updateFlashlightRotation();
+      }
+      rafId = null;
+    });
   };
 
   const init = () => {
     if (isListening.value) return;
 
     // Set initial mask positions to center screen
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    document.documentElement.style.setProperty('--mouse-x', `${centerX}px`);
+    document.documentElement.style.setProperty('--mouse-y', `${centerY}px`);
     document.documentElement.style.setProperty('--mask-x', '50vw');
     document.documentElement.style.setProperty('--mask-y', '50vh');
     document.documentElement.style.setProperty('--spotlight-x-raw', '50%');

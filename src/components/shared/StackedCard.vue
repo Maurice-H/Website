@@ -10,7 +10,7 @@
       <div 
         v-for="i in 3" 
         :key="i"
-        class="absolute inset-0 rounded-2xl border border-finished-text/10 bg-finished-text/5 backdrop-blur-md transition-all duration-300 pointer-events-none"
+        class="absolute inset-0 rounded-2xl border border-finished-text/10 bg-finished-text/5 backdrop-blur-md transition-transform transition-opacity duration-300 pointer-events-none"
         :style="getStackLayerStyle(i)"
       ></div>
       

@@ -2,7 +2,6 @@
   <div 
     v-if="lighting.phase === 'CONTENT'"
     class="flashlight-container fixed pointer-events-none z-[100]"
-    :style="containerStyle"
   >
     <!-- The physical flashlight body (Technical industrial look) -->
     <div class="flashlight-body">
@@ -25,29 +24,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
 
 const lighting = useLightingStore();
 
-const containerStyle = computed(() => {
-  return {
-    right: '100px',
-    bottom: '-50px',
-    // translateX(50%) centers the 50px wide flashlight exactly on the 150px right mark
-    transform: `translateX(50%) rotate(${lighting.flashlightRotation + 90}deg)`,
-    transformOrigin: '50% 20px',
-    transition: 'transform 0.1s linear',
-  };
-});
+/*
+ * PERFORMANCE: All rotation is handled via CSS var(--flashlight-rotation).
+ * No Vue computed depends on flashlightRotation — zero recomputes per frame.
+ *
+ * The container rotates via:
+ *   transform: translateX(50%) rotate(calc((var(--flashlight-rotation) + 90) * 1deg))
+ * Set in the scoped <style> block below.
+ */
 </script>
 
 <style scoped>
+.flashlight-container {
+  right: 100px;
+  bottom: -50px;
+  /* translateX(50%) centers the 50px wide flashlight exactly on the 150px right mark */
+  transform: translateX(50%) rotate(calc((var(--flashlight-rotation, 0) + 90) * 1deg));
+  transform-origin: 50% 20px;
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
 .flashlight-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
 }
 
 /* Emitter Head */
@@ -89,14 +94,14 @@ const containerStyle = computed(() => {
 
 .flashlight-lens-glow {
   position: absolute;
-  top: -10px;
+  top: -15px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 30px;
-  background: radial-gradient(ellipse, var(--finished-accent) 0%, transparent 70%);
-  filter: blur(15px);
+  width: 90px;
+  height: 45px;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--finished-accent) 80%, transparent) 0%, transparent 70%);
   opacity: 0.8;
+  will-change: transform;
 }
 
 /* Grip Section */

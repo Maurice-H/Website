@@ -29,7 +29,7 @@
           <button 
             type="button"
             @click="handleBackToNav"
-            class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer"
+            class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-colors text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer"
           >
             [ ESC ] Back
           </button>

@@ -25,6 +25,14 @@ export const useLightingStore = defineStore('lighting', () => {
     const dy = viewport.mousePosition.y - source.y;
     // Calculate angle in radians, then convert to degrees
     flashlightRotation.value = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    // Publish as CSS custom property for pure-CSS consumption.
+    // Components use var(--flashlight-rotation) in CSS transforms,
+    // avoiding Vue reactive recomputes on every frame.
+    document.documentElement.style.setProperty(
+      '--flashlight-rotation',
+      `${flashlightRotation.value}`
+    );
   };
 
   const setPhase = (newPhase: LightingPhase) => {

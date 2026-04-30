@@ -1,6 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { useLightingStore } from '../../stores/lighting';
+import { useThemeStore } from '../../stores/useThemeStore';
 import { LightingPhase } from '../../types';
 import { useViewportStore } from '../useViewportStore';
 
@@ -138,6 +139,9 @@ describe('useViewportStore', () => {
 
       const mockEl = {
         getBoundingClientRect: vi.fn(() => ({ left: 100, top: 200 })),
+        style: {
+          setProperty: vi.fn(),
+        },
       } as unknown as HTMLElement;
       store.register('test-element', mockEl);
 
@@ -159,10 +163,13 @@ describe('useViewportStore', () => {
       expect(store.getOffsets('test-element').top).toBe(600);
     });
 
-    it('should handle mousemove events correctly when lighting phase is CONTENT', () => {
+    it('should handle mousemove events correctly when lighting phase is CONTENT', async () => {
       const store = useViewportStore();
       const lighting = useLightingStore();
+      const themeStore = useThemeStore();
+
       lighting.phase = LightingPhase.CONTENT;
+      themeStore.lightingEnabled = true;
 
       // Mock window inner dimensions
       Object.defineProperty(window, 'innerWidth', { value: 1000, writable: true });
@@ -171,6 +178,7 @@ describe('useViewportStore', () => {
       vi.spyOn(lighting, 'updateFlashlightRotation');
 
       store.init();
+      setPropertySpy.mockClear();
 
       // Dispatch mousemove
       const mouseEvent = new MouseEvent('mousemove', {
@@ -178,6 +186,9 @@ describe('useViewportStore', () => {
         clientY: 400,
       });
       window.dispatchEvent(mouseEvent);
+
+      // Wait for requestAnimationFrame
+      await new Promise((resolve) => requestAnimationFrame(resolve));
 
       // Verify mouse position was updated
       expect(store.mousePosition.x).toBe(250);

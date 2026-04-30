@@ -2,13 +2,14 @@
   <button
     type="button"
     @click="toggleTheme"
+    aria-label="Toggle Theme"
     class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95"
     :class="[
       isBlueprint
         ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
         : 'border-finished-border text-finished-accent bg-finished-bg/5 hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30',
     ]"
-    aria-label="Toggle Theme"
+    :aria-pressed="isBlueprint"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

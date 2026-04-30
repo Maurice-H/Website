@@ -365,6 +365,7 @@ onUnmounted(() => {
     transparent 100%
   );
   clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  will-change: transform;
   pointer-events: none;
   z-index: 50; /* over the track but behind cards technically, but cards are inside track */
 }
@@ -374,16 +375,16 @@ onUnmounted(() => {
   top: 145px;
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
-  height: 30vh;
-  background: conic-gradient(
-    from 45deg at bottom,
+  width: 600px;
+  height: 50vh;
+  background: radial-gradient(
+    ellipse at top,
     color-mix(in srgb, var(--finished-accent) 40%, transparent) 0%,
-    color-mix(in srgb, var(--finished-accent) 10%, transparent) 35%,
-    transparent 100%
+    color-mix(in srgb, var(--finished-accent) 10%, transparent) 40%,
+    transparent 70%
   );
-  clip-path: polygon(45% 0, 55% 0, 80% 100%, 20% 100%);
-  filter: blur(350px);
+  opacity: 0.8;
+  will-change: transform;
   pointer-events: none;
   z-index: 51;
 }

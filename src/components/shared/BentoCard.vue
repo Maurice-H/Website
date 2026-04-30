@@ -117,8 +117,12 @@ onUnmounted(() => {
 .bento-card {
   background: black;
   border: 1px solid var(--finished-border);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   box-shadow: var(--finished-glow);
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-reveal {
@@ -135,7 +139,7 @@ onUnmounted(() => {
   border: 1px solid var(--finished-border);
   border-radius: inherit;
   pointer-events: none;
-  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: -1;
   background: transparent;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5);

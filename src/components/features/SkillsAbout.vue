@@ -15,7 +15,7 @@
         <span 
           v-for="skill in stack.skills" 
           :key="skill"
-          class="px-3 py-1.5 border border-finished-text/5 bg-finished-text/[0.03] rounded-full text-[10px] uppercase tracking-widest text-finished-text/40 hover:border-finished-accent/30 hover:text-finished-text/80 transition-all duration-300"
+          class="px-3 py-1.5 border border-finished-text/5 bg-finished-text/[0.03] rounded-full text-[10px] uppercase tracking-widest text-finished-text/40 hover:border-finished-accent/30 hover:text-finished-text/80 transition-colors duration-300"
         >
           {{ skill }}
         </span>

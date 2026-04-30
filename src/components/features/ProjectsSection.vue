@@ -16,14 +16,14 @@
         <span 
           v-for="tag in project.tags" 
           :key="tag"
-          class="px-2 py-0.5 text-[10px] uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-all"
+          class="px-2 py-0.5 text-[10px] uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-colors"
         >
           {{ tag }}
         </span>
       </div>
       
       <!-- Subtle Industrial Border on hover -->
-      <div class="absolute inset-0 border border-finished-accent/0 group-hover:border-finished-accent/10 transition-all pointer-events-none rounded-[inherit]"></div>
+      <div class="absolute inset-0 border border-finished-accent/0 group-hover:border-finished-accent/10 transition-colors pointer-events-none rounded-[inherit]"></div>
     </div>
   </BentoCard>
 </template>
