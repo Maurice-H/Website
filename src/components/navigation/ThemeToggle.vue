@@ -2,6 +2,7 @@
   <button
     type="button"
     @click="toggleTheme"
+    aria-label="Toggle Theme"
     class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95"
     :class="[
       isBlueprint
