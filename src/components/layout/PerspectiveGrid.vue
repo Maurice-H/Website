@@ -1,5 +1,5 @@
 <template>
-  <div class="perspective-grid-container fixed inset-0 pointer-events-none z-[-1]">
+  <div v-if="themeStore.lightingEnabled" class="perspective-grid-container fixed inset-0 pointer-events-none z-[-1]">
     <div 
       class="perspective-grid w-[200vw] h-[200vh] -left-[50vw] -top-[50vw]"
       :style="gridStyle"
@@ -10,8 +10,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
+import { useThemeStore } from '../../stores/useThemeStore';
 
 const lighting = useLightingStore();
+const themeStore = useThemeStore();
 
 const gridStyle = computed(() => {
   const isNav = lighting.phase === 'NAV';

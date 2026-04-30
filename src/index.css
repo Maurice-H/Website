@@ -38,6 +38,12 @@
 
   /* Blueprint Theme */
   --blueprint-border: rgba(255, 255, 255, 0.08);
+
+  /* Layout Bounds & Scaling */
+  --max-content-width: 1200px;
+  --page-padding: 2rem;
+  --beam-width: max(900px, 30vw);
+  --beam-height: max(1700px, 120vh);
 }
 
 .noise-overlay {

@@ -1,14 +1,15 @@
 <template>
   <div 
     ref="cardRef"
-    class="bento-card relative rounded-2xl p-6 transition-all duration-700 overflow-hidden flex flex-col min-w-0 w-full h-full group"
+    class="bento-card relative rounded-2xl p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass]"
+    
   >
     <!-- Background Layer (Base) -->
-    <div class="absolute inset-0 bg-black/40 z-[-1]"></div>
+    <div class="absolute inset-0 bg-finished-bg/40 z-[-1]"></div>
     
     <!-- Blueprint Layer (Dashed) -->
-    <div class="absolute inset-0 border border-dashed border-white/5 rounded-2xl pointer-events-none z-0"></div>
+    <div class="absolute inset-0 border border-dashed border-blueprint-border rounded-2xl pointer-events-none z-0"></div>
     
     <!-- Glass/Finished Layer (Revealed via Mask) -->
     <div 
@@ -24,6 +25,12 @@
       <div class="bento-card-stack-layer layer-3"></div>
     </div>
     
+    <!-- Glare Effect Overlay -->
+    <div
+      class="absolute inset-0 pointer-events-none z-[15] rounded-[inherit]"
+      :style="glareStyle"
+    ></div>
+    
     <!-- Content Slot Wrapper -->
     <div class="relative z-20 flex-1 flex flex-col w-full h-full">
        <WindowFrame v-if="withWindow" :title="title">
@@ -36,6 +43,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useMouseTilt } from '../../composables/useMouseTilt';
 import { useViewportStore } from '../../stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
@@ -58,6 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
 const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
 let unregisterFn: (() => void) | null = null;
+
+const { glareStyle } = useMouseTilt(cardRef);
 
 const revealStyle = computed(() => {
   return {
@@ -106,16 +116,16 @@ onUnmounted(() => {
 
 <style scoped>
 .bento-card {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: black;
+  border: 1px solid var(--finished-border);
   backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  box-shadow: var(--finished-glow);
 }
 
 .glass-reveal {
-  background: rgba(16, 185, 129, 0.015);
-  backdrop-filter: blur(40px);
-  border: 1px solid rgba(16, 185, 129, 0.1);
+  background: black;
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
 }
 
 /* Layered Wireframe Stack Effect (High-Fidelity Mockup) */
@@ -123,13 +133,13 @@ onUnmounted(() => {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(16, 185, 129, 0.3); /* Clearer green tint */
+  border: 1px solid var(--finished-border);
   border-radius: inherit;
   pointer-events: none;
   transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: -1;
   background: transparent;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* subtle inner shadow for depth */
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
 
 /* 
@@ -153,24 +163,23 @@ onUnmounted(() => {
 
 .bento-card:hover .layer-1 {
   transform: translate(-10px, 10px);
-  border-color: rgba(16, 185, 129, 0.5);
+  border-color: var(--finished-accent);
 }
 
 .bento-card:hover .layer-2 {
   transform: translate(-20px, 20px);
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: var(--finished-accent);
 }
 
 .bento-card:hover .layer-3 {
   transform: translate(-30px, 30px);
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: var(--finished-accent);
 }
 
 .bento-card:hover {
-  border-color: rgba(16, 185, 129, 0.6);
+  border-color: var(--finished-accent);
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.8),
-    0 0 40px rgba(16, 185, 129, 0.2);
-  transform: scale(1.01);
+    var(--finished-glow);
 }
 </style>

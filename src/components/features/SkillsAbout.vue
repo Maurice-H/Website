@@ -2,7 +2,7 @@
   <!-- About Tile (Discovery Path) -->
   <BentoCard id="about-discovery" class="md:col-span-3 md:row-span-1" with-window title="Discovery Path">
     <div class="p-10 flex flex-col h-full">
-      <p class="text-white/50 text-lg leading-relaxed max-w-2xl">
+      <p class="text-finished-text/50 text-lg leading-relaxed max-w-2xl">
         {{ bio.content }}
       </p>
     </div>
@@ -15,7 +15,7 @@
         <span 
           v-for="skill in stack.skills" 
           :key="skill"
-          class="px-3 py-1.5 border border-white/5 bg-white/[0.03] rounded-full text-[10px] uppercase tracking-widest text-white/40 hover:border-[var(--accent-color)]/30 hover:text-white/80 transition-all duration-300"
+          class="px-3 py-1.5 border border-finished-text/5 bg-finished-text/[0.03] rounded-full text-[10px] uppercase tracking-widest text-finished-text/40 hover:border-finished-accent/30 hover:text-finished-text/80 transition-all duration-300"
         >
           {{ skill }}
         </span>

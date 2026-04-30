@@ -10,14 +10,14 @@
       <div 
         v-for="i in 3" 
         :key="i"
-        class="absolute inset-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 pointer-events-none"
+        class="absolute inset-0 rounded-2xl border border-finished-text/10 bg-finished-text/5 backdrop-blur-md transition-all duration-300 pointer-events-none"
         :style="getStackLayerStyle(i)"
       ></div>
       
       <!-- Main Content Card -->
       <BentoCard 
         id="stacked-main" 
-        class="absolute inset-0 z-10 !bg-white/10 !backdrop-blur-xl border border-white/20 shadow-2xl"
+        class="absolute inset-0 z-10 !bg-finished-text/10 !backdrop-blur-xl border border-finished-text/20 shadow-2xl"
       >
         <slot></slot>
       </BentoCard>

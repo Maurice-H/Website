@@ -1,14 +1,14 @@
 <template>
   <button
     type="button"
-    @click="toggleTheme"
+    @click="toggleLighting"
     class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95"
     :class="[
       isBlueprint
         ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
         : 'border-finished-border text-finished-accent bg-finished-bg/5 hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30',
     ]"
-    aria-label="Toggle Theme"
+    aria-label="Toggle Lighting Effects"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,23 +18,32 @@
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="w-10 h-10 transition-all duration-[var(--theme-transition-duration)] drop-shadow-[0_0_15px_currentColor]"
+      class="w-10 h-10 transition-all duration-[var(--theme-transition-duration)]"
+      :class="lightingEnabled ? 'drop-shadow-[0_0_15px_currentColor]' : 'opacity-40'"
     >
+      <!-- Lamp body -->
       <path d="M9 18h6" />
       <path d="M10 22h4" />
-      <path v-if="!isBlueprint" d="M12 2v1" />
       <path
         d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.25.5 2.4 1.5 3.5.76.76 1.23 1.52 1.41 2.5"
       />
+      <!-- Light rays (only shown when lighting is ON) -->
+      <template v-if="lightingEnabled">
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="19.78" y1="4.22" x2="18.36" y2="5.64" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+      </template>
     </svg>
     <div
       class="ml-4 flex flex-col items-start transition-colors duration-[var(--theme-transition-duration)]"
     >
       <span class="text-xs uppercase tracking-widest font-bold opacity-60"
-        >System Mode</span
+        >Lighting</span
       >
       <span class="font-mono font-bold tracking-wider text-sm mt-1">
-        {{ isBlueprint ? "Blueprint" : "Finished" }}
+        {{ lightingEnabled ? "On" : "Off" }}
       </span>
     </div>
   </button>
@@ -45,20 +54,20 @@ import { storeToRefs } from "pinia";
 import { useThemeStore } from "../../stores/useThemeStore";
 
 const themeStore = useThemeStore();
-const { isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
+const { lightingEnabled, isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
 const playSwitchSound = () => {
   try {
-    const audio = new Audio("audio/switch2.ogg");
+    const audio = new Audio("audio/switch15.ogg");
     audio.volume = 0.5;
     audio.play();
-  } catch (e) {
+  } catch {
     // Silently ignore if audio fails (e.g. browser policy)
   }
 };
 
-const toggleTheme = () => {
-  themeStore.toggleTheme();
+const toggleLighting = () => {
+  themeStore.toggleLighting();
   playSwitchSound();
 };
 </script>
