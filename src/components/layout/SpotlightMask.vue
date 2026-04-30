@@ -102,7 +102,7 @@ const radialOverlayStyle = computed<CSSProperties>(() => {
   }
 
   // CONTENT phase: dynamic radial distance falloff centered around the mouse cursor
-  // The oversized element is 300vw x 300vh, top/left -150vw/vh, so 0,0 translate means 
+  // The oversized element is 300vw x 300vh, top/left -150vw/vh, so 0,0 translate means
   // its center is at the top left of the screen. We translate it to the mouse coordinates.
   return {
     background: `radial-gradient(

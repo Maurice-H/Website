@@ -31,7 +31,7 @@ export const useLightingStore = defineStore('lighting', () => {
     // avoiding Vue reactive recomputes on every frame.
     document.documentElement.style.setProperty(
       '--flashlight-rotation',
-      `${flashlightRotation.value}`,
+      `${flashlightRotation.value}`
     );
   };
 

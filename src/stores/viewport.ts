@@ -35,7 +35,7 @@ export const useViewportStore = defineStore('viewport', () => {
   const handleMouseMove = (e: MouseEvent) => {
     const cx = e.clientX;
     const cy = e.clientY;
-    
+
     // We only need to store these if other things still read them
     mousePosition.x = cx;
     mousePosition.y = cy;

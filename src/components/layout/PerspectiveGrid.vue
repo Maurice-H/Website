@@ -27,8 +27,8 @@ const containerStyle = computed(() => {
 
   // The container is 100vw x 100vh (inset-0). The mask is at 50% 50% (50vw, 50vh).
   // We offset the mask position to follow the mouse:
-  const maskPos = isNav 
-    ? '0px -20vh, 0px 0px' 
+  const maskPos = isNav
+    ? '0px -20vh, 0px 0px'
     : 'calc(var(--mouse-x) - 50vw) calc(var(--mouse-y) - 50vh), 0px 0px';
 
   return {
