@@ -10,19 +10,24 @@ Currently, theming is applied inconsistently and sometimes resets unexpectedly (
 - **Component Hierarchy & Reusability**: Ensure hover effects and layout behaviors are encapsulated inside generic wrapper components (e.g., `BentoCard.vue`), keeping the bento grid DRY.
 - **Responsive Layouts**: Implement flexible layouts for mobile devices (stacking bento cards) and fix fixed pixel values for ultra-wide monitors (e.g., ensuring light rays extend infinitely).
 - **Micro-Interactions**: Add a subtle 3D tilt/glare effect on Bento cards on hover and quiet UI sound effects for toggling the theme.
+- **Lighting Effects Toggle**: A new toggle button (placed left of the existing ThemeToggle) that enables/disables all atmospheric lighting effects (VolumetricBeam, SpotlightMask light-overlay, PerspectiveGrid, FlashlightSource beam in NAV phase). When disabled, the scene becomes a clean dark canvas with content fully visible. Plays `switch15.ogg` on toggle. State is persisted via localStorage. Mouse rotation tracking is paused when effects are off for performance.
 
 ## Capabilities
 
 ### New Capabilities
 - `micro-interactions`: Requirements for tactile feedback, including 3D tilt/glare on bento cards and subtle UI sound effects for theming.
+- `lighting-toggle`: A dedicated toggle button to enable/disable all atmospheric lighting effects (beam, overlay, grid) across both NAV and CONTENT phases. Managed via `useThemeStore` alongside the Blueprint/Finished toggle as a second theme axis.
 
 ### Modified Capabilities
-- `theme-engine`: Requires strict enforcement of CSS variables over Tailwind colors and persistent Pinia state management that survives navigation and keypresses.
+- `theme-engine`: Requires strict enforcement of CSS variables over Tailwind colors and persistent Pinia state management that survives navigation and keypresses. Extended with a `lightingEnabled` boolean for the lighting effects toggle.
 - `bento-layout`: Requires responsive behavior adjustments for mobile (stacking) and ultra-wide screens (fluid scaling/boundaries), plus integration of hover wrappers.
 
 ## Impact
 
 - **Affected Code**: `src/assets/index.css`, `src/stores/useThemeStore.ts`, all Vue components using hardcoded Tailwind colors, `BentoCard.vue`, `LandingPage.vue`.
+- **New Component**: `src/components/navigation/LightingToggle.vue` — the toggle button with `switch15.ogg` audio, placed left of `ThemeToggle` in the floating controls bar.
+- **Store Changes**: `src/stores/useThemeStore.ts` — adds `lightingEnabled` ref with localStorage persistence and `toggleLighting()` action.
+- **Component Changes**: `SpotlightMask.vue`, `VolumetricBeam.vue`, `PerspectiveGrid.vue` — conditionally render/hide based on `useThemeStore.lightingEnabled`.
 - **Dependencies**: May require adding a lightweight library for 3D tilt effects (e.g., `vanilla-tilt.js` or custom Vue implementation) or audio playing (e.g., `howler.js` or native HTML5 audio).
 
 ## Non-goals

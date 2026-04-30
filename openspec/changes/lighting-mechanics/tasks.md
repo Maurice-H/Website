@@ -17,7 +17,8 @@
 - [ ] 3.2 Refactor `VolumetricBeam.vue` to read `lighting.beamGeometry` for position, rotation, and spread — remove all local offset calculations (`-90`, `transformOrigin: '0px 20px'`).
 - [ ] 3.3 Refactor `SpotlightMask.vue` to read `lighting.beamGeometry` for cone origin and angles — remove local `+90 - halfSpread` calculations and `originX`/`originY` strings.
 - [ ] 3.4 Refactor `PerspectiveGrid.vue` to read `lighting.beamGeometry.origin` for the mask center instead of raw `--mask-x`/`--mask-y` CSS variables.
-- [ ] 3.5 Verify visual alignment: VolumetricBeam cone, SpotlightMask cutout, and FlashlightSource body all overlap perfectly when pointing at any screen corner.
+- [ ] 3.5 Fix `PerspectiveGrid.vue` mask shape — replace the radial-gradient blob mask with a conic-gradient mask that matches the VolumetricBeam cone angle and spread, so the grid illumination aligns with the beam wedge shape instead of lighting the sides.
+- [ ] 3.6 Verify visual alignment: VolumetricBeam cone, SpotlightMask cutout, PerspectiveGrid illumination, and FlashlightSource body all overlap perfectly when pointing at any screen corner.
 
 ## 4. Draggable Flashlight
 

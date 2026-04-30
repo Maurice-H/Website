@@ -33,13 +33,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useLightingStore } from '../../stores/lighting';
+import { useThemeStore } from '../../stores/useThemeStore';
 import FlashlightSource from './FlashlightSource.vue';
 import PerspectiveGrid from './PerspectiveGrid.vue';
 import VolumetricBeam from './VolumetricBeam.vue';
 
 const lighting = useLightingStore();
+const themeStore = useThemeStore();
 
 const overlayStyle = computed(() => {
+  // When lighting is disabled, no darkness overlay
+  if (!themeStore.lightingEnabled) {
+    return { background: 'none' };
+  }
+
   const isNav = lighting.phase === 'NAV';
 
   // NAV phase: Static overhead lamp — softer, wider illumination
@@ -61,7 +68,7 @@ const overlayStyle = computed(() => {
   // Layer 1 (TOP): Radial distance falloff — bell-curve shape
   // Dark near source → bright sweet spot at mid-range → dark at far edges
   const radialFalloff = `radial-gradient(
-    circle 1400px at ${originX} ${originY},
+    circle calc(var(--beam-height) * 0.9) at ${originX} ${originY},
     rgba(0,0,0,0.7) 0%,
     rgba(0,0,0,0.4) 15%,
     transparent 30%,
@@ -99,7 +106,7 @@ const overlayStyle = computed(() => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: var(--finished-bg);
+  background: black;
   transition: background-color var(--theme-transition-duration) ease-in-out;
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="lighting.phase === 'CONTENT'"
+    v-if="lighting.phase === 'CONTENT' && themeStore.lightingEnabled"
     class="volumetric-beam fixed pointer-events-none z-[90]"
     :style="beamContainerStyle"
   >
@@ -23,8 +23,10 @@ import type { CSSProperties } from 'vue';
 import { computed } from 'vue';
 
 import { useLightingStore } from '../../stores/lighting';
+import { useThemeStore } from '../../stores/useThemeStore';
 
 const lighting = useLightingStore();
+const themeStore = useThemeStore();
 
 const beamContainerStyle = computed<CSSProperties>(() => {
   return {
@@ -47,12 +49,12 @@ const beamInnerStyle = computed<CSSProperties>(() => {
       rgba(16, 185, 129, 0.4) 40%,
       transparent 100%)`,
     clipPath: 'polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%)',
-    width: '1000px',
-    height: '1500px',
+    width: 'var(--beam-width)',
+    height: 'var(--beam-height)',
     /* Shift top by 36px so when rotated 180deg, the tip is exactly 16px above the origin (at the lens) */
     top: '36px',
     /* Center the top of the polygon (50% mark) exactly at the origin (0px) */
-    marginLeft: '-500px',
+    marginLeft: 'calc(var(--beam-width) / -2)',
     filter: 'blur(50px)',
     opacity: '0.85',
     position: 'absolute',
@@ -70,8 +72,8 @@ const beamInnerStyle = computed<CSSProperties>(() => {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 400px;
-  height: 1500px;
+  width: min(400px, 80vw);
+  height: var(--beam-height);
   border-radius: 50%;
   background: conic-gradient(
     from 45deg at bottom,
@@ -106,8 +108,8 @@ const beamInnerStyle = computed<CSSProperties>(() => {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 800px;
-  height: 1200px;
+  width: min(800px, 100vw);
+  height: var(--beam-height);
   background-image:
     radial-gradient(
       1.5px 1.5px at 20px 30px,

@@ -27,9 +27,23 @@ The current styling approach mixes Tailwind utility classes with hardcoded value
 - **Micro-Interactions**: Use CSS 3D transforms (`transform: perspective(...)`) guided by mouse position coordinates, calculated via a composable (e.g., `useMouseTilt`).
   - *Rationale*: Avoids heavy external dependencies while providing tactile feedback.
 
+### 5. Lighting Effects Toggle
+
+**Decision**: Add a `lightingEnabled` boolean to `useThemeStore` (persisted to localStorage), exposed as a second theme axis alongside `isBlueprintMode`. A new `LightingToggle.vue` button is placed left of the existing `ThemeToggle` in the floating controls bar. When `lightingEnabled` is false:
+- `VolumetricBeam` does not render (v-if)
+- `SpotlightMask`'s `.light-overlay` becomes fully transparent (no conic/radial darkness)
+- `PerspectiveGrid` does not render (v-if)
+- NAV-phase lamp beam/glow is hidden — lamp appears "off"
+- Mouse rotation tracking in the viewport store is skipped for performance
+- Audio: plays `public/Audio/switch15.ogg` on toggle
+
+**Rationale**: This is conceptually a "theme" concern (light vs. clean) rather than a "lighting mechanics" concern. Both toggles control the visual presentation layer, so colocating them in `useThemeStore` keeps the API clean. Persisting to localStorage means the user's preference survives page reloads.
+
 ## Risks / Trade-offs
 
 - **Risk**: Moving away from Tailwind colors to CSS variables might make it harder to read template styling.
   - *Mitigation*: Clearly document the CSS variables in `index.css` and use a consistent naming convention (e.g., `var(--color-bg-primary)`).
 - **Risk**: 3D hover effects might impact performance on low-end devices.
   - *Mitigation*: Disable hover 3D transforms via CSS `@media (hover: none)` and `(prefers-reduced-motion)`.
+- **Risk**: Disabling lighting effects may make the page look too plain/empty.
+  - *Mitigation*: When lighting is off, the solid `--finished-bg` background plus content styling should still feel premium. The toggle is a power-user/accessibility feature, not the default.

@@ -2,6 +2,13 @@ export interface ThemeState {
   isBlueprint: boolean;
 }
 
+export interface BentoCardProps {
+  interactive?: boolean;
+  colSpan?: 1 | 2 | 3 | 4;
+  rowSpan?: 1 | 2 | 3 | 4;
+  className?: string;
+}
+
 export interface PortfolioProject {
   id: string;
   title: string;

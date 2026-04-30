@@ -52,7 +52,7 @@ defineProps<{
   width: 100%;
   aspect-ratio: 16/10;
   background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--blueprint-border);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -62,10 +62,10 @@ defineProps<{
 }
 
 .is-active .window-container {
-  border-color: rgba(16, 185, 129, 0.5);
+  border-color: color-mix(in srgb, var(--finished-accent) 50%, transparent);
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(16, 185, 129, 0.15);
+    0 0 30px color-mix(in srgb, var(--finished-accent) 15%, transparent);
 }
 
 .window-content {
@@ -102,7 +102,7 @@ defineProps<{
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 11px;
   line-height: 1.8;
-  color: rgba(16, 185, 129, 0.8);
+  color: color-mix(in srgb, var(--finished-accent) 80%, transparent);
 }
 :deep(.code-line) {
   display: flex;
@@ -138,7 +138,7 @@ defineProps<{
 }
 :deep(.profile-lines) .line {
   height: 4px;
-  background: rgba(16, 185, 129, 0.08);
+  background: color-mix(in srgb, var(--finished-accent) 8%, transparent);
   border-radius: 2px;
   margin-bottom: 8px;
 }

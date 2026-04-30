@@ -3,6 +3,11 @@
     <Transition name="fade-overlay" mode="out-in">
       <!-- Navigation Phase -->
       <div v-if="lighting.phase === 'NAV'" key="nav" class="h-screen w-full relative">
+        <!-- Floating Controls (NAV Phase — Lighting Toggle only) -->
+        <div class="fixed top-8 right-8 z-[100] flex items-center gap-4 pointer-events-auto">
+          <LightingToggle />
+          <ThemeToggle />
+        </div>
         <!-- Fused Background Text (Landing Page Parity) -->
         <div 
           class="absolute inset-0 flex items-end justify-center pointer-events-none pb-[10vh]"
@@ -19,11 +24,12 @@
       <div v-else key="content" class="p-4 md:p-8 lg:p-16 min-h-screen relative">
         <!-- Floating Controls (Theme Toggle + ESC Back) -->
         <div class="fixed top-8 right-8 z-[100] flex items-center gap-4 pointer-events-auto">
+          <LightingToggle />
           <ThemeToggle />
           <button 
             type="button"
             @click="handleBackToNav"
-            class="px-4 py-2 border border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer"
+            class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer"
           >
             [ ESC ] Back
           </button>
@@ -52,6 +58,7 @@ import ProjectsSection from './components/features/ProjectsSection.vue';
 import SkillsAbout from './components/features/SkillsAbout.vue';
 import BentoLayout from './components/layout/BentoLayout.vue';
 import SpotlightMask from './components/layout/SpotlightMask.vue';
+import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
 import { initGlobalViewportService } from './composables/useViewportStore';

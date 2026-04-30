@@ -87,3 +87,11 @@
 - [ ] **Back to Top Button:** A floating action button that appears after scrolling down, styled consistently with the theme.
 - [ ] **Bento Card Hover Effects:** Add a subtle 3D tilt or glare effect on the Bento cards when hovering over them to make them feel more tactile.
 - [ ] **Subtle Sound Effects (Optional):** Add very quiet, satisfying UI sounds for actions like toggling the theme (light switch click) or hovering over buttons.
+
+Order to do the Core changes with /opsx-apply:
+
+1. [x] theming-responsiveness
+2. [ ] core-navigation-layout
+3. [ ] lighting-mechanics
+4. [ ] dynamic-content-integration
+5. [ ] performance-seo

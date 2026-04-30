@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 import { useLightingStore } from './lighting';
+import { useThemeStore } from './useThemeStore';
 
 interface ViewportOffset {
   left: number;
@@ -17,6 +18,7 @@ export const useViewportStore = defineStore('viewport', () => {
   const mousePosition = reactive({ x: 0, y: 0 });
   const isListening = ref(false);
   const lighting = useLightingStore();
+  const themeStore = useThemeStore();
 
   const updateAll = () => {
     for (const [_id, reg] of registeredComponents) {
@@ -29,6 +31,9 @@ export const useViewportStore = defineStore('viewport', () => {
   const handleMouseMove = (e: MouseEvent) => {
     mousePosition.x = e.clientX;
     mousePosition.y = e.clientY;
+
+    // Skip all lighting-related tracking when effects are disabled
+    if (!themeStore.lightingEnabled) return;
 
     // Update global mask variables only in CONTENT phase
     if (lighting.phase === 'CONTENT') {

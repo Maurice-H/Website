@@ -8,11 +8,11 @@
       Hi. I'm <span class="text-[var(--finished-accent)]">Alex</span>
     </h1>
     
-    <p class="max-w-xl text-xl md:text-2xl text-white/60 leading-relaxed mb-12 font-sans font-light">
+    <p class="max-w-xl text-xl md:text-2xl text-finished-text/60 leading-relaxed mb-12 font-sans font-light">
       A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.
     </p>
     
-    <div class="flex flex-wrap items-center gap-8 text-[10px] md:text-xs tracking-[0.4em] font-mono text-white/30 uppercase">
+    <div class="flex flex-wrap items-center gap-8 text-[10px] md:text-xs tracking-[0.4em] font-mono text-finished-text/30 uppercase">
       <div class="flex items-center gap-2">
         <span class="w-1 h-1 bg-[var(--finished-accent)] rounded-full"></span>
         DEVELOPER
