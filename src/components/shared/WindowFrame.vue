@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue';
 
 const props = defineProps<{
   title?: string;
@@ -38,9 +38,7 @@ const props = defineProps<{
 // If the title naturally has brackets (like "[ STACK ]"), format it monospace
 const isBracketed = computed(() => {
   if (!props.title) return false;
-  return (
-    props.title.trim().startsWith("[") || props.title.toLowerCase() === "stack"
-  );
+  return props.title.trim().startsWith('[') || props.title.toLowerCase() === 'stack';
 });
 </script>
 

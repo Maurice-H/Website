@@ -60,5 +60,4 @@ describe('BentoCard.vue', () => {
 
     expect(registerSpy).toHaveBeenCalledWith('test-card', expect.any(HTMLElement));
   });
-
 });

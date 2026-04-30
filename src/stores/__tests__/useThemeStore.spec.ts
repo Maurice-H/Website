@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { nextTick } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { useThemeStore } from '../useThemeStore';
 
 describe('useThemeStore', () => {

@@ -8,9 +8,8 @@ export const useThemeStore = defineStore('theme', () => {
   const isBlueprintMode = ref<ThemeState['isBlueprint']>(false);
 
   // Lighting effects toggle — persisted to localStorage
-  const storedLighting = typeof window !== 'undefined'
-    ? localStorage.getItem(LIGHTING_STORAGE_KEY)
-    : null;
+  const storedLighting =
+    typeof window !== 'undefined' ? localStorage.getItem(LIGHTING_STORAGE_KEY) : null;
   const lightingEnabled = ref<boolean>(storedLighting !== null ? storedLighting === 'true' : true);
 
   const toggleTheme = () => {
@@ -50,4 +49,3 @@ export const useThemeStore = defineStore('theme', () => {
     toggleLighting,
   };
 });
-

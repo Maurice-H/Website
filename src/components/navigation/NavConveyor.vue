@@ -118,19 +118,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import { useLightingEngine } from "../../composables/useLightingEngine";
-import { NAV_TABS as tabs } from "../../data/portfolio";
-import { LightingPhase } from "../../types/index";
-import NavWindow from "./NavWindow.vue";
-import { useThemeStore } from "../../stores/useThemeStore";
-import { storeToRefs } from "pinia";
+import { storeToRefs } from 'pinia';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useLightingEngine } from '../../composables/useLightingEngine';
+import { NAV_TABS as tabs } from '../../data/portfolio';
+import { useThemeStore } from '../../stores/useThemeStore';
+import { LightingPhase } from '../../types/index';
+import NavWindow from './NavWindow.vue';
 
 const { setPhase } = useLightingEngine();
 const { lightingEnabled } = storeToRefs(useThemeStore());
 const trackEl = ref<HTMLElement | null>(null);
 
-const activeId = ref("skills"); // Start at EXPERIENCE to match mockup
+const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
@@ -142,7 +142,7 @@ const startDrag = (e: MouseEvent) => {
   isDragging = true;
   startX = e.pageX - trackEl.value.offsetLeft;
   scrollLeft = trackEl.value.scrollLeft;
-  trackEl.value.style.cursor = "grabbing";
+  trackEl.value.style.cursor = 'grabbing';
 };
 
 const onDrag = (e: MouseEvent) => {
@@ -155,14 +155,14 @@ const onDrag = (e: MouseEvent) => {
 
 const stopDrag = () => {
   isDragging = false;
-  if (trackEl.value) trackEl.value.style.cursor = "grab";
+  if (trackEl.value) trackEl.value.style.cursor = 'grab';
 };
 
 const handleScroll = () => {
   if (!trackEl.value) return;
 
   // Find which tab is closest to center
-  const elements = trackEl.value.querySelectorAll(".nav-window");
+  const elements = trackEl.value.querySelectorAll('.nav-window');
   let closestId = tabs[0].id;
   let minDistance = Infinity;
 
@@ -195,12 +195,12 @@ const selectTab = (id: string) => {
 };
 
 onMounted(() => {
-  window.addEventListener("mousemove", onDrag);
-  window.addEventListener("mouseup", stopDrag);
+  window.addEventListener('mousemove', onDrag);
+  window.addEventListener('mouseup', stopDrag);
   // Initial scroll to EXPERIENCE
   if (trackEl.value) {
     // Find the skills tab
-    const index = tabs.findIndex((t) => t.id === "skills");
+    const index = tabs.findIndex((t) => t.id === 'skills');
     if (index >= 0) {
       setTimeout(() => {
         if (!trackEl.value) return;
@@ -212,8 +212,8 @@ onMounted(() => {
   }
 });
 onUnmounted(() => {
-  window.removeEventListener("mousemove", onDrag);
-  window.removeEventListener("mouseup", stopDrag);
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('mouseup', stopDrag);
 });
 </script>
 
