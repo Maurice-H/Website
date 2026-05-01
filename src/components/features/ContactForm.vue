@@ -4,24 +4,33 @@
       <p class="text-finished-text/40 text-sm mb-8 font-mono tracking-wide">Establish direct channel for collaboration.</p>
       
       <form @submit.prevent class="flex flex-col gap-5 flex-1">
-        <div class="input-wrapper">
+        <div class="input-wrapper flex flex-col">
+          <label for="contact-name" class="sr-only">Name</label>
           <input 
+            id="contact-name"
             type="text" 
-            placeholder="Name" 
-            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors"
+            placeholder="Name"
+            required
+            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--finished-accent)] transition-colors"
           />
         </div>
-        <div class="input-wrapper">
+        <div class="input-wrapper flex flex-col">
+          <label for="contact-email" class="sr-only">Email</label>
           <input 
+            id="contact-email"
             type="email" 
-            placeholder="Email" 
-            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors"
+            placeholder="Email"
+            required
+            class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--finished-accent)] transition-colors"
           />
         </div>
-        <div class="input-wrapper flex-1">
+        <div class="input-wrapper flex-1 flex flex-col">
+          <label for="contact-message" class="sr-only">Message</label>
           <textarea 
+            id="contact-message"
             placeholder="Message" 
-            class="contact-input w-full h-full min-h-[120px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none transition-colors resize-none"
+            required
+            class="contact-input w-full h-full min-h-[120px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--finished-accent)] transition-colors resize-none"
           ></textarea>
         </div>
         
