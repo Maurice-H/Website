@@ -1,10 +1,11 @@
 <template>
   <div class="stacked-card-wrapper perspective-1000">
     <div 
+      ref="containerRef"
       class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d hover:rotate-y-12"
       @mousemove="handleMouseMove"
       @mouseleave="resetRotation"
-      :style="containerStyle"
+      style="transform: rotateX(0deg) rotateY(0deg);"
     >
       <!-- Background layers for stack effect -->
       <div 
@@ -26,25 +27,50 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 import BentoCard from './BentoCard.vue';
 
-const rotation = ref({ x: 0, y: 0 });
+const containerRef = ref<HTMLElement | null>(null);
+let rafId: number | null = null;
+
+// ⚡ Bolt Optimization:
+// Removed reactive 'rotation' ref and computed 'containerStyle'.
+// Replaced with vanilla DOM updates inside requestAnimationFrame to prevent
+// Vue reactivity thrashing and layout recalculations on every mousemove event.
+let pendingX = 0;
+let pendingY = 0;
 
 const handleMouseMove = (e: MouseEvent) => {
-  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-  const x = (e.clientX - rect.left) / rect.width - 0.5;
-  const y = (e.clientY - rect.top) / rect.height - 0.5;
-  rotation.value = { x: -y * 20, y: x * 20 };
+  pendingX = e.clientX;
+  pendingY = e.clientY;
+
+  if (rafId !== null) return;
+  rafId = requestAnimationFrame(() => {
+    if (containerRef.value) {
+      const rect = containerRef.value.getBoundingClientRect();
+      const x = (pendingX - rect.left) / rect.width - 0.5;
+      const y = (pendingY - rect.top) / rect.height - 0.5;
+      containerRef.value.style.transform = `rotateX(${-y * 20}deg) rotateY(${x * 20}deg)`;
+    }
+    rafId = null;
+  });
 };
 
 const resetRotation = () => {
-  rotation.value = { x: 0, y: 0 };
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  if (containerRef.value) {
+    containerRef.value.style.transform = `rotateX(0deg) rotateY(0deg)`;
+  }
 };
 
-const containerStyle = computed(() => ({
-  transform: `rotateX(${rotation.value.x}deg) rotateY(${rotation.value.y}deg)`,
-}));
+onUnmounted(() => {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+  }
+});
 
 const getStackLayerStyle = (index: number) => {
   return {

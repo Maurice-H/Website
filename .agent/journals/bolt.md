@@ -1,0 +1,3 @@
+## 2024-05-15 - Vue Reactivity Thrashing with MouseMove
+ **Learning:** Using Vue's `ref` and `computed` properties for high-frequency events like `mousemove` causes severe performance degradation and layout thrashing as Vue tracks dependencies and diffs the virtual DOM on every pixel movement.
+ **Action:** For animations and effects tied to `mousemove`, bypass Vue reactivity entirely. Use vanilla DOM manipulation (`element.style.transform = ...`) throttled by `requestAnimationFrame`. Crucially, when throttling `mousemove` with `rAF`, store the `e.clientX` and `e.clientY` in closure variables *before* the early return `if (rafId) return;` so that the scheduled frame always executes with the latest cursor position, avoiding a stale final state when movement stops.
