@@ -1,0 +1,3 @@
+## 2026-05-02 - Optimize Layout Thrashing via rAF and IntersectionObserver
+**Learning:** High-frequency events (like scroll, resize, and mousemove) can cause significant layout thrashing and Vue 3 reactivity bottlenecks if DOM reads/writes (like getBoundingClientRect) and state updates are not throttled. In `viewport.ts`, recalculating offsets for off-screen elements exacerbated this issue.
+**Action:** Always throttle continuous high-frequency event handlers using `requestAnimationFrame`. Additionally, use `IntersectionObserver` to bypass expensive DOM measurements for elements that are completely outside the visible viewport.

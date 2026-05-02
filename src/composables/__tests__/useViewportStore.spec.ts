@@ -8,6 +8,19 @@ import { useViewportStore } from '../useViewportStore';
 describe('useViewportStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+
+    // Mock IntersectionObserver
+    class MockIntersectionObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+    window.IntersectionObserver =
+      MockIntersectionObserver as unknown as typeof IntersectionObserver;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should register a component and calculate initial offsets', () => {
@@ -132,7 +145,7 @@ describe('useViewportStore', () => {
       expect(addEventListenerSpy.mock.calls.length).toBe(callCount);
     });
 
-    it('should update offsets on resize/scroll events', () => {
+    it('should update offsets on resize/scroll events', async () => {
       const store = useViewportStore();
 
       const mockEl = {
@@ -151,11 +164,17 @@ describe('useViewportStore', () => {
       // Trigger resize event
       window.dispatchEvent(new Event('resize'));
 
+      // wait for raf
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
       expect(store.getOffsets('test-element').left).toBe(300);
       expect(store.getOffsets('test-element').top).toBe(400);
 
       (mockEl.getBoundingClientRect as Mock).mockReturnValue({ left: 500, top: 600 });
       window.dispatchEvent(new Event('scroll'));
+
+      // wait for raf
+      await new Promise((resolve) => requestAnimationFrame(resolve));
 
       expect(store.getOffsets('test-element').left).toBe(500);
       expect(store.getOffsets('test-element').top).toBe(600);
@@ -214,6 +233,8 @@ describe('useViewportStore', () => {
         clientY: 100,
       });
       window.dispatchEvent(mouseEvent);
+
+      await new Promise((resolve) => requestAnimationFrame(resolve));
 
       // Verify mouse position was updated (always written, even in NAV)
       expect(store.mousePosition.x).toBe(100);
