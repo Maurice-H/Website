@@ -41,5 +41,3 @@ coverage/
 artifacts/
 scratch/
 .stitch_project_id
-playwright-report/
-test-results/
