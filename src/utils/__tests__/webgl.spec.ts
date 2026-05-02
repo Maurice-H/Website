@@ -1,5 +1,5 @@
-import { Matrix4, PerspectiveCamera, Vector3 } from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { PerspectiveCamera, Vector3 } from 'three';
+import { describe, expect, it } from 'vitest';
 import { projectToScreenSpace } from '../webgl';
 
 describe('WebGL Utilities', () => {
