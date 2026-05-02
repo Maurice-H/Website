@@ -1,0 +1,3 @@
+## 2025-02-28 - Missing Form Labels and Focus Indicators
+Learning: Placeholder-only forms are a severe accessibility anti-pattern. Screen readers may skip placeholders, and they disappear when users start typing, losing context. Furthermore, custom form inputs that remove standard focus outlines (`focus:outline-none`) must explicitly provide alternative focus indicators using `focus-visible` for keyboard navigators.
+Action: Always pair `<input>` and `<textarea>` elements with explicit `<label>` elements linked via `id` and `for` attributes. Ensure focus states are accessible by applying `focus-visible:ring-*` when native outlines are suppressed.
