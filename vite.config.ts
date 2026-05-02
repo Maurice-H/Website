@@ -14,6 +14,19 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  build: {
+    target: 'esnext',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('three') || id.includes('@tresjs')) {
+            return 'three-vendor';
+          }
+        },
+      },
+    },
+  },
   test: {
     environment: 'happy-dom',
     globals: true,
