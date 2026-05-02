@@ -7,17 +7,23 @@
     ]"
   >
     <!-- Window Frame -->
-    <div class="window-container">
-      <WindowFrame :title="label">
+    <div class="window-container-wrapper">
+      <div class="window-container">
+        <WindowFrame :title="label">
         <!-- Content Area (Slot-based) -->
         <div class="window-content">
           <slot></slot>
         </div>
       </WindowFrame>
+      </div>
+      <div class="window-active-glow"></div>
     </div>
     
     <!-- Label Below -->
-    <div class="window-label">{{ label }}</div>
+    <div class="window-label-wrapper">
+      <div class="window-label-base">{{ label }}</div>
+      <div class="window-label-active">{{ label }}</div>
+    </div>
   </div>
 </template>
 
@@ -48,9 +54,16 @@ defineProps<{
   transform: scale(1.15);
 }
 
-.window-container {
+.window-container-wrapper {
+  position: relative;
   width: 100%;
   aspect-ratio: 16/10;
+  border-radius: 12px;
+}
+
+.window-container {
+  position: absolute;
+  inset: 0;
   background: #000;
   border: 1px solid var(--blueprint-border);
   border-radius: 12px;
@@ -58,14 +71,25 @@ defineProps<{
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s var(--lighting-transition);
+  z-index: 2;
 }
 
-.is-active .window-container {
-  border-color: color-mix(in srgb, var(--finished-accent) 50%, transparent);
+.window-active-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--finished-accent) 50%, transparent);
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.6),
     0 0 30px color-mix(in srgb, var(--finished-accent) 15%, transparent);
+  opacity: 0;
+  transition: opacity 0.4s var(--lighting-transition);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.is-active .window-active-glow {
+  opacity: 1;
 }
 
 .window-content {
@@ -80,21 +104,43 @@ defineProps<{
   overflow: hidden;
 }
 
-.window-label {
+.window-label-wrapper {
+  position: relative;
+  margin-top: 12px;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.4em;
   font-weight: 900;
+  height: 1.2em; /* Ensure stable height */
+}
+
+.window-label-base,
+.window-label-active {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  transition: opacity 0.4s var(--lighting-transition);
+}
+
+.window-label-base {
   opacity: 0.15;
-  transition: all 0.3s ease;
-  margin-top: 12px;
   color: white;
 }
 
-.is-active .window-label {
-  opacity: 1;
+.is-active .window-label-base {
+  opacity: 0;
+}
+
+.window-label-active {
+  opacity: 0;
   color: var(--finished-accent);
   text-shadow: 0 0 10px var(--finished-accent);
+}
+
+.is-active .window-label-active {
+  opacity: 1;
 }
 
 /* --- Theme Specific Content (High-Fidelity) --- */
