@@ -1,50 +1,45 @@
 # 📋 Project Roadmap & TODOs
 
-## 🏠 Landing Page
+## 🏠 Landing Page (UFO Phase)
 
 ### 1. Tabs & Navigation
 
-- [ ] Improve Navigation tabs content
-- [ ] Make Navigation of tabs snap to center of lamp
-- [ ] Make tabs more interactive and navigate to the right pages
-- [ ] Ensure navigation from tabs (e.g., "Experience", "Get in Touch") scrolls directly down to the respective Bento card or page section.
+- [ ] Improve Navigation tabs content (NavConveyor labels)
+- [ ] Make Navigation of tabs snap to center of UFO/Beam
+- [ ] Ensure navigation from tabs (e.g., "Experience", "Get in Touch") scrolls directly down to the respective Bento card.
 - [ ] Include keyboard navigation (WASD and arrow keys to move, ESC to go back)
 
-### 2. Lighting
+### 2. WebGL Lighting (GPU Accelerated)
 
-- [ ] Make Landing Page lighting more realistic
-- [ ] **Asset Update:** Replace the `src/assets/hero.png` placeholder with a real 3D render/image of the lamp model to anchor the light source.
+- [x] **Pivot:** Move lighting from CSS Filters to TresJS/WebGL for 60+ FPS.
+- [x] **Asset Update:** Procedural UFO/Drone geometry implemented (zero-latency loading).
+- [x] **Tractor Beam:** Project 3D UFO position to 2D Screen Space for pixel-perfect shader tracking.
 
 ### 3. Ideas
 
-- [ ] Try out a Parallax effect on some elements (?)
+- [ ] Add subtle "abduction" particle effect when switching to CONTENT phase.
 
 ---
 
-## 📄 Subpages
+## 📄 Subpages (Cockpit / Drone Phase)
 
 ### 1. Visuals
 
-- [ ] Fix layout interaction buttons (theme toggle and navigation)
-- [ ] Fix outlines of bentoCards to have the depth outlines on the bottom and left instead of top and right
-- [ ] Remove white outline of project cards
-- [ ] Remove scrollbar
+- [x] Fix layout interaction buttons (theme toggle and navigation)
+- [x] Fix outlines of bentoCards to have the depth outlines on the bottom and left instead of top and right
+- [x] Remove white outline of project cards
+- [x] Remove scrollbar (custom themed scrollbar or hidden)
+- [x] Refined Contact Form button into a high-contrast Sci-Fi Ghost Button.
 
-### 2. Lighting
+### 2. Lighting (Cockpit Mode)
 
-- [ ] Think of a new way to incorporate the flashlight mechanic (make flashlight moveable or reposition) (improves lighting and UX)
-- [ ] Fix light position of flashlight being outside the beam on the top
-- [ ] **State Sync:** Centralize the tracking logic so `VolumetricBeam` and `SpotlightMask` are perfectly synchronized (prevents the beam from visually disconnecting from the illuminated "hole").
+- [x] **Companion Drone:** Autopilot "Acht-Figur" animation during Content phase.
+- [x] **HUD Scanner:** Micro-optic cursor effect following the drone/mouse.
+- [x] **State Sync:** Centralized lighting store syncing `uPhase` and `uAccentColor` across all components.
 
 ### 3. Projects Section
 
 - [ ] Consider fetching projects dynamically from GitHub instead of hardcoding them.
-- [ ] Automatically display Title, Name, Description, and analyze/display the applied technologies for each repository.
-
-### 4. Get in Touch Section
-
-- [ ] Add multiple contact methods (e.g., classic email via form/mailto).
-- [ ] Include links to external profiles (Discord, LinkedIn, Xing).
 
 ---
 
@@ -52,46 +47,25 @@
 
 ### 1. Theming
 
-- [ ] Fix theming not being applied correctly and consistently. _(Ensure strict use of CSS variables over hardcoded Tailwind classes)._
-- [ ] Ensure Blue and Green theming is constantly applied everywhere (currently resets when toggling or pressing Escape).
+- [x] Fix theming not being applied correctly and consistently.
+- [x] Ensure Blue and Green theming is constantly applied everywhere (WebGL Uniform Sync).
 
-### 2. Code Quality & SEO
+### 2. Code Quality (The "Jules" Standard)
 
-- [ ] Fix biome issues
-- [ ] Check coverage of tests and checks
-- [ ] **SEO Fix:** Add a `<meta name="description" content="...">` tag to `index.html`.
-- [ ] **SEO Fix:** Add a basic `robots.txt` to the `public/` folder to resolve crawler warnings.
+- [x] Fix biome issues
+- [x] **Test Coverage:** Added unit tests for WebGL projection math and Lighting Store.
+- [x] **SEO Fix:** Add a `<meta name="description" content="...">` tag to `index.html`.
+- [x] Anti-Evasion: Implemented check:avoidance script to block AI bypasses.
 
-### 3. Performance (Rendering)
+### 3. Performance & Stability
 
-- [ ] **GPU Load:** Evaluate CSS Filter Performance. Consider swapping extremely heavy `blur(50px)` filters for native CSS `radial-gradient` or optimizing the `<SpotlightMask>` to improve render times on weaker devices.
-- [ ] **Production Check:** Run a final Lighthouse audit against the built production files (`npm run build` & `npm run preview`) to confirm 100/100 performance without Vite dev-server overhead.
+- [x] **GPU Load:** Swapped heavy CSS `blur(50px)` for WebGL Shaders — Performance stabilized at 60+ FPS.
+- [ ] **Production Check:** Run a final Lighthouse audit against built production files.
 
-### 4. Responsiveness
+### 4. Extra Features & QoL
 
-- [ ] Fix fixed values for large screens (e.g., 4K monitors/HDR) so that elements like light rays extend far enough.
-- [ ] Implement responsive alternatives and layouts for mobile devices.
-
-### 5. Content & Data
-
-- [ ] Update icons and HTML naming (e.g., `<title>`).
-- [ ] Update placeholder texts and data globally (e.g., change "Hi I'm Alex" to "Hi I'm Maurice" and similar content).
-
-### 6. Extra Features & Quality of Life (QoL)
-
-- [ ] **Page Transitions:** Add smooth page transitions (e.g., View Transitions API or Framer Motion) when navigating between the landing page and subpages.
-- [ ] **Loading States & Skeletons:** Add a stylized initial loader (e.g., a lamp turning on) for 3D assets and skeleton loaders for the GitHub projects.
-- [ ] **Custom Cursor:** Enhance the flashlight mechanic by making it follow the cursor with a smooth trailing spring effect, hiding the default cursor.
-- [ ] **Scroll Progress Indicator:** Add a subtle scroll progress bar (like a glowing line) at the top of the screen or along the side.
-- [ ] **Smart Contact Actions:** For the "Get in Touch" buttons, either directly open the profile link in a new tab (LinkedIn, Xing) or copy the username/address to the clipboard with a nice success toast (Discord, Email).
-- [ ] **Back to Top Button:** A floating action button that appears after scrolling down, styled consistently with the theme.
-- [ ] **Bento Card Hover Effects:** Add a subtle 3D tilt or glare effect on the Bento cards when hovering over them to make them feel more tactile.
-- [ ] **Subtle Sound Effects (Optional):** Add very quiet, satisfying UI sounds for actions like toggling the theme (light switch click) or hovering over buttons.
-
-Order to do the Core changes with /opsx-apply:
-
-1. [x] theming-responsiveness
-2. [ ] core-navigation-layout
-3. [ ] lighting-mechanics
-4. [ ] dynamic-content-integration
-5. [ ] performance-seo
+- [ ] **Page Transitions:** Add smooth page transitions (View Transitions API).
+- [x] **Custom Cursor:** WebGL-based HUD scanner active in CONTENT phase.
+- [ ] **Subtle Sound Effects:** Satisfaction clicks for theme toggle and phase shifts.
+      ver buttons.
+- [x] Custom Cursor: WebGL-based HUD scanner active in CONTENT phase (system cursor hidden dynamically).

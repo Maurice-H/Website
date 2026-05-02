@@ -3,26 +3,7 @@
     <!-- Grid Background -->
     <div class="nav-grid"></div>
 
-    <!-- High-Fidelity Industrial Lamp Fixture -->
-    <div class="lamp-fixture">
-      <div class="lamp-wire"></div>
-      <div class="lamp-head">
-        <div class="lamp-top-cap"></div>
-        <div class="lamp-dome">
-          <!-- Ridges for the dome -->
-          <div class="ridge ridge-1"></div>
-          <div class="ridge ridge-2"></div>
-          <div class="ridge ridge-3"></div>
-        </div>
-        <div class="lamp-rim" :class="{ 'is-emitting': lightingEnabled }"></div>
-        <!-- Inner bulb glow -->
-        <div class="lamp-bulb" :class="{ 'is-emitting': lightingEnabled }"></div>
-      </div>
-      <!-- Volumetric light cone -->
-      <div v-show="lightingEnabled" class="cone-light"></div>
-      <!-- Core beam -->
-      <div v-show="lightingEnabled" class="cone-core"></div>
-    </div>
+    
 
     <!-- Conveyor Belt (drag-scrollable) -->
     <div
@@ -118,16 +99,13 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { onMounted, onUnmounted, ref } from 'vue';
-import { useLightingEngine } from '../../composables/useLightingEngine';
 import { NAV_TABS as tabs } from '../../data/portfolio';
-import { useThemeStore } from '../../stores/useThemeStore';
+import { useLightingStore } from '../../stores/lighting';
 import { LightingPhase } from '../../types/index';
 import NavWindow from './NavWindow.vue';
 
-const { setPhase } = useLightingEngine();
-const { lightingEnabled } = storeToRefs(useThemeStore());
+const lightingStore = useLightingStore();
 const trackEl = ref<HTMLElement | null>(null);
 
 const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
@@ -191,7 +169,7 @@ const selectTab = (id: string) => {
     // Optionally auto-scroll to it, but for now we just require it to be centered to click
     return;
   }
-  setPhase(LightingPhase.CONTENT);
+  lightingStore.setPhase(LightingPhase.CONTENT);
 };
 
 onMounted(() => {
@@ -227,7 +205,7 @@ onUnmounted(() => {
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: #080b0e; /* Deep dark background */
+  background: transparent; /* WebGL canvas shows through from behind */
 }
 
 /* ---- Background Grid ---- */
@@ -243,151 +221,9 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* ---- High-Fidelity Industrial Lamp Fixture ---- */
-.lamp-fixture {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-}
 
-.lamp-wire {
-  width: 4px;
-  height: 60px;
-  background: linear-gradient(to right, #0a0a0a, #333, #0a0a0a);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-}
 
-.lamp-head {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-.lamp-top-cap {
-  width: 40px;
-  height: 15px;
-  background: linear-gradient(to bottom, #222, #111);
-  border-radius: 5px 5px 0 0;
-  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.1);
-}
-
-.lamp-dome {
-  width: 180px;
-  height: 70px;
-  background: linear-gradient(180deg, #2a2a2a 0%, #111 100%);
-  border-radius: 100px 100px 0 0;
-  position: relative;
-  box-shadow:
-    inset 0 2px 5px rgba(255, 255, 255, 0.05),
-    0 10px 30px rgba(0, 0, 0, 0.9);
-  overflow: hidden;
-}
-
-/* Decorative ridges on the lamp dome */
-.ridge {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.05);
-}
-.ridge-1 {
-  bottom: 15px;
-}
-.ridge-2 {
-  bottom: 30px;
-}
-.ridge-3 {
-  bottom: 45px;
-}
-
-.lamp-rim {
-  width: 190px;
-  height: 6px;
-  background: #000;
-  border-radius: 3px;
-  position: relative;
-  z-index: 2;
-  border-bottom: 2px solid transparent;
-  transition: all 0.4s ease;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-}
-
-.lamp-rim.is-emitting {
-  border-bottom: 2px solid
-    color-mix(in srgb, var(--finished-accent) 60%, transparent);
-  box-shadow:
-    0 2px 10px color-mix(in srgb, var(--finished-accent) 40%, transparent),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
-}
-
-.lamp-bulb {
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0 0 20px 20px;
-  z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.4s ease;
-}
-
-.lamp-bulb.is-emitting {
-  background: #fff;
-  border-color: transparent;
-  box-shadow:
-    0 0 30px 10px color-mix(in srgb, var(--finished-accent) 80%, transparent),
-    0 0 60px 20px color-mix(in srgb, var(--finished-accent) 40%, transparent);
-}
-
-/* Volumetric light cones */
-.cone-light {
-  position: absolute;
-  top: 145px; /* right below the lamp rim */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px;
-  height: 90vh;
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--finished-accent) 25%, transparent) 0%,
-    color-mix(in srgb, var(--finished-accent) 5%, transparent) 60%,
-    transparent 100%
-  );
-  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
-  will-change: transform;
-  pointer-events: none;
-  z-index: 50; /* over the track but behind cards technically, but cards are inside track */
-}
-
-.cone-core {
-  position: absolute;
-  top: 145px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 50vh;
-  background: radial-gradient(
-    ellipse at top,
-    color-mix(in srgb, var(--finished-accent) 40%, transparent) 0%,
-    color-mix(in srgb, var(--finished-accent) 10%, transparent) 40%,
-    transparent 70%
-  );
-  opacity: 0.8;
-  will-change: transform;
-  pointer-events: none;
-  z-index: 51;
-}
 
 /* ---- Conveyor Track ---- */
 .conveyor-track {

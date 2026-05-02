@@ -106,8 +106,6 @@ describe('useViewportStore', () => {
 
       expect(setPropertySpy).toHaveBeenCalledWith('--mask-x', '50vw');
       expect(setPropertySpy).toHaveBeenCalledWith('--mask-y', '50vh');
-      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-x-raw', '50%');
-      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-y-raw', '50%');
 
       expect(addEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function), {
         passive: true,
@@ -175,8 +173,6 @@ describe('useViewportStore', () => {
       Object.defineProperty(window, 'innerWidth', { value: 1000, writable: true });
       Object.defineProperty(window, 'innerHeight', { value: 800, writable: true });
 
-      vi.spyOn(lighting, 'updateFlashlightRotation');
-
       store.init();
       setPropertySpy.mockClear();
 
@@ -190,18 +186,15 @@ describe('useViewportStore', () => {
       // Wait for requestAnimationFrame
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      // Verify mouse position was updated
+      // Verify mouse position was updated (both reactive and raw)
       expect(store.mousePosition.x).toBe(250);
       expect(store.mousePosition.y).toBe(400);
+      expect(store.rawMouse.x).toBe(250);
+      expect(store.rawMouse.y).toBe(400);
 
       // Verify CSS variables were updated
       expect(setPropertySpy).toHaveBeenCalledWith('--mask-x', '250px');
       expect(setPropertySpy).toHaveBeenCalledWith('--mask-y', '400px');
-      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-x-raw', '25%'); // 250 / 1000
-      expect(setPropertySpy).toHaveBeenCalledWith('--spotlight-y-raw', '50%'); // 400 / 800
-
-      // Verify lighting rotation update was called
-      expect(lighting.updateFlashlightRotation).toHaveBeenCalled();
     });
 
     it('should handle mousemove events correctly when lighting phase is NOT CONTENT', async () => {
@@ -209,8 +202,6 @@ describe('useViewportStore', () => {
       const lighting = useLightingStore();
 
       lighting.phase = LightingPhase.NAV;
-
-      vi.spyOn(lighting, 'updateFlashlightRotation');
 
       store.init();
 
@@ -224,15 +215,14 @@ describe('useViewportStore', () => {
       });
       window.dispatchEvent(mouseEvent);
 
-      // Verify mouse position was updated
+      // Verify mouse position was updated (always written, even in NAV)
       expect(store.mousePosition.x).toBe(100);
       expect(store.mousePosition.y).toBe(100);
+      expect(store.rawMouse.x).toBe(100);
+      expect(store.rawMouse.y).toBe(100);
 
-      // Verify CSS variables were NOT updated
+      // Verify CSS variables were NOT updated (NAV phase)
       expect(setPropertySpy).not.toHaveBeenCalled();
-
-      // Verify lighting rotation update was NOT called
-      expect(lighting.updateFlashlightRotation).not.toHaveBeenCalled();
     });
   });
 });

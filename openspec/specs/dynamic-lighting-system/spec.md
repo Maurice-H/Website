@@ -19,24 +19,31 @@ The system SHALL calculate and provide the rotation angle (in degrees or radians
 - **WHEN** the mouse moves
 - **THEN** the flashlight asset SHALL rotate to point its "emitter" exactly at the cursor coordinates.
 
+### Requirement: WebGL Background Lighting Engine
+The system SHALL use a WebGL-based canvas to render the global background lighting, including ambient light and a mouse-tracking spotlight, instead of DOM elements.
+
+#### Scenario: User moves the mouse across the viewport
+- **WHEN** the user moves the mouse
+- **THEN** the WebGL shader updates its spotlight position dynamically via a uniform without triggering DOM layout or repaint cycles.
+
 ### Requirement: Volumetric Beam Rendering
-The system SHALL render a visual representation of the light beam (the "cone") that perfectly aligns with the functional mask revealing the content.
+The system SHALL render a visual representation of the light beam (the "cone") within the WebGL fragment shader to ensure high-performance rendering.
 
 #### Scenario: Beam Visibility
 - **WHEN** a light source is active
-- **THEN** a semi-transparent, gradient-filled beam SHALL be rendered, matching the rotation and spread of the functional mask.
+- **THEN** a semi-transparent, gradient-filled beam SHALL be rendered by the shader, matching the rotation and spread of the lighting logic.
 
 #### Scenario: Flashlight Beam Illumination
 - **WHEN** a user moves the mouse in the `CONTENT` phase
-- **THEN** the dark overlay SHALL become transparent specifically within the conical area defined by the flashlight's position and the calculated angle to the mouse cursor.
+- **THEN** the shader SHALL calculate the spotlight illumination specifically within the conical area defined by the mouse position.
 
 #### Scenario: Beam Distance Falloff
 - **WHEN** the flashlight beam extends across the screen
-- **THEN** the illumination SHALL smoothly fade out over distance, combining directional lighting with a natural radial falloff.
+- **THEN** the shader SHALL apply a natural radial and directional falloff.
 
 ### Requirement: Phase-Synchronized Transitions
-The system SHALL provide smooth transitions between light sources during phase changes.
+The system SHALL provide smooth transitions between light sources during phase changes using shader uniforms (e.g., `uPhase`).
 
 #### Scenario: Swapping Sources
 - **WHEN** switching from `NAV` to `CONTENT`
-- **THEN** the hanging lamp SHALL dim while the flashlight "switches on" and rotates into position over a period of 400ms.
+- **THEN** the `uPhase` uniform SHALL lerp from 0.0 to 1.0, transitioning the lighting from the hanging lamp to the flashlight over a period of 400ms.
