@@ -1,7 +1,9 @@
 {
-  "name": "tmpapp",
+  "name": "website",
+  "version": "1.0.0",
+  "description": "Personal website",
+  "author": "Maurice-H",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

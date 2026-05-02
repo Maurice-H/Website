@@ -1,13 +1,15 @@
 import { expect, test } from '@playwright/test';
+import { AppPage } from './pages/app.page';
 
 test.describe('Mobile Layout Responsiveness', () => {
   test.use({ viewport: { width: 375, height: 667 } }); // Mobile viewport size
 
   test('stacks BentoCards in single column on mobile', async ({ page }) => {
-    await page.goto('/');
+    const app = new AppPage(page);
+    await app.goto();
 
-    // Go to Content phase
-    await page.getByText('About Me', { exact: true }).first().click();
+    // Go to Content phase using robust model
+    await app.enterContentPhase();
 
     // Ensure content is loaded
     await expect(page.getByText('Discovery Path')).toBeVisible();

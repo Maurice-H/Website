@@ -11,6 +11,7 @@ interface ViewportOffset {
 interface ComponentRegistration {
   el: HTMLElement;
   offsets: ViewportOffset;
+  isVisible: boolean;
 }
 
 export const useViewportStore = defineStore('viewport', () => {
@@ -28,14 +29,24 @@ export const useViewportStore = defineStore('viewport', () => {
    */
   const rawMouse = { x: 0, y: 0 };
 
+  let observer: IntersectionObserver | null = null;
+  let updateRafId: number | null = null;
+
   const updateAll = () => {
-    for (const [_id, reg] of registeredComponents) {
-      const rect = reg.el.getBoundingClientRect();
-      reg.offsets.left = rect.left;
-      reg.offsets.top = rect.top;
-      reg.el.style.setProperty('--card-left', `${rect.left}px`);
-      reg.el.style.setProperty('--card-top', `${rect.top}px`);
-    }
+    if (updateRafId !== null) return;
+
+    updateRafId = requestAnimationFrame(() => {
+      for (const [_id, reg] of registeredComponents) {
+        if (!reg.isVisible) continue;
+
+        const rect = reg.el.getBoundingClientRect();
+        reg.offsets.left = rect.left;
+        reg.offsets.top = rect.top;
+        reg.el.style.setProperty('--card-left', `${rect.left}px`);
+        reg.el.style.setProperty('--card-top', `${rect.top}px`);
+      }
+      updateRafId = null;
+    });
   };
 
   let rafId: number | null = null;
@@ -48,18 +59,19 @@ export const useViewportStore = defineStore('viewport', () => {
     rawMouse.x = cx;
     rawMouse.y = cy;
 
-    // Reactive coordinates — only for Vue consumers (watchers, computed, etc.)
-    mousePosition.x = cx;
-    mousePosition.y = cy;
-
     if (rafId !== null) return;
 
     rafId = requestAnimationFrame(() => {
+      // Reactive coordinates — only for Vue consumers (watchers, computed, etc.)
+      // Read from rawMouse to ensure we process the absolute latest position for the frame
+      mousePosition.x = rawMouse.x;
+      mousePosition.y = rawMouse.y;
+
       // Skip all lighting-related tracking when effects are disabled
       if (themeStore.lightingEnabled && lighting.phase === 'CONTENT') {
         // --mask-x/y consumed by FusedReveal mask positioning
-        document.documentElement.style.setProperty('--mask-x', `${cx}px`);
-        document.documentElement.style.setProperty('--mask-y', `${cy}px`);
+        document.documentElement.style.setProperty('--mask-x', `${rawMouse.x}px`);
+        document.documentElement.style.setProperty('--mask-y', `${rawMouse.y}px`);
       }
       rafId = null;
     });
@@ -80,6 +92,35 @@ export const useViewportStore = defineStore('viewport', () => {
     window.addEventListener('resize', updateAll, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          let needsUpdate = false;
+          entries.forEach((entry) => {
+            for (const reg of registeredComponents.values()) {
+              if (reg.el === entry.target) {
+                reg.isVisible = entry.isIntersecting;
+                needsUpdate = true;
+                break;
+              }
+            }
+          });
+          if (needsUpdate) {
+            updateAll();
+          }
+        },
+        {
+          root: null,
+          rootMargin: '100px',
+          threshold: 0,
+        }
+      );
+
+      for (const reg of registeredComponents.values()) {
+        observer.observe(reg.el);
+      }
+    }
+
     isListening.value = true;
   };
 
@@ -88,7 +129,12 @@ export const useViewportStore = defineStore('viewport', () => {
     registeredComponents.set(id, {
       el,
       offsets: { left: rect.left || 0, top: rect.top || 0 },
+      isVisible: true,
     });
+
+    if (observer) {
+      observer.observe(el);
+    }
 
     return {
       update: () => {
@@ -99,7 +145,13 @@ export const useViewportStore = defineStore('viewport', () => {
           reg.offsets.top = rect.top;
         }
       },
-      unregister: () => registeredComponents.delete(id),
+      unregister: () => {
+        const reg = registeredComponents.get(id);
+        if (reg && observer) {
+          observer.unobserve(reg.el);
+        }
+        registeredComponents.delete(id);
+      },
     };
   };
 
