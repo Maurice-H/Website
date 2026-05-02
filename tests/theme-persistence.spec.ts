@@ -15,7 +15,7 @@ test.describe('Theme Persistence and Navigation', () => {
     await expect(page.getByText('Discovery Path').first()).toBeVisible({ timeout: 10000 });
 
     // Now in content phase, Toggle theme to Blueprint
-    await page.getByLabel('Toggle Theme').click();
+    await page.getByRole('button', { name: /System Mode/ }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'blueprint');
 
     // Click ESC back button to go back to Nav

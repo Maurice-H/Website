@@ -17,7 +17,7 @@ test.describe('WebGL Background Canvas', () => {
 
   test('canvas layer should NOT block pointer events for the UI', async ({ page }) => {
     // The wrapper div has pointer-events: none — verify UI elements are still clickable
-    const themeToggle = page.getByLabel('Toggle Theme');
+    const themeToggle = page.getByRole('button', { name: /System Mode/ });
     await expect(themeToggle).toBeVisible({ timeout: 10000 });
 
     // If pointer events were blocked, this click would fail

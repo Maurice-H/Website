@@ -24,7 +24,7 @@ export class AppPage {
   constructor(page: Page) {
     this.page = page;
     this.htmlRoot = page.locator('html');
-    this.themeToggleBtn = page.getByLabel('Toggle Theme');
+    this.themeToggleBtn = page.getByRole('button', { name: /System Mode/ });
     this.navWindows = page.locator('.nav-window');
     this.backToNavBtn = page.getByRole('button', {
       name: 'Back to Navigation',
