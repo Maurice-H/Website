@@ -6,13 +6,13 @@
     title="Get In Touch"
   >
     <div class="p-10 flex flex-col h-full">
-      <p class="text-finished-text/40 text-sm mb-8 font-mono tracking-wide">
+      <p class="text-slate-400 text-sm mb-8 font-mono tracking-wide">
         Establish direct channel for collaboration.
       </p>
 
       <form @submit.prevent class="flex flex-col gap-4 flex-1">
         <div class="flex flex-col gap-1.5">
-          <label for="contact-name" class="text-[10px] text-finished-text/60 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-name" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
             Name <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper">
@@ -21,12 +21,12 @@
               type="text"
               required
               placeholder="Enter your designation"
-              class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+              class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
             />
           </div>
         </div>
         <div class="flex flex-col gap-1.5">
-          <label for="contact-email" class="text-[10px] text-finished-text/60 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-email" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
             Email <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper">
@@ -35,12 +35,12 @@
               type="email"
               required
               placeholder="Enter comm-link"
-              class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+              class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
             />
           </div>
         </div>
         <div class="flex flex-col gap-1.5 flex-1">
-          <label for="contact-message" class="text-[10px] text-finished-text/60 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-message" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
             Message <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper h-full">
@@ -48,7 +48,7 @@
               id="contact-message"
               required
               placeholder="Transmit payload..."
-              class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none"
+              class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none"
             ></textarea>
           </div>
         </div>
