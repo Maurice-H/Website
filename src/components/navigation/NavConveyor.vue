@@ -19,7 +19,7 @@
         :theme="tab.theme"
         :label="tab.label"
         :active="activeId === tab.id"
-        @click="selectTab(tab.id)"
+        @click="selectTab(tab.id, $event)"
       >
         <!-- The mockup has a large title inside the card for EXPERIENCE -->
         <div
@@ -112,23 +112,34 @@ const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
+let hasMoved = false;
 let startX = 0;
+let mouseDownX = 0; // Added for distance-based click detection
 let scrollLeft = 0;
 
 const startDrag = (e: MouseEvent) => {
   if (!trackEl.value) return;
   isDragging = true;
+  hasMoved = false;
   startX = e.pageX - trackEl.value.offsetLeft;
+  mouseDownX = e.pageX; // Capture start X
   scrollLeft = trackEl.value.scrollLeft;
   trackEl.value.style.cursor = 'grabbing';
 };
 
 const onDrag = (e: MouseEvent) => {
   if (!isDragging || !trackEl.value) return;
-  e.preventDefault();
   const x = e.pageX - trackEl.value.offsetLeft;
-  const walk = (x - startX) * 2; // speed multiplier
-  trackEl.value.scrollLeft = scrollLeft - walk;
+  const walk = (x - startX) * 2;
+
+  if (Math.abs(walk) > 5) {
+    hasMoved = true;
+  }
+
+  if (hasMoved) {
+    e.preventDefault();
+    trackEl.value.scrollLeft = scrollLeft - walk;
+  }
 };
 
 const stopDrag = () => {
@@ -163,12 +174,15 @@ const onWheel = (e: WheelEvent) => {
   trackEl.value.scrollLeft += e.deltaY;
 };
 
-const selectTab = (id: string) => {
-  if (isDragging) return; // ignore click after drag
-  if (id !== activeId.value) {
-    // Optionally auto-scroll to it, but for now we just require it to be centered to click
+const selectTab = (id: string, e: MouseEvent) => {
+  // Distance-based check is much more robust for E2E tests than a simple flag
+  const moveDistance = Math.abs(e.pageX - mouseDownX);
+
+  if (moveDistance > 15) {
     return;
   }
+
+  activeId.value = id;
   lightingStore.setPhase(LightingPhase.CONTENT);
 };
 
