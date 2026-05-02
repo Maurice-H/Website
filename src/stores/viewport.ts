@@ -33,6 +33,8 @@ export const useViewportStore = defineStore('viewport', () => {
       const rect = reg.el.getBoundingClientRect();
       reg.offsets.left = rect.left;
       reg.offsets.top = rect.top;
+      reg.el.style.setProperty('--card-left', `${rect.left}px`);
+      reg.el.style.setProperty('--card-top', `${rect.top}px`);
     }
   };
 
@@ -67,6 +69,10 @@ export const useViewportStore = defineStore('viewport', () => {
     if (isListening.value) return;
 
     // Set initial mask positions to center screen
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    document.documentElement.style.setProperty('--mouse-x', `${centerX}px`);
+    document.documentElement.style.setProperty('--mouse-y', `${centerY}px`);
     document.documentElement.style.setProperty('--mask-x', '50vw');
     document.documentElement.style.setProperty('--mask-y', '50vh');
 

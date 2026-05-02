@@ -6,6 +6,7 @@ export const useLightingStore = defineStore('lighting', () => {
   const phase = ref<LightingPhase>(LightingPhase.NAV);
   const isFlashActive = ref(false);
 
+
   const setPhase = (newPhase: LightingPhase) => {
     isFlashActive.value = true;
 
