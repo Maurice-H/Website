@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { reactive, ref } from 'vue';
+import { reactive, ref, markRaw } from 'vue';
 import { useLightingStore } from './lighting';
 import { useThemeStore } from './useThemeStore';
 
@@ -26,8 +26,9 @@ export const useViewportStore = defineStore('viewport', () => {
    * Updated on every mousemove event BEFORE the rAF gate, so the
    * TresJS render loop always reads the freshest position without
    * triggering Vue dependency tracking.
+   * markRaw ensures Pinia doesn't automatically wrap this in a proxy.
    */
-  const rawMouse = { x: 0, y: 0 };
+  const rawMouse = markRaw({ x: 0, y: 0 });
 
   let observer: IntersectionObserver | null = null;
   let updateRafId: number | null = null;

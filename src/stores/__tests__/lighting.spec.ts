@@ -53,4 +53,18 @@ describe('useLightingStore', () => {
     expect(document.documentElement.style.setProperty).toHaveBeenCalledWith('--mask-x', '50%');
     expect(document.documentElement.style.setProperty).toHaveBeenCalledWith('--mask-y', '50%');
   });
+
+  it('setPhase should reject invalid phase enums (Sentinel strict state enforcement)', () => {
+    const store = useLightingStore();
+    const initialPhase = store.phase;
+
+    // We expect it either to handle it safely or to reject it by not updating the state
+    store.setPhase('INVALID_PHASE' as unknown as LightingPhase);
+
+    vi.advanceTimersByTime(300);
+
+    // Should remain on the initial phase or correctly reject the state change
+    expect(store.phase).toBe(initialPhase);
+    expect(store.isFlashActive).toBe(false); // Make sure flash doesn't get stuck
+  });
 });
