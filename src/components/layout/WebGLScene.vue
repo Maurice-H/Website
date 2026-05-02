@@ -293,7 +293,7 @@ onBeforeRender(({ elapsed, delta }) => {
 
     // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
     const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
-    
+
     if (shaderMaterialRef.value) {
       shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
     }

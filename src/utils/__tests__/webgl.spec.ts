@@ -23,12 +23,12 @@ describe('WebGL Utilities', () => {
       camera.updateMatrixWorld();
       camera.projectionMatrix.makePerspective(-1, 1, 1, -1, 1, 100);
 
-      // We use a simpler mock for projection if needed, 
+      // We use a simpler mock for projection if needed,
       // but Three.js math is reliable if matrices are updated.
       const position = new Vector3(-10, 0, 0);
       // Project manually to verify expectations
       const vector = position.clone().project(camera);
-      
+
       const result = projectToScreenSpace(position, camera);
       expect(result.x).toBe((vector.x + 1) / 2);
       expect(result.y).toBe((vector.y + 1) / 2);
@@ -49,12 +49,12 @@ describe('WebGL Utilities', () => {
       camera.position.set(5, 0, 10);
       camera.lookAt(5, 0, 0); // Still looking straight ahead relative to its position
       camera.updateMatrixWorld();
-      
+
       // Move camera to the right, but keep it looking straight ahead (not at the object)
       camera.position.set(5, 0, 10);
-      camera.lookAt(5, 0, 0); 
+      camera.lookAt(5, 0, 0);
       camera.updateMatrixWorld();
-      
+
       const res2 = projectToScreenSpace(position, camera);
       // Object at (0,0,0) should now be to the left of the camera (which is at x=5)
       expect(res2.x).toBeLessThan(0.5);

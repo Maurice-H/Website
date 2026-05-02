@@ -9,13 +9,13 @@
 </template>
 
 <script setup lang="ts">
-import { TresCanvas } from "@tresjs/core";
-import { BasicShadowMap, NoToneMapping, SRGBColorSpace } from "three";
-import WebGLScene from "./WebGLScene.vue";
+import { TresCanvas } from '@tresjs/core';
+import { BasicShadowMap, NoToneMapping, SRGBColorSpace } from 'three';
+import WebGLScene from './WebGLScene.vue';
 
 // in src/components/layout/WebGLBackground.vue (Zeile 10)
 const gl = {
-  clearColor: "#000000",
+  clearColor: '#000000',
   shadows: false,
   alpha: false,
   shadowMapType: BasicShadowMap,
