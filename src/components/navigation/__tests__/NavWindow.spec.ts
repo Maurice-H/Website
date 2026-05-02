@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it } from 'vitest';
 import NavWindow from '../NavWindow.vue';
 
 describe('NavWindow.vue', () => {
@@ -13,8 +13,8 @@ describe('NavWindow.vue', () => {
       props: {
         theme: 'about',
         label: 'ABOUT ME',
-        active: true
-      }
+        active: true,
+      },
     });
 
     // Check main container class correctly merges theme and active state
@@ -32,11 +32,11 @@ describe('NavWindow.vue', () => {
     const wrapperWithSlot = mount(NavWindow, {
       props: {
         theme: 'projects',
-        label: 'PROJECTS'
+        label: 'PROJECTS',
       },
       slots: {
-        default: '<div class="test-slot">Custom Content</div>'
-      }
+        default: '<div class="test-slot">Custom Content</div>',
+      },
     });
 
     expect(wrapperWithSlot.html()).toContain('Custom Content');
