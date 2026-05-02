@@ -9,10 +9,7 @@
 }
 
 :root {
-  /* Spotlight Configuration */
-  --mask-x: 50%;
-  --mask-y: 50%;
-  --spotlight-size: 450px;
+  /* Lighting Transition Timing */
   --lighting-transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --theme-transition-duration: 400ms;
 
@@ -42,8 +39,6 @@
   /* Layout Bounds & Scaling */
   --max-content-width: 1200px;
   --page-padding: 2rem;
-  --beam-width: max(900px, 30vw);
-  --beam-height: max(1700px, 120vh);
 }
 
 .noise-overlay {
@@ -84,7 +79,6 @@ body {
   --finished-border: rgba(56, 189, 248, 0.2);
   --finished-glow: 0 0 40px rgba(56, 189, 248, 0.15);
   --accent-bright: #67e8f9;
-  --spotlight-size: 350px;
 }
 
 /* Flash Transition Effect */
@@ -99,4 +93,9 @@ body {
 }
 .flash-active {
   opacity: 0.5;
+}
+
+/* Zwingt das WebGL-Canvas, Klicks und Scrolls an das DOM durchzulassen */
+canvas {
+  pointer-events: none !important;
 }

@@ -24,12 +24,6 @@
       <div class="bento-card-stack-layer layer-3"></div>
     </div>
     
-    <!-- Glare Effect Overlay -->
-    <div
-      class="absolute inset-0 pointer-events-none z-[15] rounded-[inherit]"
-      :style="glareStyle"
-    ></div>
-    
     <!-- Content Slot Wrapper -->
     <div class="relative z-20 flex-1 flex flex-col w-full h-full">
        <WindowFrame v-if="withWindow" :title="title">
@@ -42,7 +36,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useMouseGlare } from '../../composables/useMouseGlare';
 import { useViewportStore } from '../../stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
@@ -65,8 +58,6 @@ const props = withDefaults(defineProps<Props>(), {
 const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
 let unregisterFn: (() => void) | null = null;
-
-const { glareStyle } = useMouseGlare(cardRef);
 
 const revealStyle = computed(() => {
   return {

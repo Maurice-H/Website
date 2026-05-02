@@ -1,13 +1,19 @@
 /// <reference types="vitest" />
 
 import tailwindcss from '@tailwindcss/vite';
+import { templateCompilerOptions } from '@tresjs/core';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vitest/config';
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/Website/',
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue({
+      ...templateCompilerOptions,
+    }),
+    tailwindcss(),
+  ],
   test: {
     environment: 'happy-dom',
     globals: true,

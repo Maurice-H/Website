@@ -57,3 +57,5 @@ export interface HeroData {
   roles: string[];
   tagline: string;
 }
+
+export * from './webgl';
