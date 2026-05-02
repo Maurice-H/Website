@@ -1,3 +1,3 @@
-## 2026-05-02 - Optimize Layout Thrashing via rAF and IntersectionObserver
-**Learning:** High-frequency events (like scroll, resize, and mousemove) can cause significant layout thrashing and Vue 3 reactivity bottlenecks if DOM reads/writes (like getBoundingClientRect) and state updates are not throttled. In `viewport.ts`, recalculating offsets for off-screen elements exacerbated this issue.
-**Action:** Always throttle continuous high-frequency event handlers using `requestAnimationFrame`. Additionally, use `IntersectionObserver` to bypass expensive DOM measurements for elements that are completely outside the visible viewport.
+## 2024-05-02 - Layout Thrashing in CSS Animations
+ **Learning:** Animating `color`, `text-shadow`, `border-color`, and `box-shadow` properties on Vue components triggers `non-composited-animations` warnings and causes severe layout thrashing on the main thread.
+ **Action:** Refactored CSS to use hardware-accelerated properties. Instead of animating the complex properties directly, create overlapping pseudo-elements (or extra wrapper elements) that hold the final styled state, and animate their `opacity` from 0 to 1 during state transitions.

@@ -41,3 +41,15 @@ coverage/
 artifacts/
 scratch/
 .stitch_project_id
+
+# Reports & Screenshots
+lighthouse-report.json
+screenshot.png
+*.png
+*.jpeg
+*.jpg
+LIGHTHOUSE.md
+COVERAGE.md
+
+# Vite temporary files
+*.timestamp-*

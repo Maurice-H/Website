@@ -24,7 +24,7 @@ export class AppPage {
   constructor(page: Page) {
     this.page = page;
     this.htmlRoot = page.locator('html');
-    this.themeToggleBtn = page.getByLabel('Toggle Theme');
+    this.themeToggleBtn = page.getByRole('button', { name: /System Mode/ });
     this.navWindows = page.locator('.nav-window');
     this.backToNavBtn = page.getByRole('button', {
       name: 'Back to Navigation',
@@ -40,18 +40,18 @@ export class AppPage {
 
   /** Transition from NAV → CONTENT by clicking the first nav window. */
   async enterContentPhase() {
+    // Wait for the initial centering scroll to settle
+    await this.page.waitForTimeout(500);
+
     // We must click the CURRENTLY ACTIVE window to enter the phase.
     const activeWindow = this.page.locator('.nav-window.is-active');
     await activeWindow.waitFor({ state: 'attached', timeout: 10000 });
 
     // The Fused Portfolio uses a selection mechanic.
-    // We dispatch a direct click event to avoid triggering the mousedown drag logic
-    // which might set isDragging to true and block the click handler.
-    await activeWindow.dispatchEvent('click');
+    // Now that the component uses distance-based click detection, a standard .click() is reliable.
+    await activeWindow.click();
 
     // Wait for the content phase layout to appear AND be ready for interaction.
-    // Check for attachment and visibility to ensure reliable interaction.
-    await this.themeToggleBtn.waitFor({ state: 'attached', timeout: 15000 });
     await this.themeToggleBtn.waitFor({ state: 'visible', timeout: 15000 });
   }
 
