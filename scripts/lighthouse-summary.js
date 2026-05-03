@@ -52,7 +52,7 @@ try {
 
   // 2. Detailed Failures (from the representative run)
   const representativeRun = manifest.find(r => r.isRepresentativeRun) || manifest[0];
-  const jsonReportPath = path.join(MANIFEST_DIR, representativeRun.jsonPath);
+  const jsonReportPath = path.resolve(path.dirname(manifestPath), representativeRun.jsonPath);
 
   if (fs.existsSync(jsonReportPath)) {
     const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf8'));
@@ -90,6 +90,13 @@ try {
       summaryMd += '\n';
     });
   } else {
+    console.log(`Debug: manifestPath: ${manifestPath}`);
+    console.log(`Debug: jsonReportPath target: ${jsonReportPath}`);
+    if (fs.existsSync(MANIFEST_DIR)) {
+      console.log(`Debug: Contents of ${MANIFEST_DIR}:`, fs.readdirSync(MANIFEST_DIR));
+    } else {
+      console.log(`Debug: MANIFEST_DIR does not exist: ${MANIFEST_DIR}`);
+    }
     summaryMd += '⚠️ Detailed JSON report not found. Please check the full HTML report for optimization details.\n';
   }
 

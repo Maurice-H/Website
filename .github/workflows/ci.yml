@@ -151,14 +151,17 @@ jobs:
 
       - name: Generate Lighthouse Summary
         if: always()
-        run: node scripts/lighthouse-summary.js
+        run: |
+          echo "Listing .lighthouseci directory contents:"
+          ls -la .lighthouseci || echo ".lighthouseci directory not found"
+          node scripts/lighthouse-summary.js
 
       - name: Upload Lighthouse Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-reports
-          path: .lighthouseci/
+          path: ./.lighthouseci
           retention-days: 30
 
   deploy:
