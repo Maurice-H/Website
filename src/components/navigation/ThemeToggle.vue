@@ -52,7 +52,9 @@ const playSwitchSound = () => {
   try {
     const audio = new Audio('audio/switch2.ogg');
     audio.volume = 0.5;
-    audio.play();
+    audio.play().catch(() => {
+      // Silently ignore if audio fails (e.g. browser policy)
+    });
   } catch (e) {
     // Silently ignore if audio fails (e.g. browser policy)
   }
