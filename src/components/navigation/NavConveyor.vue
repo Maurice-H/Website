@@ -9,6 +9,8 @@
     <div
       class="conveyor-track mask-fused"
       ref="trackEl"
+      role="tablist"
+      aria-label="Navigation Conveyor"
       @mousedown="startDrag"
       @wheel.prevent="onWheel"
       @scroll="handleScroll"
@@ -20,6 +22,8 @@
         :label="tab.label"
         :active="activeId === tab.id"
         @click="selectTab(tab.id, $event)"
+        @keydown.enter="selectTab(tab.id, $event)"
+        @keydown.space.prevent="selectTab(tab.id, $event)"
       >
         <!-- The mockup has a large title inside the card for EXPERIENCE -->
         <div
@@ -174,12 +178,14 @@ const onWheel = (e: WheelEvent) => {
   trackEl.value.scrollLeft += e.deltaY;
 };
 
-const selectTab = (id: string, e: MouseEvent) => {
-  // Distance-based check is much more robust for E2E tests than a simple flag
-  const moveDistance = Math.abs(e.pageX - mouseDownX);
+const selectTab = (id: string, e: MouseEvent | KeyboardEvent) => {
+  if (e instanceof MouseEvent) {
+    // Distance-based check is much more robust for E2E tests than a simple flag
+    const moveDistance = Math.abs(e.pageX - mouseDownX);
 
-  if (moveDistance > 15) {
-    return;
+    if (moveDistance > 15) {
+      return;
+    }
   }
 
   activeId.value = id;
