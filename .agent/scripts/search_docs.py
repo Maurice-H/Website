@@ -3,17 +3,32 @@ import os
 from pathlib import Path
 
 # Berechne den absoluten Pfad zum core.py Verzeichnis
-# Wir gehen von .agent/scripts/ aus zwei Ebenen hoch zum Root und dann in die Docs
-root_dir = Path(__file__).parent.parent.parent
-core_dir = root_dir / ".docs" / "skills" / "creative-design" / "ui-ux-pro-max" / "scripts"
+current_file = Path(__file__).resolve()
+root_dir = current_file.parent.parent.parent
+core_dir = (root_dir / ".docs" / "skills" / "creative-design" / "ui-ux-pro-max" / "scripts").resolve()
 
-# Füge das Verzeichnis zu sys.path hinzu, damit wir 'core' direkt importieren können
-sys.path.append(str(core_dir))
+# Prüfe, ob das Verzeichnis existiert
+if not core_dir.exists():
+    print(f"Error: Search core directory not found: {core_dir}")
+    sys.exit(1)
 
-try:
-    from core import search, search_stack, AVAILABLE_STACKS
-except ImportError as e:
-    print(f"Error: Could not import core search module. {e}")
+# Lade das Modul direkt über den Dateipfad (robuster als sys.path)
+import importlib.util
+core_file = core_dir / "core.py"
+
+if not core_file.exists():
+    print(f"Error: core.py not found at {core_file}")
+    sys.exit(1)
+
+spec = importlib.util.spec_from_file_location("core", str(core_file))
+if spec and spec.loader:
+    core = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(core)
+    search = core.search
+    search_stack = core.search_stack
+    AVAILABLE_STACKS = core.AVAILABLE_STACKS
+else:
+    print(f"Error: Could not load core module from {core_file}")
     sys.exit(1)
 
 if __name__ == "__main__":
