@@ -21,6 +21,7 @@ Implement tasks from an OpenSpec change.
    - **Standard Check**: Ensure your implementation strictly adheres to:
      - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
      - `.docs/skills/project-bridge.md` (Senior Frontend standards)
+     - `development/typescript-expert` (No `any` types)
      - `creative-design/ui-ux-pro-max` (CSS Variables, Transitions)
      - Any other relevant skill listed in the index.
 
