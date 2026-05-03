@@ -5,6 +5,8 @@ This index guides the AI agent on which skills to activate during specific OpenS
 ## 🌍 Global Baseline (MANDATORY)
 *Applies to ALL phases and tasks.*
 - `.agent/AGENT.md`: Karpathy AI Behavioral Guidelines (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution).
+- `development/agent-efficiency`: Context management, `npm run agent:boot`, and Path Alias usage.
+- **Token Optimization**: Use `token-optimizer` MCP for large outputs; request minimal data for Playwright/E2E debugging.
 
 ## 🧭 Phase 1: Explore & Propose (Architecture & UI/UX)
 *When brainstorming, planning, or creating `proposal.md` and `design.md`.*

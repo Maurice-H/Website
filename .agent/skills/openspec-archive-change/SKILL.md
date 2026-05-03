@@ -16,9 +16,12 @@ Archive a completed change in the experimental workflow.
 **Steps**
 
 0. **Check Project Skills (MANDATORY)**
-
-   Before archiving, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills (Phase 3).
-   Verify that the implementation meets the AI Behavioral Guidelines in `.agent/AGENT.md` and the **Definition of Done** in `.docs/skills/project-bridge.md`.
+   - **Context Automation**: Run `npm run agent:boot` to load the structure, aliases, and store APIs into your context immediately.
+   - **Phase Check**: Read `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 3: Verify & Archive**.
+   - **Standard Check**: Ensure your archiving strictly adheres to:
+     - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
+     - `.docs/skills/project-bridge.md`
+     - Any other relevant skill listed in the index.
 
 1. **If no change name provided, prompt for selection**
 

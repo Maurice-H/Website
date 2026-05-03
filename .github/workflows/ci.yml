@@ -40,10 +40,18 @@ jobs:
         run: npm run check:avoidance
 
       - name: Run Unit Tests
-        run: npm run test:unit
+        run: npm run test:unit -- --coverage
+
+      - name: Generate Coverage Summary
+        if: always()
+        run: node scripts/coverage-summary.js
 
       - name: Build Application
         run: npm run build
+
+      - name: Generate Bundle Summary
+        if: success()
+        run: node scripts/bundle-summary.js
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
@@ -102,6 +110,10 @@ jobs:
       - name: Run E2E Tests (Shard ${{ matrix.shard }}/3)
         run: npx playwright test --shard=${{ matrix.shard }}/3
 
+      - name: Generate Playwright Summary
+        if: always()
+        run: node scripts/playwright-summary.js
+
       - name: Upload Playwright Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -110,8 +122,101 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+  lighthouse-mobile:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Install Lighthouse CI CLI
+        run: npm install -g @lhci/cli@0.13.0
+
+      - name: Run Lighthouse CI (Mobile)
+        run: lhci autorun --collect.settings.preset=perf || true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Mobile Summary
+        if: always()
+        run: |
+          mkdir -p lighthouse-mobile
+          cp -r .lighthouseci/* lighthouse-mobile/ || true
+          LHCI_TITLE="Lighthouse Mobile Audit" node scripts/lighthouse-summary.js
+
+      - name: Upload Mobile Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-mobile
+          path: lighthouse-mobile/
+          retention-days: 30
+
+  lighthouse-desktop:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Install Lighthouse CI CLI
+        run: npm install -g @lhci/cli@0.13.0
+
+      - name: Run Lighthouse CI (Desktop)
+        run: lhci autorun --collect.settings.preset=desktop || true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Desktop Summary
+        if: always()
+        run: |
+          mkdir -p lighthouse-desktop
+          cp -r .lighthouseci/* lighthouse-desktop/ || true
+          LHCI_TITLE="Lighthouse Desktop Audit" node scripts/lighthouse-summary.js
+
+      - name: Upload Desktop Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-desktop
+          path: lighthouse-desktop/
+          retention-days: 30
+
+
+
+
   deploy:
-    needs: [build, test-e2e]
+    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -133,7 +238,7 @@ jobs:
           keep_files: true
 
   pr-preview:
-    needs: [build, test-e2e]
+    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     concurrency:

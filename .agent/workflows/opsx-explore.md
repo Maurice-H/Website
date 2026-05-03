@@ -82,8 +82,9 @@ You have full context of the OpenSpec system. Use it naturally, don't force it.
 ### Check for context
 
 At the start, you MUST check the project's core guidelines:
-1.  **Check Project Skills**: Read `.docs/skills/SKILLS_INDEX.md` and follow the guidelines for the current phase (usually **Phase 1: Explore & Propose**).
-2.  **Verify Standards**: Ensure your thinking aligns with `.agent/AGENT.md` (AI Behavioral Guidelines - MANDATORY BASELINE), `.docs/skills/project-bridge.md` (Architecture), and `creative-design/ui-ux-pro-max` (Visual standards).
+1.  **Context Automation**: Run `npm run agent:boot` to load the project structure, aliases, and store APIs into your context immediately.
+2.  **Check Project Skills**: Read `.docs/skills/SKILLS_INDEX.md` and follow the guidelines for the current phase (usually **Phase 1: Explore & Propose**).
+3.  **Verify Standards**: Ensure your thinking aligns with `.agent/AGENT.md` (AI Behavioral Guidelines - MANDATORY BASELINE), `.docs/skills/project-bridge.md` (Architecture), and `creative-design/ui-ux-pro-max` (Visual standards).
 
 Then, check the OpenSpec state:
 ```bash

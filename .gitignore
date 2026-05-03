@@ -12,6 +12,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+__pycache__/
 
 # TypeScript Cache
 *.tsbuildinfo
@@ -25,6 +26,7 @@ dist-ssr/
 playwright-report/
 test-results/
 coverage/
+.lighthouseci/
 
 # Editor directories and files
 .vscode/*
@@ -53,3 +55,7 @@ COVERAGE.md
 
 # Vite temporary files
 *.timestamp-*
+
+# Heavy Agent Data & Context Bloat
+.docs/**/*.csv
+.docs/**/data/

@@ -16,14 +16,14 @@ Implement tasks from an OpenSpec change.
 **Steps**
 
 0. **Check Project Skills (MANDATORY)**
-
-   Before implementing any code, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 2: Apply & Tasks**.
-   Ensure your implementation strictly adheres to the standards in:
-   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
-   - `.docs/skills/project-bridge.md` (Senior Frontend standards)
-   - `development/typescript-expert` (No `any` types)
-   - `creative-design/ui-ux-pro-max` (CSS Variables, Transitions)
-   - Any other relevant skill listed in the index.
+   - **Context Automation**: Run `npm run agent:boot` to load the structure, aliases, and store APIs into your context immediately.
+   - **Phase Check**: Read `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 2: Apply & Tasks**.
+   - **Standard Check**: Ensure your implementation strictly adheres to:
+     - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
+     - `.docs/skills/project-bridge.md` (Senior Frontend standards)
+     - `development/typescript-expert` (No `any` types)
+     - `creative-design/ui-ux-pro-max` (CSS Variables, Transitions)
+     - Any other relevant skill listed in the index.
 
 1. **Select the change**
 

@@ -29,6 +29,10 @@ try {
   // git grep returns 1 when NO matches are found, which is what we want!
   if (error.status === 1) {
     console.log('✅ Strict checks passed: No avoidance keywords found.');
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const fs = await import('node:fs');
+      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## ✅ Avoidance Check\n\nStrict checks passed: No avoidance keywords found (`@ts-ignore`, `biome-ignore`, etc.).\n');
+    }
     process.exit(0);
   } else {
     // Some other error occurred

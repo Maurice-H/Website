@@ -10,14 +10,15 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
 0. **Check Project Skills (MANDATORY)**
 
-   Before starting verification, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 3: Verify & Archive**.
-   Ensure your verification report evaluates the implementation against:
-   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
-   - `.docs/skills/project-bridge.md` (Definition of Done checklist)
-   - `development/test-driven-development` (Vitest coverage)
-   - `development/webapp-testing` (Playwright E2E)
-   - `web-development/web-performance-optimization` (Transition timings)
-   - Any other relevant skill listed in the index.
+   - **Context Automation**: Run `npm run agent:boot` to load the structure, aliases, and store APIs into your context immediately.
+   - **Phase Check**: Read `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 3: Verify & Archive**.
+   - **Standard Check**: Ensure your verification report evaluates the implementation against:
+     - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
+     - `.docs/skills/project-bridge.md` (Definition of Done checklist)
+     - `development/test-driven-development` (Vitest coverage)
+     - `development/webapp-testing` (Playwright E2E)
+     - `web-development/web-performance-optimization` (Transition timings)
+     - Any other relevant skill listed in the index.
 
 1. **If no change name provided, prompt for selection**
 
