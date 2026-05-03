@@ -4,3 +4,6 @@
 ## 2024-05-02 - WebGL Render Loop Performance
  **Learning:** Accessing reactive Vue proxy objects (like Pinia state properties that aren't marked as raw) inside a high-frequency WebGL render loop (like TresJS `useLoop().onBeforeRender`) triggers Vue's dependency tracking every frame (60+ times per second), leading to massive CPU overhead and garbage collection pauses.
  **Action:** Isolate high-frequency data structures using `markRaw` in Pinia. The viewport store's mouse pointer coordinates (`rawMouse`) must be passed to the WebGL context as a plain JavaScript object without reactivity proxies, while a debounced/rAF-gated reactive version (`mousePosition`) handles standard DOM updates.
+## 2024-05-03 - Layout Thrashing & GC Pressure in Loops
+ **Learning:** Calling `getBoundingClientRect()` within scroll event handlers causes layout thrashing, and using `.clone()` on Three.js primitives (like `Vector3`) within high-frequency WebGL render loops causes severe garbage collection pressure.
+ **Action:** Instead of querying the DOM in scroll listeners, calculate necessary metrics using pure math and known layout constants. In WebGL loops, pre-allocate module-scoped instances (e.g., `const _workingVector = new Vector3()`) and modify them in-place using `.copy()` to bypass object creation overhead.
