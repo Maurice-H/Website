@@ -208,89 +208,93 @@ render(() => {
 
 let lastMouse = new Vector2(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
-  // Update accent color only if theme changes
-  const accentColor = new Color();
-  watchEffect(() => {
-    accentColor.set(accentColorStr.value);
-    if (shaderMaterialRef.value) {
-      shaderMaterialRef.value.uniforms.uAccentColor.value = [accentColor.r, accentColor.g, accentColor.b];
-    }
-  });
+// Update accent color only if theme changes
+const accentColor = new Color();
+watchEffect(() => {
+  accentColor.set(accentColorStr.value);
+  if (shaderMaterialRef.value) {
+    shaderMaterialRef.value.uniforms.uAccentColor.value = [
+      accentColor.r,
+      accentColor.g,
+      accentColor.b,
+    ];
+  }
+});
 
-  onBeforeRender(({ elapsed, delta }) => {
-    if (ufoRef.value && camera.activeCamera.value) {
-      const isNav = lightingStore.phase === 'NAV';
-      if (ufoRef.value.visible !== isNav) {
-        ufoRef.value.visible = isNav;
-      }
-      
-      if (isNav) {
-        ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
-
-        // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
-        const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
-
-        if (shaderMaterialRef.value) {
-          shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
-        }
-      }
+onBeforeRender(({ elapsed, delta }) => {
+  if (ufoRef.value && camera.activeCamera.value) {
+    const isNav = lightingStore.phase === 'NAV';
+    if (ufoRef.value.visible !== isNav) {
+      ufoRef.value.visible = isNav;
     }
 
-    if (droneRef.value) {
-      const isContent = lightingStore.phase === 'CONTENT';
-      if (droneRef.value.visible !== isContent) {
-        droneRef.value.visible = isContent;
-      }
+    if (isNav) {
+      ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
 
-      if (isContent) {
-        droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
-        droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
-        droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
+      // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
+      const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
 
-        droneRef.value.rotation.x = elapsed * 0.5;
-        droneRef.value.rotation.y = elapsed * 0.8;
+      if (shaderMaterialRef.value) {
+        shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
       }
     }
+  }
 
-    if (dustRef.value) {
-      dustRef.value.rotation.y += 0.05 * delta;
-      dustRef.value.rotation.x += 0.02 * delta;
+  if (droneRef.value) {
+    const isContent = lightingStore.phase === 'CONTENT';
+    if (droneRef.value.visible !== isContent) {
+      droneRef.value.visible = isContent;
     }
 
-    if (rgbShiftPass) {
-      const currentMouseX = viewportStore.rawMouse.x;
-      const currentMouseY = viewportStore.rawMouse.y;
-      
-      const dx = currentMouseX - lastMouse.x;
-      const dy = currentMouseY - lastMouse.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      lastMouse.set(currentMouseX, currentMouseY);
+    if (isContent) {
+      droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
+      droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
+      droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
 
-      const targetAmount = Math.min(distance * 0.00005, 0.005);
-      rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
+      droneRef.value.rotation.x = elapsed * 0.5;
+      droneRef.value.rotation.y = elapsed * 0.8;
     }
+  }
 
-    if (!shaderMaterialRef.value) return;
+  if (dustRef.value) {
+    dustRef.value.rotation.y += 0.05 * delta;
+    dustRef.value.rotation.x += 0.02 * delta;
+  }
 
-    const u = shaderMaterialRef.value.uniforms;
-    u.uTime.value = elapsed;
-    u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
+  if (rgbShiftPass) {
+    const currentMouseX = viewportStore.rawMouse.x;
+    const currentMouseY = viewportStore.rawMouse.y;
 
-    // State change checks already present
-    const currentThemeState = themeStore.isBlueprintMode ? 1.0 : 0.0;
-    if (u.uThemeState.value !== currentThemeState) {
-      u.uThemeState.value = currentThemeState;
-    }
+    const dx = currentMouseX - lastMouse.x;
+    const dy = currentMouseY - lastMouse.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const currentLightingEnabled = themeStore.lightingEnabled;
-    if (u.uLightingEnabled.value !== currentLightingEnabled) {
-      u.uLightingEnabled.value = currentLightingEnabled;
-    }
+    lastMouse.set(currentMouseX, currentMouseY);
 
-    const currentPhase = lightingStore.phase === 'CONTENT' ? 1.0 : 0.0;
-    if (u.uPhase.value !== currentPhase) {
-      u.uPhase.value = currentPhase;
-    }
-  });
+    const targetAmount = Math.min(distance * 0.00005, 0.005);
+    rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
+  }
+
+  if (!shaderMaterialRef.value) return;
+
+  const u = shaderMaterialRef.value.uniforms;
+  u.uTime.value = elapsed;
+  u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
+
+  // State change checks already present
+  const currentThemeState = themeStore.isBlueprintMode ? 1.0 : 0.0;
+  if (u.uThemeState.value !== currentThemeState) {
+    u.uThemeState.value = currentThemeState;
+  }
+
+  const currentLightingEnabled = themeStore.lightingEnabled;
+  if (u.uLightingEnabled.value !== currentLightingEnabled) {
+    u.uLightingEnabled.value = currentLightingEnabled;
+  }
+
+  const currentPhase = lightingStore.phase === 'CONTENT' ? 1.0 : 0.0;
+  if (u.uPhase.value !== currentPhase) {
+    u.uPhase.value = currentPhase;
+  }
+});
 </script>

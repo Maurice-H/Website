@@ -6,10 +6,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results/results.json' }]
-  ],
+  reporter: [['html'], ['json', { outputFile: 'test-results/results.json' }]],
   timeout: 60000, // Increase global test timeout
   use: {
     baseURL: 'http://localhost:4173',

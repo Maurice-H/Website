@@ -53,7 +53,7 @@ export const useViewportStore = defineStore('viewport', () => {
         reg.el.style.setProperty('--card-left', `${rect.left}px`);
         reg.el.style.setProperty('--card-top', `${rect.top}px`);
       }
-      
+
       updateRafId = null;
     });
   };

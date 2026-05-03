@@ -153,7 +153,7 @@ const handleScroll = () => {
   const scrollPos = trackEl.value.scrollLeft;
   const itemWidth = 600; // 480px width + 120px gap
   const index = Math.round(scrollPos / itemWidth);
-  
+
   // Clamp index to available tabs
   const safeIndex = Math.max(0, Math.min(tabs.length - 1, index));
   const closestId = tabs[safeIndex].id;

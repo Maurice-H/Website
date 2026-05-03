@@ -82,23 +82,22 @@
 </template>
 
 <script setup lang="ts">
-import type { CSSProperties } from "vue";
-import { computed, defineAsyncComponent, onMounted, ref } from "vue";
-import ContactForm from "./components/features/ContactForm.vue";
-import HeroSection from "./components/features/HeroSection.vue";
-import ProjectsSection from "./components/features/ProjectsSection.vue";
-import SkillsAbout from "./components/features/SkillsAbout.vue";
-import BentoLayout from "./components/layout/BentoLayout.vue";
-import LightingToggle from "./components/navigation/LightingToggle.vue";
-import NavConveyor from "./components/navigation/NavConveyor.vue";
-import ThemeToggle from "./components/navigation/ThemeToggle.vue";
-import { initGlobalViewportService } from "./composables/useViewportStore";
-import { useLightingStore } from "./stores/lighting";
-import { useThemeStore } from "./stores/useThemeStore";
-import { LightingPhase } from "./types";
-
+import type { CSSProperties } from 'vue';
+import { computed, onMounted } from 'vue';
+import ContactForm from './components/features/ContactForm.vue';
+import HeroSection from './components/features/HeroSection.vue';
+import ProjectsSection from './components/features/ProjectsSection.vue';
+import SkillsAbout from './components/features/SkillsAbout.vue';
+import BentoLayout from './components/layout/BentoLayout.vue';
 // Lazy load the heavy WebGL background to keep the initial bundle small
-import WebGLBackground from "./components/layout/WebGLBackground.vue";
+import WebGLBackground from './components/layout/WebGLBackground.vue';
+import LightingToggle from './components/navigation/LightingToggle.vue';
+import NavConveyor from './components/navigation/NavConveyor.vue';
+import ThemeToggle from './components/navigation/ThemeToggle.vue';
+import { initGlobalViewportService } from './composables/useViewportStore';
+import { useLightingStore } from './stores/lighting';
+import { useThemeStore } from './stores/useThemeStore';
+import { LightingPhase } from './types';
 
 // Use the store directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
@@ -106,7 +105,7 @@ const themeStore = useThemeStore();
 
 // Check if we use the WebGL scanner (only on Content page + light on)
 const isCustomCursorActive = computed(() => {
-  return themeStore.lightingEnabled && lighting.phase === "CONTENT";
+  return themeStore.lightingEnabled && lighting.phase === 'CONTENT';
 });
 
 /**
@@ -117,12 +116,12 @@ const isCustomCursorActive = computed(() => {
 const rootCssVars = computed<CSSProperties>(() => {
   if (!themeStore.lightingEnabled) return {};
 
-  const isNav = lighting.phase === "NAV";
+  const isNav = lighting.phase === 'NAV';
 
   return {
-    "--reveal-mask": isNav
+    '--reveal-mask': isNav
       ? `radial-gradient(ellipse 40% 160% at 50% -10%, black 0%, rgba(0,0,0,0) 100%)`
-      : "",
+      : '',
   } as CSSProperties;
 });
 
@@ -131,7 +130,7 @@ const handleBackToNav = () => {
 };
 
 onMounted(() => {
-  console.log("App Mounted in Fused Single-Layer Mode");
+  console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
 });
 </script>
