@@ -12,6 +12,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+__pycache__/
 
 # TypeScript Cache
 *.tsbuildinfo
@@ -53,3 +54,7 @@ COVERAGE.md
 
 # Vite temporary files
 *.timestamp-*
+
+# Heavy Agent Data & Context Bloat
+.docs/**/*.csv
+.docs/**/data/

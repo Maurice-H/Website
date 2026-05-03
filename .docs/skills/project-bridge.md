@@ -23,3 +23,9 @@ You are applying your senior development skills to a specific Vue 3 / Vite portf
 - [ ] Are CSS variables used for all color/theme switching instead of hardcoded Tailwind classes?
 - [ ] Is the Component using `<script setup lang="ts">` with no implicit `any` types?
 - [ ] Are global events (scroll/resize) delegated to the Pinia stores instead of local listeners?
+
+## 5. AI Tooling & Efficiency
+- **Agent Bootstrap:** At the start of a session, ALWAYS run `npm run agent:boot`. This loads the structure, aliases, and store interfaces (`src/types/stores.d.ts`) into context in seconds.
+- **Path Aliases:** ALWAYS use `@/*` aliases (e.g., `@components/`, `@stores/`) for imports. Avoid relative paths like `../../` to ensure robust, location-agnostic code.
+- **Token Shielding:** When using the Playwright MCP to debug E2E tests, DO NOT request full HTML dumps or full console logs. Request ONLY the specific error locator and the exact assertion that failed. 
+- **Large Context Handling:** Use the `token-optimizer` MCP to parse large outputs. Keep the context window as minimal as possible to prevent reasoning degradation during complex Vue/WebGL tasks.

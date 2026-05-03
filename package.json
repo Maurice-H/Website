@@ -13,7 +13,9 @@
     "test:e2e": "playwright test",
     "lint": "biome check .",
     "format": "biome check . --write",
-    "check:avoidance": "node .agent/scripts/check-avoidance.js"
+    "check:avoidance": "node .agent/scripts/check-avoidance.js",
+    "search": "python .agent/scripts/search_docs.py",
+    "agent:boot": "node .agent/scripts/agent-boot.js"
   },
   "dependencies": {
     "@tresjs/cientos": "^5.7.0",

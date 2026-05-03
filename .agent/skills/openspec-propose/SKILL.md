@@ -25,13 +25,13 @@ When ready to implement, run /opsx:apply
 **Steps**
 
 0. **Check Project Skills (MANDATORY)**
-
-   Before creating any artifacts, you MUST check `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 1: Explore & Propose**. 
-   Ensure your proposal and design strictly follow the architectural and UI/UX rules defined in:
-   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
-   - `.docs/skills/project-bridge.md`
-   - `creative-design/ui-ux-pro-max` (if UI/UX related)
-   - Any other relevant skill listed in the index.
+   - **Context Automation**: Run `npm run agent:boot` to load the structure, aliases, and store APIs into your context immediately.
+   - **Phase Check**: Read `.docs/skills/SKILLS_INDEX.md` and read any skills listed for **Phase 1: Explore & Propose**. 
+   - **Standard Check**: Ensure your proposal and design strictly follow:
+     - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
+     - `.docs/skills/project-bridge.md`
+     - `creative-design/ui-ux-pro-max` (if UI/UX related)
+     - Any other relevant skill listed in the index.
 
 1. **If no clear input provided, ask what they want to build**
 

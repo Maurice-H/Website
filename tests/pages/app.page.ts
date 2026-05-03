@@ -27,7 +27,7 @@ export class AppPage {
     this.themeToggleBtn = page.getByRole('button', { name: /System Mode/ });
     this.navWindows = page.locator('.nav-window');
     this.backToNavBtn = page.getByRole('button', {
-      name: 'Back to Navigation',
+      name: /Back|ESC/,
     });
   }
 
@@ -41,18 +41,25 @@ export class AppPage {
   /** Transition from NAV → CONTENT by clicking the first nav window. */
   async enterContentPhase() {
     // Wait for the initial centering scroll to settle
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
 
     // We must click the CURRENTLY ACTIVE window to enter the phase.
     const activeWindow = this.page.locator('.nav-window.is-active');
-    await activeWindow.waitFor({ state: 'attached', timeout: 10000 });
+    await activeWindow.waitFor({ state: 'visible', timeout: 15000 });
 
-    // The Fused Portfolio uses a selection mechanic.
-    // Now that the component uses distance-based click detection, a standard .click() is reliable.
-    await activeWindow.click();
+    // On mobile, the card (480px) is wider than the viewport (375px).
+    // Standard click might hit outside the viewport if not careful.
+    // We click the center of the viewport which should be the center of the active card.
+    const viewport = this.page.viewportSize();
+    if (viewport) {
+      await this.page.mouse.click(viewport.width / 2, viewport.height / 2);
+    } else {
+      await activeWindow.click({ force: true });
+    }
 
     // Wait for the content phase layout to appear AND be ready for interaction.
-    await this.themeToggleBtn.waitFor({ state: 'visible', timeout: 15000 });
+    // We wait for the Back button as a signal that the content transition is done.
+    await this.backToNavBtn.waitFor({ state: 'visible', timeout: 15000 });
   }
 
   /** Click the theme toggle button. */

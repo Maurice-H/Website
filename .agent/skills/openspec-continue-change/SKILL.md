@@ -16,13 +16,13 @@ Continue working on a change by creating the next artifact.
 **Steps**
 
 0. **Check Project Skills (MANDATORY)**
-
-   Before creating the next artifact, you MUST check `.docs/skills/SKILLS_INDEX.md` and read the relevant skills for the current phase (Phase 1 or 2).
-   Ensure the artifact follows:
-   - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
-   - `.docs/skills/project-bridge.md` (Architecture)
-   - `creative-design/ui-ux-pro-max` (Visual standards)
-   - Any other relevant skill listed in the index for the specific artifact type.
+   - **Context Automation**: Run `npm run agent:boot` to load the structure, aliases, and store APIs into your context immediately.
+   - **Phase Check**: Read `.docs/skills/SKILLS_INDEX.md` and read the relevant skills for the current phase (Phase 1 or 2).
+   - **Standard Check**: Ensure the artifact follows:
+     - `.agent/AGENT.md` (Karpathy AI Behavioral Guidelines - MANDATORY BASELINE)
+     - `.docs/skills/project-bridge.md` (Architecture)
+     - `creative-design/ui-ux-pro-max` (Visual standards)
+     - Any other relevant skill listed in the index for the specific artifact type.
 
 1. **If no change name provided, prompt for selection**
 

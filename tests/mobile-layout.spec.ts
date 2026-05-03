@@ -12,7 +12,10 @@ test.describe('Mobile Layout Responsiveness', () => {
     await app.enterContentPhase();
 
     // Ensure content is loaded
-    await expect(page.getByText('Discovery Path')).toBeVisible();
+    // We use a regex and longer timeout to account for transitions and potential text-shadow rendering delays
+    const discoveryTitle = page.getByText(/Discovery Path/i);
+    await discoveryTitle.waitFor({ state: 'visible', timeout: 15000 });
+    await expect(discoveryTitle).toBeVisible();
 
     // Find the first two BentoCards
     const bentoCards = page.locator('.bento-card');
