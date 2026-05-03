@@ -1,5 +1,3 @@
-## 2025-02-28 - Missing Form Labels and Focus Indicators
-Learning: Placeholder-only forms are a severe accessibility anti-pattern. Screen readers may skip placeholders, and they disappear when users start typing, losing context. Furthermore, custom form inputs that remove standard focus outlines (`focus:outline-none`) must explicitly provide alternative focus indicators using `focus-visible` for keyboard navigators.
-Action: Always pair `<input>` and `<textarea>` elements with explicit `<label>` elements linked via `id` and `for` attributes. Ensure focus states are accessible by applying `focus-visible:ring-*` when native outlines are suppressed.## 2024-05-02 - Aria-Label vs Visible Text Mismatch
- Learning: When using an `aria-label` attribute on a button, its value must fully contain or match the visible text within that button. Using a static aria-label (like "Toggle Theme") when the visible text changes state (like "System Mode Blueprint") creates a `label-content-name-mismatch` accessibility failure in Lighthouse.
- Action: Dynamically bind the `aria-label` (e.g., `:aria-label`) to match the dynamic text exactly.
+## 2024-05-02 - ARIA Press State Synchronization
+ Learning: Toggles with complex multi-state logic (e.g. Blueprint/Finished mode, Lighting on/off) often fail to properly communicate their active state to screen readers if they only rely on visual class changes (`is-active`).
+ Action: Ensure that all toggle buttons dynamically map their state to `aria-pressed="true|false"` and dynamically update their `aria-label` to provide accurate context to screen readers on state change.

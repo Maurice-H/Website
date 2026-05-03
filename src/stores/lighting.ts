@@ -7,6 +7,12 @@ export const useLightingStore = defineStore('lighting', () => {
   const isFlashActive = ref(false);
 
   const setPhase = (newPhase: LightingPhase) => {
+    // Strict state enforcement: reject invalid enums
+    if (!Object.values(LightingPhase).includes(newPhase)) {
+      console.warn(`[LightingStore] Invalid phase rejected: ${newPhase}`);
+      return;
+    }
+
     isFlashActive.value = true;
 
     setTimeout(() => {

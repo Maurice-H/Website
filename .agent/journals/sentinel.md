@@ -1,0 +1,3 @@
+## 2024-05-02 - Sentinel Strict State Enforcement
+ **Learning:** TypeScript enum validation is easily bypassed during runtime serialization or coercion. Standard store actions assumed type safety would catch invalid enums.
+ **Action:** Implemented strict runtime phase validation in `lighting.ts` by explicitly verifying that the incoming payload is an approved `LightingPhase` before executing state transitions.
