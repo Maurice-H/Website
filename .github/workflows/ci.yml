@@ -153,6 +153,14 @@ jobs:
         if: always()
         run: node scripts/lighthouse-summary.js
 
+      - name: Upload Lighthouse Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
+
   deploy:
     needs: [build, test-e2e, lighthouse-audit]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
