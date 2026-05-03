@@ -37,15 +37,23 @@ export const useViewportStore = defineStore('viewport', () => {
     if (updateRafId !== null) return;
 
     updateRafId = requestAnimationFrame(() => {
+      const updates = [];
+
+      // Phase 1: Batch all READS
       for (const [_id, reg] of registeredComponents) {
         if (!reg.isVisible) continue;
-
         const rect = reg.el.getBoundingClientRect();
+        updates.push({ reg, rect });
+      }
+
+      // Phase 2: Batch all WRITES
+      for (const { reg, rect } of updates) {
         reg.offsets.left = rect.left;
         reg.offsets.top = rect.top;
         reg.el.style.setProperty('--card-left', `${rect.left}px`);
         reg.el.style.setProperty('--card-top', `${rect.top}px`);
       }
+      
       updateRafId = null;
     });
   };

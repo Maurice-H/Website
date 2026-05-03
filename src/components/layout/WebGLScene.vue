@@ -29,14 +29,14 @@
 
   <!-- UFO -->
   <TresMesh ref="ufoRef" :position="[0, 1.6, 0]" :scale="[0.3, 0.3, 0.3]">
-    <TresCylinderGeometry :args="[1.2, 1.5, 0.4, 64]" />
+    <TresCylinderGeometry :args="[1.2, 1.5, 0.4, 32]" />
     <TresMeshStandardMaterial
       color="#333333"
       :metalness="0.8"
       :roughness="0.2"
     />
     <TresMesh :position="[0, -0.2, 0]" :rotation="[Math.PI / 2, 0, 0]">
-      <TresTorusGeometry :args="[1.4, 0.05, 16, 64]" />
+      <TresTorusGeometry :args="[1.4, 0.05, 12, 32]" />
       <TresMeshBasicMaterial :color="accentColorStr" />
     </TresMesh>
   </TresMesh>
@@ -50,7 +50,7 @@
       :roughness="0.2"
     />
     <TresMesh :rotation="[Math.PI / 2, 0, 0]">
-      <TresTorusGeometry :args="[1.5, 0.1, 16, 64]" />
+      <TresTorusGeometry :args="[1.5, 0.1, 12, 32]" />
       <TresMeshBasicMaterial :color="accentColorStr" />
     </TresMesh>
   </TresMesh>
@@ -66,7 +66,6 @@ import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js';
 import { computed, shallowRef, watch, watchEffect } from 'vue';
 import fragmentShader from '../../shaders/main.frag.glsl?raw';
 import vertexShader from '../../shaders/main.vert.glsl?raw';
@@ -90,6 +89,31 @@ const { renderer, scene, camera, sizes } = useTresContext();
 let composer: EffectComposer | null = null;
 let rgbShiftPass: ShaderPass | null = null;
 let glitchPass: GlitchPass | null = null;
+const RGB_SHIFT_SHADER = {
+  uniforms: {
+    tDiffuse: { value: null },
+    amount: { value: 0.005 },
+    angle: { value: 0.0 },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform float amount;
+    uniform float angle;
+    varying vec2 vUv;
+    void main() {
+      vec2 offset = vec2(cos(angle), sin(angle)) * amount;
+      vec4 cr = texture2D(tDiffuse, vUv + offset);
+      vec4 cga = texture2D(tDiffuse, vUv);
+      vec4 cb = texture2D(tDiffuse, vUv - offset);
+      gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
+    }`,
+};
 
 watchEffect(() => {
   const activeRenderer = renderer.instance;
@@ -103,17 +127,16 @@ watchEffect(() => {
     composer.addPass(renderPass);
 
     // 2. Cinematic Bloom Pass
-    // A subtle glow focused on the flashlight core and dust motes.
     const bloomPass = new UnrealBloomPass(
       new Vector2(sizes.width.value, sizes.height.value),
       0.15, // strength
       0.5, // radius
-      0.9 // threshold (only bright things bloom)
+      0.9 // threshold
     );
     composer.addPass(bloomPass);
 
     // 3. Velocity-based Chromatic Aberration
-    rgbShiftPass = new ShaderPass(RGBShiftShader);
+    rgbShiftPass = new ShaderPass(RGB_SHIFT_SHADER);
     rgbShiftPass.uniforms.amount.value = 0.0;
     composer.addPass(rgbShiftPass);
 
@@ -125,9 +148,12 @@ watchEffect(() => {
   }
 });
 
-// Resize Handler for Composer
+// Resize Handler for Composer and Uniforms
 watch([() => sizes.width.value, () => sizes.height.value], ([w, h]) => {
   if (composer) composer.setSize(w, h);
+  if (shaderMaterialRef.value) {
+    shaderMaterialRef.value.uniforms.uResolution.value.set(w, h);
+  }
 });
 
 // Theme Glitch Trigger
@@ -146,7 +172,7 @@ watch(
 );
 
 // Generate Indoor Room Dust Particles (fewer, subtle)
-const particleCount = 400;
+const particleCount = 200;
 const dustPositions = new Float32Array(particleCount * 3);
 // We also want some varying speeds or offsets for a more organic float,
 // but we'll keep it simple: just position them around the camera.
@@ -182,67 +208,89 @@ render(() => {
 
 let lastMouse = new Vector2(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
-onBeforeRender(({ elapsed, delta }) => {
-  if (ufoRef.value && camera.activeCamera.value) {
-    ufoRef.value.visible = lightingStore.phase === 'NAV';
-    ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
-
-    // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
-    const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
-
+  // Update accent color only if theme changes
+  const accentColor = new Color();
+  watchEffect(() => {
+    accentColor.set(accentColorStr.value);
     if (shaderMaterialRef.value) {
-      shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
+      shaderMaterialRef.value.uniforms.uAccentColor.value = [accentColor.r, accentColor.g, accentColor.b];
     }
-  }
+  });
 
-  if (droneRef.value) {
-    droneRef.value.visible = lightingStore.phase === 'CONTENT';
+  onBeforeRender(({ elapsed, delta }) => {
+    if (ufoRef.value && camera.activeCamera.value) {
+      const isNav = lightingStore.phase === 'NAV';
+      if (ufoRef.value.visible !== isNav) {
+        ufoRef.value.visible = isNav;
+      }
+      
+      if (isNav) {
+        ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
 
-    // Autopilot: Die Drohne fliegt eine unendliche, sanfte Acht (Lissajous-Figur) im Hintergrund
-    if (droneRef.value.visible) {
-      // Fliegt von links nach rechts (und zurück) über die gesamte Breite
-      droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
-      // Schwebt leicht auf und ab
-      droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
-      // Fliegt leicht auf dich zu und wieder weg (Tiefe)
-      droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
+        // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
+        const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
 
-      // Der kleine Ring um die Drohne dreht sich
-      droneRef.value.rotation.x = elapsed * 0.5;
-      droneRef.value.rotation.y = elapsed * 0.8;
+        if (shaderMaterialRef.value) {
+          shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
+        }
+      }
     }
-  }
 
-  if (dustRef.value) {
-    // Slow, weightless drift rotation
-    dustRef.value.rotation.y += 0.05 * delta;
-    dustRef.value.rotation.x += 0.02 * delta;
-  }
+    if (droneRef.value) {
+      const isContent = lightingStore.phase === 'CONTENT';
+      if (droneRef.value.visible !== isContent) {
+        droneRef.value.visible = isContent;
+      }
 
-  // Velocity tracking for RGB Shift Chromatic Aberration
-  const currentMouse = new Vector2(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
-  const distance = currentMouse.distanceTo(lastMouse);
-  lastMouse.copy(currentMouse);
+      if (isContent) {
+        droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
+        droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
+        droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
 
-  if (rgbShiftPass) {
-    // Calculate target amount based on velocity per frame
-    const targetAmount = Math.min(distance * 0.00005, 0.005);
-    // Smoothly lerp towards the target
-    rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
-  }
+        droneRef.value.rotation.x = elapsed * 0.5;
+        droneRef.value.rotation.y = elapsed * 0.8;
+      }
+    }
 
-  if (!shaderMaterialRef.value) return;
+    if (dustRef.value) {
+      dustRef.value.rotation.y += 0.05 * delta;
+      dustRef.value.rotation.x += 0.02 * delta;
+    }
 
-  const u = shaderMaterialRef.value.uniforms;
-  u.uTime.value = elapsed;
-  u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
-  u.uResolution.value.set(window.innerWidth, window.innerHeight);
-  u.uThemeState.value = themeStore.isBlueprintMode ? 1.0 : 0.0;
-  u.uLightingEnabled.value = themeStore.lightingEnabled;
-  u.uPhase.value = lightingStore.phase === 'CONTENT' ? 1.0 : 0.0;
+    if (rgbShiftPass) {
+      const currentMouseX = viewportStore.rawMouse.x;
+      const currentMouseY = viewportStore.rawMouse.y;
+      
+      const dx = currentMouseX - lastMouse.x;
+      const dy = currentMouseY - lastMouse.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      lastMouse.set(currentMouseX, currentMouseY);
 
-  // Update accent color
-  const accentColor = new Color(accentColorStr.value);
-  u.uAccentColor.value = [accentColor.r, accentColor.g, accentColor.b];
-});
+      const targetAmount = Math.min(distance * 0.00005, 0.005);
+      rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
+    }
+
+    if (!shaderMaterialRef.value) return;
+
+    const u = shaderMaterialRef.value.uniforms;
+    u.uTime.value = elapsed;
+    u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
+
+    // State change checks already present
+    const currentThemeState = themeStore.isBlueprintMode ? 1.0 : 0.0;
+    if (u.uThemeState.value !== currentThemeState) {
+      u.uThemeState.value = currentThemeState;
+    }
+
+    const currentLightingEnabled = themeStore.lightingEnabled;
+    if (u.uLightingEnabled.value !== currentLightingEnabled) {
+      u.uLightingEnabled.value = currentLightingEnabled;
+    }
+
+    const currentPhase = lightingStore.phase === 'CONTENT' ? 1.0 : 0.0;
+    if (u.uPhase.value !== currentPhase) {
+      u.uPhase.value = currentPhase;
+    }
+  });
 </script>

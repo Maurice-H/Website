@@ -150,23 +150,17 @@ const stopDrag = () => {
 const handleScroll = () => {
   if (!trackEl.value) return;
 
-  // Find which tab is closest to center
-  const elements = trackEl.value.querySelectorAll('.nav-window');
-  let closestId = tabs[0].id;
-  let minDistance = Infinity;
+  const scrollPos = trackEl.value.scrollLeft;
+  const itemWidth = 600; // 480px width + 120px gap
+  const index = Math.round(scrollPos / itemWidth);
+  
+  // Clamp index to available tabs
+  const safeIndex = Math.max(0, Math.min(tabs.length - 1, index));
+  const closestId = tabs[safeIndex].id;
 
-  elements.forEach((el, index) => {
-    const rect = el.getBoundingClientRect();
-    const elCenter = rect.left + rect.width / 2;
-    const distance = Math.abs(window.innerWidth / 2 - elCenter);
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestId = tabs[index].id;
-    }
-  });
-
-  activeId.value = closestId;
+  if (activeId.value !== closestId) {
+    activeId.value = closestId;
+  }
 };
 
 const onWheel = (e: WheelEvent) => {

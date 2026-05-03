@@ -48,6 +48,8 @@ defineProps<{
   align-items: center;
   transition: transform 0.4s var(--lighting-transition);
   cursor: pointer;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .nav-window.is-active {

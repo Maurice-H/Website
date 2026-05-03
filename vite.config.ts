@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import { templateCompilerOptions } from '@tresjs/core';
 import vue from '@vitejs/plugin-vue';
+import viteCompression from 'vite-plugin-compression';
 import { defineConfig } from 'vitest/config';
 
 // https://vite.dev/config/
@@ -14,6 +15,14 @@ export default defineConfig({
       ...templateCompilerOptions,
     }),
     tailwindcss(),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+    }),
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+    }),
   ],
   resolve: {
     alias: {
@@ -47,7 +56,7 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**', 'tests/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'json-summary'],
     },
   },
 });
