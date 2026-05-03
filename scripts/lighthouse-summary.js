@@ -23,7 +23,9 @@ try {
     process.exit(0);
   }
 
-  let summaryMd = '## ⚡ Lighthouse Audit Report\n\n';
+  const title = process.env.LHCI_TITLE || 'Lighthouse Audit Report';
+  let summaryMd = `## ⚡ ${title}\n\n`;
+
   
   // 1. Overview Table
   summaryMd += '### 📊 Overview\n\n';

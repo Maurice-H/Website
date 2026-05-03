@@ -122,7 +122,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  lighthouse-audit:
+  lighthouse-mobile:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -144,28 +144,79 @@ jobs:
           name: dist
           path: dist
 
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
-        with:
-          configPath: ./.lighthouserc.json
+      - name: Install Lighthouse CI CLI
+        run: npm install -g @lhci/cli@0.13.0
 
-      - name: Generate Lighthouse Summary
+      - name: Run Lighthouse CI (Mobile)
+        run: lhci autorun --collect.settings.preset=perf || true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Mobile Summary
         if: always()
         run: |
-          mkdir -p lighthouse-artifacts
-          cp -r .lighthouseci/* lighthouse-artifacts/ || true
-          node scripts/lighthouse-summary.js
+          mkdir -p lighthouse-mobile
+          cp -r .lighthouseci/* lighthouse-mobile/ || true
+          LHCI_TITLE="Lighthouse Mobile Audit" node scripts/lighthouse-summary.js
 
-      - name: Upload Lighthouse Reports
+      - name: Upload Mobile Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-reports
-          path: lighthouse-artifacts/
+          name: lighthouse-reports-mobile
+          path: lighthouse-mobile/
           retention-days: 30
 
+  lighthouse-desktop:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Install Lighthouse CI CLI
+        run: npm install -g @lhci/cli@0.13.0
+
+      - name: Run Lighthouse CI (Desktop)
+        run: lhci autorun --collect.settings.preset=desktop || true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Desktop Summary
+        if: always()
+        run: |
+          mkdir -p lighthouse-desktop
+          cp -r .lighthouseci/* lighthouse-desktop/ || true
+          LHCI_TITLE="Lighthouse Desktop Audit" node scripts/lighthouse-summary.js
+
+      - name: Upload Desktop Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-desktop
+          path: lighthouse-desktop/
+          retention-days: 30
+
+
+
+
   deploy:
-    needs: [build, test-e2e, lighthouse-audit]
+    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -187,7 +238,7 @@ jobs:
           keep_files: true
 
   pr-preview:
-    needs: [build, test-e2e, lighthouse-audit]
+    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     concurrency:

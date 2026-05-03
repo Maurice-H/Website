@@ -69,3 +69,12 @@
 - [ ] **Subtle Sound Effects:** Satisfaction clicks for theme toggle and phase shifts.
       ver buttons.
 - [x] Custom Cursor: WebGL-based HUD scanner active in CONTENT phase (system cursor hidden dynamically).
+
+## Notes
+
+- changes Lighthouse Audit from warn to error if score below threshold, see .lighthouserc.json (needs implementation below)
+- implement a clean webgl free alternative for low end devices or without hardwareacceleration 
+- look for cooler models for the ufo and the drone
+- improve imersivness of the visuals
+- fix layout bugs for mobile devices
+- fix cursor tracking on mobile devices
