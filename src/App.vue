@@ -89,8 +89,9 @@ import HeroSection from './components/features/HeroSection.vue';
 import ProjectsSection from './components/features/ProjectsSection.vue';
 import SkillsAbout from './components/features/SkillsAbout.vue';
 import BentoLayout from './components/layout/BentoLayout.vue';
+import { defineAsyncComponent } from 'vue';
 // Lazy load the heavy WebGL background to keep the initial bundle small
-import WebGLBackground from './components/layout/WebGLBackground.vue';
+const WebGLBackground = defineAsyncComponent(() => import('./components/layout/WebGLBackground.vue'));
 import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
