@@ -3,7 +3,7 @@
     type="button"
     @click="toggleLighting"
     :aria-label="`Lighting ${lightingEnabled ? 'On' : 'Off'}`"
-    class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95"
+    class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     :class="[
       isBlueprint
         ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
@@ -21,6 +21,7 @@
       stroke-linejoin="round"
       class="w-10 h-10 transition-all duration-[var(--theme-transition-duration)]"
       :class="lightingEnabled ? 'drop-shadow-[0_0_15px_currentColor]' : 'opacity-40'"
+      aria-hidden="true"
     >
       <!-- Lamp body -->
       <path d="M9 18h6" />
@@ -61,7 +62,9 @@ const playSwitchSound = () => {
   try {
     const audio = new Audio('audio/switch15.ogg');
     audio.volume = 0.5;
-    audio.play();
+    audio.play().catch(() => {
+      // Silently ignore if audio fails (e.g. browser policy)
+    });
   } catch {
     // Silently ignore if audio fails (e.g. browser policy)
   }

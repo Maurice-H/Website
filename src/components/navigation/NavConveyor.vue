@@ -9,6 +9,8 @@
     <div
       class="conveyor-track mask-fused"
       ref="trackEl"
+      role="tablist"
+      aria-label="Navigation Conveyor"
       @mousedown="startDrag"
       @wheel.prevent="onWheel"
       @scroll="handleScroll"
@@ -20,6 +22,8 @@
         :label="tab.label"
         :active="activeId === tab.id"
         @click="selectTab(tab.id, $event)"
+        @keydown.enter="selectTab(tab.id, $event)"
+        @keydown.space.prevent="selectTab(tab.id, $event)"
       >
         <!-- The mockup has a large title inside the card for EXPERIENCE -->
         <div
@@ -150,17 +154,12 @@ const stopDrag = () => {
 const handleScroll = () => {
   if (!trackEl.value) return;
 
-  const scrollPos = trackEl.value.scrollLeft;
-  const itemWidth = 600; // 480px width + 120px gap
-  const index = Math.round(scrollPos / itemWidth);
+  // Pure math calculation to find active tab index based on scrollLeft
+  // 480px width + 120px gap = 600px step
+  const rawIndex = Math.round(Math.max(0, trackEl.value.scrollLeft) / 600);
+  const clampedIndex = Math.max(0, Math.min(rawIndex, tabs.length - 1));
 
-  // Clamp index to available tabs
-  const safeIndex = Math.max(0, Math.min(tabs.length - 1, index));
-  const closestId = tabs[safeIndex].id;
-
-  if (activeId.value !== closestId) {
-    activeId.value = closestId;
-  }
+  activeId.value = tabs[clampedIndex].id;
 };
 
 const onWheel = (e: WheelEvent) => {
@@ -168,12 +167,14 @@ const onWheel = (e: WheelEvent) => {
   trackEl.value.scrollLeft += e.deltaY;
 };
 
-const selectTab = (id: string, e: MouseEvent) => {
-  // Distance-based check is much more robust for E2E tests than a simple flag
-  const moveDistance = Math.abs(e.pageX - mouseDownX);
+const selectTab = (id: string, e: MouseEvent | KeyboardEvent) => {
+  if (e instanceof MouseEvent) {
+    // Distance-based check is much more robust for E2E tests than a simple flag
+    const moveDistance = Math.abs(e.pageX - mouseDownX);
 
-  if (moveDistance > 15) {
-    return;
+    if (moveDistance > 15) {
+      return;
+    }
   }
 
   activeId.value = id;

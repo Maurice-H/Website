@@ -1,10 +1,13 @@
 <template>
   <div 
-    class="nav-window group"
+    class="nav-window group focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl"
     :class="[
       `theme-${theme}`,
       { 'is-active': active }
     ]"
+    role="tab"
+    :aria-selected="active"
+    tabindex="0"
   >
     <!-- Window Frame -->
     <div class="window-container-wrapper">
