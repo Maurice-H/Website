@@ -83,15 +83,18 @@
 
 <script setup lang="ts">
 import type { CSSProperties } from 'vue';
-import { computed, onMounted } from 'vue';
+import { computed, defineAsyncComponent, onMounted } from 'vue';
 import ContactForm from './components/features/ContactForm.vue';
 import HeroSection from './components/features/HeroSection.vue';
 import ProjectsSection from './components/features/ProjectsSection.vue';
 import SkillsAbout from './components/features/SkillsAbout.vue';
 import BentoLayout from './components/layout/BentoLayout.vue';
-import { defineAsyncComponent } from 'vue';
+
 // Lazy load the heavy WebGL background to keep the initial bundle small
-const WebGLBackground = defineAsyncComponent(() => import('./components/layout/WebGLBackground.vue'));
+const WebGLBackground = defineAsyncComponent(
+  () => import('./components/layout/WebGLBackground.vue')
+);
+
 import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
