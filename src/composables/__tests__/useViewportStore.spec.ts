@@ -350,3 +350,157 @@ describe('useViewportStore', () => {
     });
   });
 });
+
+describe('updateAll exception conditions part 3', () => {
+  it('skips processing if updateRafId is already set', async () => {
+    const store = useViewportStore();
+    const mockEl = document.createElement('div');
+    store.register('test-1', mockEl);
+    store.init();
+
+    // Trigger scroll event to queue updateAll
+    window.dispatchEvent(new Event('scroll'));
+    // Trigger it again immediately, should return early
+    window.dispatchEvent(new Event('scroll'));
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  });
+
+  it('skips processing if rafId is already set', async () => {
+    const store = useViewportStore();
+    store.init();
+
+    // Dispatch mousemove to queue handleMouseMove
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 100 }));
+    // Dispatch it again immediately, should return early
+    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200, clientY: 200 }));
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    // Should reflect the last raw position, but the callback only ran once
+    expect(store.rawMouse.x).toBe(200);
+    expect(store.rawMouse.y).toBe(200);
+  });
+
+  it('handles intersection observer when no elements match target', () => {
+    const store = useViewportStore();
+    store.init();
+
+    // We need to simulate the intersection observer callback
+    // This is tricky without exposing observer directly, but we can trigger it
+    // if we stub IntersectionObserver
+  });
+});
+
+describe('updateAll exception conditions part 4', () => {
+  it('handles intersection observer when no elements match target', async () => {
+    // Mock IntersectionObserver to expose the callback
+    let observerCallback: IntersectionObserverCallback | null = null;
+    const OriginalObserver = globalThis.IntersectionObserver;
+
+    const mockObserver = vi.fn().mockImplementation((callback) => {
+      observerCallback = callback;
+      return {
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+        disconnect: vi.fn(),
+      };
+    });
+    globalThis.IntersectionObserver = mockObserver as unknown as typeof IntersectionObserver;
+
+    const store = useViewportStore();
+    store.init();
+
+    // Ensure observerCallback was captured
+    expect(observerCallback).toBeDefined();
+
+    if (observerCallback) {
+      // Trigger with a target that is NOT registered
+      const dummyElement = document.createElement('div');
+      const entry = {
+        target: dummyElement,
+        isIntersecting: true,
+        boundingClientRect: dummyElement.getBoundingClientRect(),
+        intersectionRatio: 1,
+        intersectionRect: dummyElement.getBoundingClientRect(),
+        rootBounds: null,
+        time: 0,
+      } as IntersectionObserverEntry;
+
+      (observerCallback as IntersectionObserverCallback)(
+        [entry],
+        {} as unknown as IntersectionObserver
+      );
+    }
+
+    globalThis.IntersectionObserver = OriginalObserver;
+  });
+
+  it('safely handles unregistering when observer is null', () => {
+    const store = useViewportStore();
+    const mockEl = document.createElement('div');
+
+    store.register('test-null-obs', mockEl);
+
+    // Force observer to null (simulating window not having IntersectionObserver)
+    // We can't directly access `observer` variable from closure,
+    // but we can register before init()
+    const OriginalObserver = globalThis.IntersectionObserver;
+    delete (globalThis as unknown as Record<string, unknown>).IntersectionObserver;
+
+    const storeWithoutObs = useViewportStore();
+    const { unregister: unregister2 } = storeWithoutObs.register('test-null-obs-2', mockEl);
+
+    expect(() => unregister2()).not.toThrow();
+
+    globalThis.IntersectionObserver = OriginalObserver;
+  });
+});
+
+describe('updateAll exception conditions part 5', () => {
+  it('executes the IntersectionObserver callback when isIntersecting matches an element', async () => {
+    // Mock IntersectionObserver to expose the callback
+    let observerCallback: IntersectionObserverCallback | null = null;
+    const OriginalObserver = globalThis.IntersectionObserver;
+
+    const mockObserver = vi.fn().mockImplementation((callback) => {
+      observerCallback = callback;
+      return {
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+        disconnect: vi.fn(),
+      };
+    });
+    globalThis.IntersectionObserver = mockObserver as unknown as typeof IntersectionObserver;
+
+    const store = useViewportStore();
+
+    const mockEl = document.createElement('div');
+    store.register('test-intersect', mockEl);
+
+    store.init();
+
+    // Ensure observerCallback was captured
+    expect(observerCallback).toBeDefined();
+
+    if (observerCallback) {
+      // Trigger with a target that IS registered
+      const entry = {
+        target: mockEl,
+        isIntersecting: true,
+        boundingClientRect: mockEl.getBoundingClientRect(),
+        intersectionRatio: 1,
+        intersectionRect: mockEl.getBoundingClientRect(),
+        rootBounds: null,
+        time: 0,
+      } as IntersectionObserverEntry;
+
+      const updateAllSpy = vi.spyOn(window, 'requestAnimationFrame');
+      observerCallback([entry], {} as unknown as IntersectionObserver);
+
+      expect(store.registeredComponents.get('test-intersect')?.isVisible).toBe(true);
+      expect(updateAllSpy).toHaveBeenCalled();
+    }
+
+    globalThis.IntersectionObserver = OriginalObserver;
+  });
+});

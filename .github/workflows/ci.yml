@@ -45,9 +45,9 @@ jobs:
 
       - name: Enforce Coverage Thresholds
         run: |
-          node -e "
-            const fs = require('fs');
-            const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+          node -e '
+            const fs = require("fs");
+            const coverage = JSON.parse(fs.readFileSync("coverage/coverage-summary.json", "utf8"));
             const thresholds = { branches: 85, functions: 85, lines: 80, statements: 80 };
             let failed = false;
             for (const [metric, threshold] of Object.entries(thresholds)) {
@@ -59,7 +59,7 @@ jobs:
               }
             }
             if (failed) process.exit(1);
-          "
+          '
 
 
       - name: Generate Coverage Summary
