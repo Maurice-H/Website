@@ -7,3 +7,6 @@
 ## 2024-05-03 - Layout Thrashing & GC Pressure in Loops
  **Learning:** Calling `getBoundingClientRect()` within scroll event handlers causes layout thrashing, and using `.clone()` on Three.js primitives (like `Vector3`) within high-frequency WebGL render loops causes severe garbage collection pressure.
  **Action:** Instead of querying the DOM in scroll listeners, calculate necessary metrics using pure math and known layout constants. In WebGL loops, pre-allocate module-scoped instances (e.g., `const _workingVector = new Vector3()`) and modify them in-place using `.copy()` to bypass object creation overhead.
+## 2024-05-04 - Vue Reactivity in WebGL Render Loops
+ **Learning:** Accessing reactive Vue proxy objects (like Pinia state or `ref`s) directly inside a high-frequency WebGL render loop (like TresJS `useLoop().onBeforeRender`) triggers Vue's dependency tracking getters on every single frame (60+ FPS). This causes massive CPU overhead and garbage collection pauses.
+ **Action:** Isolate the render loop from Vue reactivity. Create a plain JavaScript object (e.g., `renderState`) outside the loop, update it asynchronously via a `watchEffect`, and read strictly from this plain object inside `onBeforeRender`.
