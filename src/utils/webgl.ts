@@ -9,9 +9,10 @@ const _workingVector = new Vector3();
  *
  * @param position The 3D position to project
  * @param camera The active camera
+ * @param target Optional Vector2 to update with the result to avoid GC
  * @returns Vector2 containing screen space x and y (0 to 1)
  */
-export function projectToScreenSpace(position: Vector3, camera: Camera): Vector2 {
+export function projectToScreenSpace(position: Vector3, camera: Camera, target?: Vector2): Vector2 {
   // Use the working vector to avoid GC pressure
   _workingVector.copy(position).project(camera);
 
@@ -19,5 +20,12 @@ export function projectToScreenSpace(position: Vector3, camera: Camera): Vector2
   // Note: Y is flipped in standard screen space (0 at top),
   // but many shaders prefer 0 at bottom.
   // We keep it as (0,0) = bottom-left for GLSL st coordinates.
-  return new Vector2((_workingVector.x + 1) / 2, (_workingVector.y + 1) / 2);
+  const x = (_workingVector.x + 1) / 2;
+  const y = (_workingVector.y + 1) / 2;
+
+  if (target) {
+    return target.set(x, y);
+  }
+
+  return new Vector2(x, y);
 }

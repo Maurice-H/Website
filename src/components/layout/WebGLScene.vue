@@ -216,6 +216,14 @@ render(() => {
 
 let lastMouse = new Vector2(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
+// Pre-cache reactive Vue state to avoid hitting getters inside the high-frequency render loop
+const renderState = {
+  isNavPhase: true,
+  isContentPhase: false,
+  isBlueprintMode: 0.0,
+  lightingEnabled: true,
+};
+
 // Update accent color only if theme changes
 const accentColor = new Color();
 watchEffect(() => {
@@ -227,34 +235,40 @@ watchEffect(() => {
       accentColor.b,
     ];
   }
+
+  // Update cached render state asynchronously
+  renderState.isNavPhase = lightingStore.phase === 'NAV';
+  renderState.isContentPhase = lightingStore.phase === 'CONTENT';
+  renderState.isBlueprintMode = themeStore.isBlueprintMode ? 1.0 : 0.0;
+  renderState.lightingEnabled = themeStore.lightingEnabled;
 });
 
 onBeforeRender(({ elapsed, delta }) => {
   if (ufoRef.value && camera.activeCamera.value) {
-    const isNav = lightingStore.phase === 'NAV';
-    if (ufoRef.value.visible !== isNav) {
-      ufoRef.value.visible = isNav;
+    if (ufoRef.value.visible !== renderState.isNavPhase) {
+      ufoRef.value.visible = renderState.isNavPhase;
     }
 
-    if (isNav) {
+    if (renderState.isNavPhase) {
       ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
 
       // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
-      const screenPos = projectToScreenSpace(ufoRef.value.position, camera.activeCamera.value);
-
       if (shaderMaterialRef.value) {
-        shaderMaterialRef.value.uniforms.uUfoPosition.value.copy(screenPos);
+        projectToScreenSpace(
+          ufoRef.value.position,
+          camera.activeCamera.value,
+          shaderMaterialRef.value.uniforms.uUfoPosition.value
+        );
       }
     }
   }
 
   if (droneRef.value) {
-    const isContent = lightingStore.phase === 'CONTENT';
-    if (droneRef.value.visible !== isContent) {
-      droneRef.value.visible = isContent;
+    if (droneRef.value.visible !== renderState.isContentPhase) {
+      droneRef.value.visible = renderState.isContentPhase;
     }
 
-    if (isContent) {
+    if (renderState.isContentPhase) {
       droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
       droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
       droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
@@ -289,18 +303,15 @@ onBeforeRender(({ elapsed, delta }) => {
   u.uTime.value = elapsed;
   u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
-  // State change checks already present
-  const currentThemeState = themeStore.isBlueprintMode ? 1.0 : 0.0;
-  if (u.uThemeState.value !== currentThemeState) {
-    u.uThemeState.value = currentThemeState;
+  if (u.uThemeState.value !== renderState.isBlueprintMode) {
+    u.uThemeState.value = renderState.isBlueprintMode;
   }
 
-  const currentLightingEnabled = themeStore.lightingEnabled;
-  if (u.uLightingEnabled.value !== currentLightingEnabled) {
-    u.uLightingEnabled.value = currentLightingEnabled;
+  if (u.uLightingEnabled.value !== renderState.lightingEnabled) {
+    u.uLightingEnabled.value = renderState.lightingEnabled;
   }
 
-  const currentPhase = lightingStore.phase === 'CONTENT' ? 1.0 : 0.0;
+  const currentPhase = renderState.isContentPhase ? 1.0 : 0.0;
   if (u.uPhase.value !== currentPhase) {
     u.uPhase.value = currentPhase;
   }

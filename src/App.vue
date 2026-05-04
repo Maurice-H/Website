@@ -59,7 +59,7 @@
             <button
               type="button"
               @click="handleBackToNav"
-              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-colors text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer"
+              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-95"
             >
               [ ESC ] Back
             </button>
@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import type { CSSProperties } from 'vue';
-import { computed, defineAsyncComponent, onMounted } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted } from 'vue';
 import ContactForm from './components/features/ContactForm.vue';
 import HeroSection from './components/features/HeroSection.vue';
 import ProjectsSection from './components/features/ProjectsSection.vue';
@@ -144,12 +144,24 @@ const handleBackToNav = () => {
   lighting.setPhase(LightingPhase.NAV);
 };
 
+const handleGlobalKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && lighting.phase === 'CONTENT') {
+    handleBackToNav();
+  }
+};
+
 onMounted(async () => {
+  window.addEventListener('keydown', handleGlobalKeydown);
+
   console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
 
   // Run GPU performance benchmark early to determine rendering tier
   await performance.checkPerformance();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown);
 });
 </script>
 

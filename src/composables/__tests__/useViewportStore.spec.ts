@@ -246,4 +246,107 @@ describe('useViewportStore', () => {
       expect(setPropertySpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('initGlobalViewportService', () => {
+    it('initializes the store', async () => {
+      const { initGlobalViewportService } = await import('../useViewportStore');
+      const store = useViewportStore();
+      const initSpy = vi.spyOn(store, 'init');
+
+      initGlobalViewportService();
+
+      expect(initSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('update component state execution paths', () => {
+    it('returns without updating when component is unregistered before callback fires', async () => {
+      const store = useViewportStore();
+      const mockEl = document.createElement('div');
+
+      const { update } = store.register('test-1', mockEl);
+      store.registeredComponents.delete('test-1');
+
+      // Shouldn't crash and should do nothing
+      expect(() => update()).not.toThrow();
+    });
+
+    it('safely unregisters multiple times without crashing', () => {
+      const store = useViewportStore();
+      const mockEl = document.createElement('div');
+
+      const { unregister } = store.register('test-1', mockEl);
+      unregister();
+
+      // Removing it manually from map and unregistering again
+      store.registeredComponents.delete('test-1');
+      expect(() => unregister()).not.toThrow();
+    });
+  });
+
+  describe('mouseMove skips correctly based on conditions', () => {
+    it('skips lighting CSS updates when lightingEnabled is false', async () => {
+      const store = useViewportStore();
+      const themeStore = useThemeStore();
+      const lighting = useLightingStore();
+
+      lighting.phase = LightingPhase.CONTENT;
+      themeStore.lightingEnabled = false; // Disabling light
+
+      const setPropertySpy = vi.spyOn(document.documentElement.style, 'setProperty');
+      store.init();
+      setPropertySpy.mockClear();
+
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 400 }));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      expect(setPropertySpy).not.toHaveBeenCalledWith('--mask-x', expect.anything());
+      expect(setPropertySpy).not.toHaveBeenCalledWith('--mask-y', expect.anything());
+    });
+  });
+
+  describe('updateAll exception conditions part 2', () => {
+    it('handles intersection observer initialization safely if window is missing', async () => {
+      const originalWindow = globalThis.window;
+
+      (globalThis as unknown as Record<string, unknown>).window = {
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      };
+
+      const store = useViewportStore();
+      expect(() => store.init()).not.toThrow();
+      globalThis.window = originalWindow;
+    });
+
+    it('should ignore entries without visible elements', async () => {
+      const store = useViewportStore();
+
+      const mockEl = document.createElement('div');
+      mockEl.getBoundingClientRect = vi.fn(() => ({
+        left: 100,
+        top: 200,
+        right: 0,
+        bottom: 0,
+        width: 0,
+        height: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      }));
+
+      store.register('test-1', mockEl);
+      store.init();
+
+      const reg = store.registeredComponents.get('test-1');
+      if (reg) reg.isVisible = false;
+
+      (mockEl.getBoundingClientRect as Mock).mockClear();
+      window.dispatchEvent(new Event('scroll'));
+
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      expect(mockEl.getBoundingClientRect).not.toHaveBeenCalled();
+    });
+  });
 });
