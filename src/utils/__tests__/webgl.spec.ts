@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Vector3 } from 'three';
+import { PerspectiveCamera, Vector2, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { projectToScreenSpace } from '../webgl';
 
@@ -60,4 +60,21 @@ describe('WebGL Utilities', () => {
       expect(res2.x).toBeLessThan(0.5);
     });
   });
+});
+
+it('should use the provided target Vector2 if passed to avoid GC pressure', () => {
+  const camera = new PerspectiveCamera(45, 1, 0.1, 1000);
+  camera.position.set(0, 0, 10);
+  camera.lookAt(0, 0, 0);
+  camera.updateMatrixWorld();
+
+  const position = new Vector3(0, 0, 0);
+  const target = new Vector2(0, 0);
+
+  const result = projectToScreenSpace(position, camera, target);
+
+  // Should return the exact same instance
+  expect(result).toBe(target);
+  expect(result.x).toBeCloseTo(0.5);
+  expect(result.y).toBeCloseTo(0.5);
 });
