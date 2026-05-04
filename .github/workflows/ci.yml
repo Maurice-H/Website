@@ -113,6 +113,8 @@ jobs:
       - name: Generate Playwright Summary
         if: always()
         run: node scripts/playwright-summary.js
+        env:
+          PLAYWRIGHT_SHARD: ${{ matrix.shard }}
 
       - name: Upload Playwright Report
         if: always()
@@ -148,7 +150,7 @@ jobs:
         run: npm install -g @lhci/cli@0.13.0
 
       - name: Run Lighthouse CI (Mobile)
-        run: lhci autorun --collect.settings.preset=perf || true
+        run: lhci autorun --collect.settings.preset=perf
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_CI_MODE: "true"
@@ -194,7 +196,7 @@ jobs:
         run: npm install -g @lhci/cli@0.13.0
 
       - name: Run Lighthouse CI (Desktop)
-        run: lhci autorun --collect.settings.preset=desktop || true
+        run: lhci autorun --collect.settings.preset=desktop
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_CI_MODE: "true"

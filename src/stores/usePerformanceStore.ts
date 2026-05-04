@@ -15,14 +15,12 @@ export const usePerformanceStore = defineStore('performance', () => {
   });
 
   /**
-   * Runs the GPU benchmark and determines the performance tier.
-   * This should be called early (e.g., during the NAV phase) to prevent FOUC.
+   * Initializes the performance tier from URL overrides or environment variables.
+   * This is synchronous and can be called before the first render to prevent FOUC/Payload.
    */
-  const checkPerformance = async () => {
-    // Avoid redundant benchmarks if already completed
-    if (isReady.value) return;
+  const initTierFromOverrides = () => {
+    if (isReady.value) return true;
 
-    // 1. Check for manual override via URL parameter (Testability Hook)
     const params = new URLSearchParams(window.location.search);
     const forcedTier = params.get('forceTier');
 
@@ -32,9 +30,19 @@ export const usePerformanceStore = defineStore('performance', () => {
         gpuTier.value = tier;
         isWebGLSupported.value = tier >= 2;
         isReady.value = true;
-        return;
+        return true;
       }
     }
+    return false;
+  };
+
+  /**
+   * Runs the GPU benchmark and determines the performance tier.
+   * This should be called early (e.g., during the NAV phase) to prevent FOUC.
+   */
+  const checkPerformance = async () => {
+    // 1. Check for manual override first (Synchronous)
+    if (initTierFromOverrides()) return;
 
     try {
       const tierResult = await getGPUTier();
@@ -63,6 +71,7 @@ export const usePerformanceStore = defineStore('performance', () => {
     isReady,
     isLowEnd,
     isCiMode,
+    initTierFromOverrides,
     checkPerformance,
   };
 });

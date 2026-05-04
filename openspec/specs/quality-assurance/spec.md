@@ -88,7 +88,8 @@ The application must allow manual overriding of the GPU performance tier via a U
 
 #### Scenario: Forced Tier 1
 - **WHEN** the user visits `/?forceTier=1`
-- **THEN** `usePerformanceStore` must set `gpuTier` to 1 and `isWebGLSupported` to `false` immediately, skipping the benchmark.
+- **THEN** `usePerformanceStore` must set `gpuTier` to 1 and `isWebGLSupported` to `false` **synchronously** during the store initialization or before the first component mount.
+- **AND** the automatic `detect-gpu` benchmark MUST NOT be executed.
 
 #### Scenario: Forced Tier 3
 - **WHEN** the user visits `/?forceTier=3`
@@ -100,6 +101,8 @@ The application must provide a mechanism to disable or accelerate time-consuming
 #### Scenario: Accelerated Intro in CI
 - **WHEN** `import.meta.env.VITE_CI_MODE` is `true` or `?ciMode=true` is present
 - **THEN** the initial loading screen and phase transitions must have a duration of `0ms` to avoid penalizing the LCP score.
+- **AND** the content stage SHALL NOT be hidden by any initialization state.
+- **AND** the LCP element SHALL be visible as soon as the main CSS is loaded.
 
 ### Requirement: Tiered Lighthouse Matrix
 The Lighthouse CI configuration must execute separate audits for each performance tier with specialized success criteria.

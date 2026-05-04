@@ -32,28 +32,35 @@ try {
   summaryMd += '| URL | Perf | Acc | BP | SEO | Report |\n';
   summaryMd += '| :--- | :---: | :---: | :---: | :---: | :---: |\n';
 
-  const formatScore = (val) => {
-    if (val === undefined || val === null) return 'N/A';
-    const s = Math.round(val * 100);
-    if (s >= 90) return `✅ **${s}**`;
-    if (s >= 50) return `⚠️ **${s}**`;
-    return `❌ **${s}**`;
-  };
-
-  manifest.forEach((run) => {
+  // Filter for representative runs to avoid 9-row tables
+  const representativeRuns = manifest.filter(run => run.isRepresentativeRun);
+  
+  representativeRuns.forEach((run) => {
     const { url, summary, reportUrl } = run;
     const perf = summary.performance;
     const acc = summary.accessibility;
     const bp = summary['best-practices'] || summary.bestPractices;
     const seo = summary.seo;
 
-    summaryMd += `| ${url} | ${formatScore(perf)} | ${formatScore(acc)} | ${formatScore(bp)} | ${formatScore(seo)} | [View](${reportUrl || '#'}) |\n`;
+    // Custom threshold logic based on URL pattern (Tier 1 requires 95, others 85)
+    const isTier1 = url.includes('forceTier=1');
+    const threshold = isTier1 ? 95 : 85;
+    
+    const formatScoreWithThreshold = (val, t) => {
+      if (val === undefined || val === null) return 'N/A';
+      const s = Math.round(val * 100);
+      if (s >= t) return `✅ **${s}**`;
+      if (s >= 50) return `⚠️ **${s}**`;
+      return `❌ **${s}**`;
+    };
+
+    summaryMd += `| ${url} | ${formatScoreWithThreshold(perf, threshold)} | ${formatScoreWithThreshold(acc, 95)} | ${formatScoreWithThreshold(bp, 95)} | ${formatScoreWithThreshold(seo, 95)} | [View](${reportUrl || '#'}) |\n`;
   });
 
   summaryMd += '\n---\n\n';
 
   // 2. Detailed Failures (from the representative run)
-  const representativeRun = manifest.find(r => r.isRepresentativeRun) || manifest[0];
+  const representativeRun = representativeRuns[0] || manifest[0];
   const jsonReportPath = path.resolve(path.dirname(manifestPath), representativeRun.jsonPath);
 
   if (fs.existsSync(jsonReportPath)) {
@@ -82,7 +89,6 @@ try {
         failedAudits.slice(0, 5).forEach(audit => {
           const displayValue = audit.displayValue ? ` - \`${audit.displayValue}\`` : '';
           summaryMd += `- **${audit.title}**${displayValue}\n`;
-          // Clean up description (remove markdown links or keep them simple)
           const desc = audit.description.split('[')[0].trim();
           summaryMd += `  > ${desc}\n`;
         });
@@ -92,13 +98,6 @@ try {
       summaryMd += '\n';
     });
   } else {
-    console.log(`Debug: manifestPath: ${manifestPath}`);
-    console.log(`Debug: jsonReportPath target: ${jsonReportPath}`);
-    if (fs.existsSync(MANIFEST_DIR)) {
-      console.log(`Debug: Contents of ${MANIFEST_DIR}:`, fs.readdirSync(MANIFEST_DIR));
-    } else {
-      console.log(`Debug: MANIFEST_DIR does not exist: ${MANIFEST_DIR}`);
-    }
     summaryMd += '⚠️ Detailed JSON report not found. Please check the full HTML report for optimization details.\n';
   }
 
