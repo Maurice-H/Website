@@ -151,7 +151,7 @@ jobs:
         run: npm install -g @lhci/cli@0.13.0
 
       - name: Run Lighthouse CI (Mobile)
-        run: lhci autorun --collect.settings.preset=mobile --upload.githubStatusContextSuffix="-mobile"
+        run: lhci autorun --collect.settings.emulatedFormFactor=mobile --upload.githubStatusContextSuffix="-mobile"
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN || secrets.GITHUB_TOKEN }}
           VITE_CI_MODE: "true"

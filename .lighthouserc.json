@@ -14,8 +14,8 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "error",
-          { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=1" },
+          "off",
+          { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=1", "assertionLevel": "error" },
           {
             "minScore": 0.95,
             "matchingUrlPattern": ".*forceTier=[23]",

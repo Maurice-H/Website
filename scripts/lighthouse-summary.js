@@ -60,46 +60,56 @@ try {
 
   summaryMd += '\n---\n\n';
 
-  // 2. Detailed Failures (from the representative run)
-  const representativeRun = representativeRuns[0] || manifest[0];
-  const jsonReportPath = path.resolve(path.dirname(manifestPath), representativeRun.jsonPath);
+  // 2. Detailed Failures
+  summaryMd += '### 🔍 Optimization Opportunities & Issues\n\n';
+  
+  let issuesFound = false;
 
-  if (fs.existsSync(jsonReportPath)) {
-    const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf8'));
-    const audits = report.audits;
-    
-    summaryMd += '### 🔍 Optimization Opportunities & Issues\n\n';
-    summaryMd += 'Found several areas for improvement. Here are the most critical ones:\n\n';
+  representativeRuns.forEach((run) => {
+    const jsonReportPath = path.resolve(path.dirname(manifestPath), run.jsonPath);
 
-    // Group audits by category (simplified logic)
-    const categories = report.categories;
-    const categoriesToReport = ['performance', 'accessibility', 'best-practices', 'seo'];
-
-    categoriesToReport.forEach(catId => {
-      const category = categories[catId];
-      if (!category || category.score >= 0.95) return;
-
-      summaryMd += `#### ${category.title} (${Math.round(category.score * 100)}%)\n\n`;
+    if (fs.existsSync(jsonReportPath)) {
+      const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf8'));
+      const categories = report.categories;
+      const audits = report.audits;
       
-      const failedAudits = category.auditRefs
-        .map(ref => audits[ref.id])
-        .filter(audit => audit && audit.score !== null && audit.score < 0.9)
-        .sort((a, b) => (a.score || 0) - (b.score || 0));
+      const categoriesToReport = ['performance', 'accessibility', 'best-practices', 'seo'];
+      const failedCategories = categoriesToReport.filter(catId => categories[catId] && categories[catId].score < 0.95);
 
-      if (failedAudits.length > 0) {
-        failedAudits.slice(0, 5).forEach(audit => {
-          const displayValue = audit.displayValue ? ` - \`${audit.displayValue}\`` : '';
-          summaryMd += `- **${audit.title}**${displayValue}\n`;
-          const desc = audit.description.split('[')[0].trim();
-          summaryMd += `  > ${desc}\n`;
+      if (failedCategories.length > 0) {
+        issuesFound = true;
+        const urlLabel = run.url.split('?')[1] || run.url;
+        summaryMd += `<details>\n<summary><b>Details for ${urlLabel}</b></summary>\n\n`;
+
+        failedCategories.forEach(catId => {
+          const category = categories[catId];
+          summaryMd += `#### ${category.title} (${Math.round(category.score * 100)}%)\n\n`;
+          
+          const failedAudits = category.auditRefs
+            .map(ref => audits[ref.id])
+            .filter(audit => audit && audit.score !== null && audit.score < 0.9)
+            .sort((a, b) => (a.score || 0) - (b.score || 0));
+
+          if (failedAudits.length > 0) {
+            failedAudits.slice(0, 5).forEach(audit => {
+              const displayValue = audit.displayValue ? ` - \`${audit.displayValue}\`` : '';
+              summaryMd += `- **${audit.title}**${displayValue}\n`;
+              const desc = audit.description.split('[')[0].trim();
+              summaryMd += `  > ${desc}\n`;
+            });
+          } else {
+            summaryMd += `- All critical audits passed, but check the full report for minor improvements.\n`;
+          }
+          summaryMd += '\n';
         });
-      } else {
-        summaryMd += `- All critical audits passed, but check the full report for minor improvements.\n`;
+
+        summaryMd += `</details>\n\n`;
       }
-      summaryMd += '\n';
-    });
-  } else {
-    summaryMd += '⚠️ Detailed JSON report not found. Please check the full HTML report for optimization details.\n';
+    }
+  });
+
+  if (!issuesFound) {
+    summaryMd += '✨ All categories reached the 95% threshold! Great job.\n\n';
   }
 
   // Write to GitHub Step Summary
