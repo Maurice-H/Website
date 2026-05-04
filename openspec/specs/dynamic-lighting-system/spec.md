@@ -26,6 +26,24 @@ The system SHALL use a WebGL-based canvas to render the global background lighti
 - **WHEN** the user moves the mouse
 - **THEN** the WebGL shader updates its spotlight position dynamically via a uniform without triggering DOM layout or repaint cycles.
 
+### Requirement: Tier-1 Fallback Rendering
+The system SHALL provide a visual lighting fallback using standard CSS when WebGL is disabled by the Performance Guard.
+
+#### Scenario: NAV Phase Fallback
+- **WHEN** `performance.isWebGLSupported` is `false` AND `lighting.phase` is `NAV`
+- **THEN** The app SHALL render a static `radial-gradient` background in the top center to simulate the UFO beam.
+
+#### Scenario: CONTENT Phase Fallback
+- **WHEN** `performance.isWebGLSupported` is `false` AND `lighting.phase` is `CONTENT`
+- **THEN** The app SHALL render a dynamic CSS spotlight tracking the mouse coordinates via `--mask-x/y`.
+
+### Requirement: System Cursor Guard
+The system cursor SHALL be visible on all interactive elements unless a functional custom cursor (WebGL) is active and tracking correctly.
+
+#### Scenario: Cursor visibility on low-end hardware
+- **WHEN** `performance.isWebGLSupported` is `false`
+- **THEN** The `hide-system-cursor` class SHALL NOT be applied to the app root, ensuring the system cursor remains functional.
+
 ### Requirement: Volumetric Beam Rendering
 The system SHALL render a visual representation of the light beam (the "cone") within the WebGL fragment shader to ensure high-performance rendering.
 

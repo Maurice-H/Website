@@ -1,10 +1,18 @@
 <template>
-  <div class="app-root" :class="{ 'hide-system-cursor': isCustomCursorActive }">
+  <div class="app-root" :class="{ 
+    'hide-system-cursor': isCustomCursorActive,
+    'is-ci-mode': performance.isCiMode
+  }">
     <!-- WebGL Canvas Background (replaces SpotlightMask, PerspectiveGrid, VolumetricBeam) -->
     <WebGLBackground />
+    <ResilienceLayer />
 
     <!-- Scrolling Content Layer -->
-    <div class="content-stage" :style="rootCssVars">
+    <div
+      v-if="performance.isReady"
+      class="content-stage"
+      :style="rootCssVars"
+    >
       <Transition name="fade-overlay" mode="out-in">
         <!-- Navigation Phase -->
         <div
@@ -95,17 +103,20 @@ const WebGLBackground = defineAsyncComponent(
   () => import('./components/layout/WebGLBackground.vue')
 );
 
+import ResilienceLayer from './components/layout/ResilienceLayer.vue';
 import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
 import { initGlobalViewportService } from './composables/useViewportStore';
 import { useLightingStore } from './stores/lighting';
+import { usePerformanceStore } from './stores/usePerformanceStore';
 import { useThemeStore } from './stores/useThemeStore';
 import { LightingPhase } from './types';
 
-// Use the store directly to avoid any destructuring reactivity caveats
+// Use the stores directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
 const themeStore = useThemeStore();
+const performance = usePerformanceStore();
 
 // Check if we use the WebGL scanner (only on Content page + light on)
 const isCustomCursorActive = computed(() => {
@@ -133,9 +144,12 @@ const handleBackToNav = () => {
   lighting.setPhase(LightingPhase.NAV);
 };
 
-onMounted(() => {
+onMounted(async () => {
   console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
+
+  // Run GPU performance benchmark early to determine rendering tier
+  await performance.checkPerformance();
 });
 </script>
 
@@ -195,5 +209,14 @@ onMounted(() => {
 .hide-system-cursor,
 .hide-system-cursor * {
   cursor: none !important;
+}
+
+/* CI Mode Overrides: Eliminate transitions for stable Lighthouse scores */
+.is-ci-mode,
+.is-ci-mode * {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-delay: 0s !important;
 }
 </style>

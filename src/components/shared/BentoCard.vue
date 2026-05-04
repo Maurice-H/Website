@@ -2,7 +2,7 @@
   <div 
     ref="cardRef"
     class="bento-card relative rounded-2xl p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
-    :class="[colSpanClass, rowSpanClass]"
+    :class="[colSpanClass, rowSpanClass, { 'is-low-end': isLowEnd }]"
   >
     <!-- Background Layer (Base) -->
     <div class="absolute inset-0 bg-finished-bg/40 z-[-1]"></div>
@@ -15,13 +15,15 @@
       class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-500 rounded-[inherit] glass-reveal"
       :style="revealStyle"
     >
-      <div class="noise-overlay"></div>
+      <div class="noise-overlay" v-if="!isLowEnd"></div>
       <div class="absolute inset-0 bg-[var(--glass-reflection)] z-0 opacity-40"></div>
       
-      <!-- 4-Layer Technical Stack for 3D Illusion -->
-      <div class="bento-card-stack-layer layer-1"></div>
-      <div class="bento-card-stack-layer layer-2"></div>
-      <div class="bento-card-stack-layer layer-3"></div>
+      <!-- 4-Layer Technical Stack for 3D Illusion (Disabled on Low-End) -->
+      <template v-if="!isLowEnd">
+        <div class="bento-card-stack-layer layer-1"></div>
+        <div class="bento-card-stack-layer layer-2"></div>
+        <div class="bento-card-stack-layer layer-3"></div>
+      </template>
     </div>
     
     <!-- Content Slot Wrapper -->
@@ -45,6 +47,7 @@ interface Props {
   rowSpan?: number;
   withWindow?: boolean;
   title?: string;
+  isLowEnd?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,6 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
   rowSpan: 1,
   withWindow: false,
   title: '',
+  isLowEnd: false,
 });
 
 const cardRef = ref<HTMLElement | null>(null);
@@ -116,10 +120,22 @@ onUnmounted(() => {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Low-end optimization: Disable expensive filters and simplify transitions */
+.bento-card.is-low-end {
+  backdrop-filter: none;
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.1);
+  will-change: auto;
+}
+
 .glass-reveal {
   background: black;
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
+}
+
+.is-low-end .glass-reveal {
+  backdrop-filter: none;
 }
 
 /* Layered Wireframe Stack Effect (High-Fidelity Mockup) */
@@ -175,5 +191,9 @@ onUnmounted(() => {
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.8),
     var(--finished-glow);
+}
+
+.bento-card.is-low-end:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 </style>

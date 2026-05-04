@@ -5,6 +5,7 @@
     class="md:col-span-2 md:row-span-1 group cursor-pointer"
     with-window
     :title="project.title"
+    :is-low-end="performance.isLowEnd"
   >
     <div class="p-8 flex flex-col h-full">
       <div class="flex-1 mt-6">
@@ -30,5 +31,8 @@
 
 <script setup lang="ts">
 import { PROJECTS as projects } from '../../data/portfolio';
+import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
+
+const performance = usePerformanceStore();
 </script>

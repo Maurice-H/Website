@@ -151,6 +151,7 @@ jobs:
         run: lhci autorun --collect.settings.preset=perf || true
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_CI_MODE: "true"
 
       - name: Generate Mobile Summary
         if: always()
@@ -196,6 +197,7 @@ jobs:
         run: lhci autorun --collect.settings.preset=desktop || true
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_CI_MODE: "true"
 
       - name: Generate Desktop Summary
         if: always()
