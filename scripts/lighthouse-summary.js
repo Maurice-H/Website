@@ -42,20 +42,22 @@ try {
     const bp = summary['best-practices'] || summary.bestPractices;
     const seo = summary.seo;
 
-    // Custom threshold logic based on URL pattern (Tier 1 requires 95, others 85)
+    // Custom threshold logic based on URL pattern and category
     const isTier1 = url.includes('forceTier=1');
     
-    const formatScore = (val, tier1) => {
+    const formatScore = (val, isPerf = false, isSeo = false) => {
       if (val === undefined || val === null) return 'N/A';
       const s = Math.round(val * 100);
+      const threshold = isSeo ? 90 : 95;
       
-      if (s >= 95) return `✅ **${s}**`;
-      // Tier 1 fails (Red) if below 95. Tier 2/3 only warns (Yellow).
-      if (tier1) return `❌ **${s}**`;
-      return `⚠️ **${s}**`;
+      if (s >= threshold) return `✅ **${s}**`;
+      // Only Performance is allowed to warn (Yellow) on Tier 2/3. 
+      // Others are always Error (Red) if below threshold.
+      if (isPerf && !isTier1) return `⚠️ **${s}**`;
+      return `❌ **${s}**`;
     };
 
-    summaryMd += `| ${url} | ${formatScore(perf, isTier1)} | ${formatScore(acc, true)} | ${formatScore(bp, true)} | ${formatScore(seo, true)} | [View](${reportUrl || '#'}) |\n`;
+    summaryMd += `| ${url} | ${formatScore(perf, true)} | ${formatScore(acc)} | ${formatScore(bp)} | ${formatScore(seo, false, true)} | [View](${reportUrl || '#'}) |\n`;
   });
 
   summaryMd += '\n---\n\n';
@@ -74,7 +76,10 @@ try {
       const audits = report.audits;
       
       const categoriesToReport = ['performance', 'accessibility', 'best-practices', 'seo'];
-      const failedCategories = categoriesToReport.filter(catId => categories[catId] && categories[catId].score < 0.95);
+      const failedCategories = categoriesToReport.filter(catId => {
+        const threshold = catId === 'seo' ? 0.90 : 0.95;
+        return categories[catId] && categories[catId].score < threshold;
+      });
 
       if (failedCategories.length > 0) {
         issuesFound = true;

@@ -14,13 +14,8 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "off",
           { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=1", "assertionLevel": "error" },
-          {
-            "minScore": 0.95,
-            "matchingUrlPattern": ".*forceTier=[23]",
-            "assertionLevel": "warn"
-          }
+          { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=[23]", "assertionLevel": "warn" }
         ],
         "categories:accessibility": ["error", { "minScore": 0.95 }],
         "categories:best-practices": ["error", { "minScore": 0.95 }],
