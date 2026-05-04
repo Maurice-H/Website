@@ -112,7 +112,7 @@ defineProps<{
 .window-label-wrapper {
   position: relative;
   margin-top: 12px;
-  font-size: 0.7rem;
+  font-size: 12px; /* Increased from 0.7rem (11.2px) for SEO */
   text-transform: uppercase;
   letter-spacing: 0.4em;
   font-weight: 900;
@@ -151,7 +151,7 @@ defineProps<{
 /* --- Theme Specific Content (High-Fidelity) --- */
 :deep(.content-terminal) {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 11px;
+  font-size: 12px; /* Increased from 11px for SEO */
   line-height: 1.8;
   color: color-mix(in srgb, var(--finished-accent) 80%, transparent);
 }
@@ -203,7 +203,7 @@ defineProps<{
   padding: 8px;
   border: 1px dashed rgba(255,255,255,0.1);
   font-family: monospace;
-  font-size: 10px;
+  font-size: 12px; /* Increased from 10px for SEO */
   color: rgba(255,255,255,0.3);
 }
 </style>

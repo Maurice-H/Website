@@ -1,6 +1,6 @@
 <template>
   <!-- About Tile (Discovery Path) -->
-  <BentoCard id="about-discovery" class="md:col-span-3 md:row-span-1" with-window title="Discovery Path">
+  <BentoCard id="about-discovery" class="md:col-span-3 md:row-span-1" with-window title="Discovery Path" :is-low-end="performance.isLowEnd">
     <div class="p-10 flex flex-col h-full">
       <p class="text-finished-text/50 text-lg leading-relaxed max-w-2xl">
         {{ bio.content }}
@@ -9,7 +9,7 @@
   </BentoCard>
 
   <!-- Skills Tile (STACK) -->
-  <BentoCard id="skills-stack" class="md:col-span-1 md:row-span-1" with-window title="Stack">
+  <BentoCard id="skills-stack" class="md:col-span-1 md:row-span-1" with-window title="Stack" :is-low-end="performance.isLowEnd">
     <div class="p-10 flex flex-col h-full">
       <div class="flex flex-wrap gap-3">
         <span 
@@ -26,8 +26,10 @@
 
 <script setup lang="ts">
 import { SKILL_SECTIONS } from '../../data/portfolio';
+import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
 
+const performance = usePerformanceStore();
 const bio = SKILL_SECTIONS.find((s) => s.id === 'bio') || SKILL_SECTIONS[0];
 const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[0];
 </script>

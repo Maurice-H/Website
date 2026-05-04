@@ -4,6 +4,7 @@
     class="md:col-span-4 md:row-span-1 flex flex-col"
     with-window
     title="Get In Touch"
+    :is-low-end="performance.isLowEnd"
   >
     <div class="p-10 flex flex-col h-full">
       <p class="text-slate-400 text-sm mb-8 font-mono tracking-wide">
@@ -73,7 +74,10 @@
 </template>
 
 <script setup lang="ts">
+import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
+
+const performance = usePerformanceStore();
 </script>
 
 <style scoped>

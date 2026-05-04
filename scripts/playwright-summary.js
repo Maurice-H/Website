@@ -28,7 +28,8 @@ try {
   const failed = stats.unexpected;
   const skipped = stats.skipped;
 
-  let summaryMd = '## 🎭 Playwright E2E Test Report\n\n';
+  const shardInfo = process.env.PLAYWRIGHT_SHARD ? ` (Shard ${process.env.PLAYWRIGHT_SHARD})` : '';
+  let summaryMd = `## 🎭 Playwright E2E Test Report${shardInfo}\n\n`;
   summaryMd += '### Summary\n\n';
 
   const statusEmoji = failed === 0 ? '✅' : '❌';

@@ -6,7 +6,9 @@ test.describe('WebGL Background Canvas', () => {
 
   test.beforeEach(async ({ page }) => {
     app = new AppPage(page);
-    await app.goto();
+    await page.goto('/?forceTier=3');
+    // Wait for the app-ready state (NavConveyor visible)
+    await expect(page.locator('.nav-conveyor')).toBeVisible({ timeout: 15000 });
   });
 
   test('should render a canvas element in the DOM', async ({ page }) => {

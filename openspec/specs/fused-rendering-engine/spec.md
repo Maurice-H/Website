@@ -19,6 +19,19 @@ The system SHALL support a "Single Source of Truth" template pattern where the "
 - **WHEN** content is passed to the `<FusedReveal>` component
 - **THEN** the system SHALL render the content twice internally (once as a base layer and once as a masked reveal layer) while ensuring all stateful attributes (IDs, accessibility labels) remain unique.
 
+#### Scenario: Initialization Flow
+- **WHEN** the application starts
+- **THEN** the system SHALL render the content stage immediately, regardless of the GPU benchmarking status.
+- **AND** the system SHALL render the background layers (WebGL or Resilience) only after the benchmarking status is confirmed.
+
+### Requirement: Conditional Resource Loading
+The system SHALL prevent the loading of heavy rendering resources (e.g., Three.js) if the device is identified as Tier 1.
+
+#### Scenario: Tier 1 Detection
+- **WHEN** the device is identified as Tier 1 (Low-end/Software)
+- **THEN** the system SHALL skip the rendering of the `<WebGLBackground>` component.
+- **AND** the browser SHOULD NOT initiate a network request for the WebGL vendor bundles.
+
 ### Requirement: Phase-Aware Mask Sync
 The system SHALL synchronize the CSS `--reveal-mask` variable across all active layers automatically when the `LightingPhase` changes.
 

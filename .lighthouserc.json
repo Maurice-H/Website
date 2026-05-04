@@ -2,21 +2,29 @@
   "ci": {
     "collect": {
       "startServerCommand": "npm run preview",
-      "startServerReadyPattern": "Local:",
-      "startServerReadyTimeout": 60000,
-      "url": ["http://localhost:4173/"],
+      "startServerReadyPattern": "Local:\\s+http://localhost:4173/",
+      "startServerReadyTimeout": 90000,
+      "url": [
+        "http://localhost:4173/?forceTier=1&ciMode=true",
+        "http://localhost:4173/?forceTier=2&ciMode=true",
+        "http://localhost:4173/?forceTier=3&ciMode=true"
+      ],
       "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["warn", { "minScore": 0.95 }],
-        "categories:accessibility": ["warn", { "minScore": 0.95 }],
-        "categories:best-practices": ["warn", { "minScore": 0.95 }],
-        "categories:seo": ["warn", { "minScore": 0.95 }]
+        "categories:performance": [
+          { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=1", "assertionLevel": "error" },
+          { "minScore": 0.95, "matchingUrlPattern": ".*forceTier=[23]", "assertionLevel": "warn" }
+        ],
+        "categories:accessibility": ["error", { "minScore": 0.95 }],
+        "categories:best-practices": ["error", { "minScore": 0.95 }],
+        "categories:seo": ["error", { "minScore": 0.95 }]
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "temporary-public-storage",
+      "githubStatusContextSuffix": "-lhci"
     }
   }
-}
+}

@@ -13,15 +13,16 @@ The current global lighting system, which uses CSS variables injected into DOM e
 
 ### New Capabilities
 - `webgl-lighting`: Core integration of TresJS and Three.js to render a full-screen WebGL canvas and custom fragment shaders for performance-driven background effects.
+- `performance-guard`: Intelligent tiered rendering strategy using `detect-gpu` to scale visual complexity (or disable WebGL entirely) based on the user's hardware capabilities.
 
 ### Modified Capabilities
 - `micro-interactions`: Adjusts the underlying implementation of hover and background interactions to use WebGL shaders instead of CSS variables for the global background lighting.
 
 ## Impact
 
-- **Dependencies**: Adds `tresjs` and `three` as core dependencies.
-- **Component Architecture**: Introduces `WebGLBackground.vue`. Removes legacy DOM lighting layers.
-- **Performance**: Dramatically reduces fill-rate pressure and GPU layer thrashing. Eliminates repaints related to mouse movement in the background.
+- **Dependencies**: Adds `tresjs`, `three`, and `detect-gpu` as core dependencies.
+- **Component Architecture**: Introduces `WebGLBackground.vue` and `usePerformanceStore.ts`. Removes legacy DOM lighting layers.
+- **Performance**: Dramatically reduces fill-rate pressure and GPU layer thrashing. Scales complexity dynamically to ensure 60 FPS on mid-range devices and battery preservation on low-end hardware.
 
 ## Non-goals
 

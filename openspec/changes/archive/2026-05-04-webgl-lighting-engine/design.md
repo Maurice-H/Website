@@ -22,6 +22,29 @@ To achieve an uncompromised 60-144 FPS experience, we are decoupling the global 
 - **Shader-Driven Architecture**: Instead of instantiating PointLights or SpotLights in Three.js (which still have overhead), we will use a `ShaderMaterial` on a full-screen `PlaneGeometry`. The Fragment Shader will handle the math for distance from the mouse to simulate the flashlight cone, allowing for perfect control over gradient falloff and noise/grain effects without the browser's CSS limits.
 - **Uniform Updates**: To bypass Vue's reactivity overhead during high-frequency mouse movements, we will grab a direct reference to the `ShaderMaterial` instance in `WebGLBackground.vue` and update `uniforms.uMouse.value` directly inside the existing `requestAnimationFrame` loop defined in `viewport.ts` (or an equivalent direct bridge).
 
+## Tiered Rendering Strategy (Graceful Degradation)
+
+To ensure a premium experience across all devices, we implement a 3-tier strategy powered by `detect-gpu`:
+
+1.  **Tier 3 (High-End / Desktop GPU):**
+    - Full experience: Bloom, Glitch, RGB Shift, high particle density (200+).
+    - Multi-pass post-processing active.
+2.  **Tier 2 (Mid-Range / Mobile / Integrated GPU):**
+    - Optimized WebGL: Bloom and complex Glitch passes are disabled.
+    - Reduced particle density (~50).
+    - Simplified fragment shader path (lower noise complexity).
+3.  **Tier 1 (Low-End / Software Rendering / CI):**
+    - WebGL is completely disabled.
+    - `WebGLBackground.vue` does not mount the `TresCanvas`.
+    - Reverts to static CSS-based background fallback.
+
+### FOUC (Flash of Unlit Content) Mitigation
+
+The GPU benchmark is asynchronous. To prevent a "flash" of the unlit fallback before WebGL initializes:
+- The `usePerformanceStore` must initialize the benchmark during the early `NAV` phase.
+- `WebGLBackground.vue` will only render the canvas once the tier is determined.
+- Content reveal animations (Phase `CONTENT`) must be gated by the completion of the `performance.checkPerformance()` benchmark.
+
 ## Risks / Trade-offs
 
 - **Bundle Size**: Three.js is a large library.

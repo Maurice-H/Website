@@ -32,74 +32,89 @@ try {
   summaryMd += '| URL | Perf | Acc | BP | SEO | Report |\n';
   summaryMd += '| :--- | :---: | :---: | :---: | :---: | :---: |\n';
 
-  const formatScore = (val) => {
-    if (val === undefined || val === null) return 'N/A';
-    const s = Math.round(val * 100);
-    if (s >= 90) return `✅ **${s}**`;
-    if (s >= 50) return `⚠️ **${s}**`;
-    return `❌ **${s}**`;
-  };
-
-  manifest.forEach((run) => {
+  // Filter for representative runs to avoid 9-row tables
+  const representativeRuns = manifest.filter(run => run.isRepresentativeRun);
+  
+  representativeRuns.forEach((run) => {
     const { url, summary, reportUrl } = run;
     const perf = summary.performance;
     const acc = summary.accessibility;
     const bp = summary['best-practices'] || summary.bestPractices;
     const seo = summary.seo;
 
-    summaryMd += `| ${url} | ${formatScore(perf)} | ${formatScore(acc)} | ${formatScore(bp)} | ${formatScore(seo)} | [View](${reportUrl || '#'}) |\n`;
+    // Custom threshold logic based on URL pattern and category
+    const isTier1 = url.includes('forceTier=1');
+    
+    const formatScore = (val, isPerf = false, isSeo = false) => {
+      if (val === undefined || val === null) return 'N/A';
+      const s = Math.round(val * 100);
+      const threshold = isSeo ? 90 : 95;
+      
+      if (s >= threshold) return `✅ **${s}**`;
+      // Only Performance is allowed to warn (Yellow) on Tier 2/3. 
+      // Others are always Error (Red) if below threshold.
+      if (isPerf && !isTier1) return `⚠️ **${s}**`;
+      return `❌ **${s}**`;
+    };
+
+    summaryMd += `| ${url} | ${formatScore(perf, true)} | ${formatScore(acc)} | ${formatScore(bp)} | ${formatScore(seo, false, true)} | [View](${reportUrl || '#'}) |\n`;
   });
 
   summaryMd += '\n---\n\n';
 
-  // 2. Detailed Failures (from the representative run)
-  const representativeRun = manifest.find(r => r.isRepresentativeRun) || manifest[0];
-  const jsonReportPath = path.resolve(path.dirname(manifestPath), representativeRun.jsonPath);
+  // 2. Detailed Failures
+  summaryMd += '### 🔍 Optimization Opportunities & Issues\n\n';
+  
+  let issuesFound = false;
 
-  if (fs.existsSync(jsonReportPath)) {
-    const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf8'));
-    const audits = report.audits;
-    
-    summaryMd += '### 🔍 Optimization Opportunities & Issues\n\n';
-    summaryMd += 'Found several areas for improvement. Here are the most critical ones:\n\n';
+  representativeRuns.forEach((run) => {
+    const jsonReportPath = path.resolve(path.dirname(manifestPath), run.jsonPath);
 
-    // Group audits by category (simplified logic)
-    const categories = report.categories;
-    const categoriesToReport = ['performance', 'accessibility', 'best-practices', 'seo'];
-
-    categoriesToReport.forEach(catId => {
-      const category = categories[catId];
-      if (!category || category.score >= 0.95) return;
-
-      summaryMd += `#### ${category.title} (${Math.round(category.score * 100)}%)\n\n`;
+    if (fs.existsSync(jsonReportPath)) {
+      const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf8'));
+      const categories = report.categories;
+      const audits = report.audits;
       
-      const failedAudits = category.auditRefs
-        .map(ref => audits[ref.id])
-        .filter(audit => audit && audit.score !== null && audit.score < 0.9)
-        .sort((a, b) => (a.score || 0) - (b.score || 0));
+      const categoriesToReport = ['performance', 'accessibility', 'best-practices', 'seo'];
+      const failedCategories = categoriesToReport.filter(catId => {
+        const threshold = catId === 'seo' ? 0.90 : 0.95;
+        return categories[catId] && categories[catId].score < threshold;
+      });
 
-      if (failedAudits.length > 0) {
-        failedAudits.slice(0, 5).forEach(audit => {
-          const displayValue = audit.displayValue ? ` - \`${audit.displayValue}\`` : '';
-          summaryMd += `- **${audit.title}**${displayValue}\n`;
-          // Clean up description (remove markdown links or keep them simple)
-          const desc = audit.description.split('[')[0].trim();
-          summaryMd += `  > ${desc}\n`;
+      if (failedCategories.length > 0) {
+        issuesFound = true;
+        const urlLabel = run.url.split('?')[1] || run.url;
+        summaryMd += `<details>\n<summary><b>Details for ${urlLabel}</b></summary>\n\n`;
+
+        failedCategories.forEach(catId => {
+          const category = categories[catId];
+          summaryMd += `#### ${category.title} (${Math.round(category.score * 100)}%)\n\n`;
+          
+          const failedAudits = category.auditRefs
+            .map(ref => audits[ref.id])
+            .filter(audit => audit && audit.score !== null && audit.score < 0.9)
+            .sort((a, b) => (a.score || 0) - (b.score || 0));
+
+          if (failedAudits.length > 0) {
+            failedAudits.slice(0, 5).forEach(audit => {
+              const displayValue = audit.displayValue ? ` - \`${audit.displayValue}\`` : '';
+              summaryMd += `- **${audit.title}**${displayValue}\n`;
+              const desc = audit.description.split('[')[0].trim();
+              summaryMd += `  > ${desc}\n`;
+            });
+          } else {
+            summaryMd += `- All critical audits passed, but check the full report for minor improvements.\n`;
+          }
+          summaryMd += '\n';
         });
-      } else {
-        summaryMd += `- All critical audits passed, but check the full report for minor improvements.\n`;
+
+        summaryMd += `</details>\n\n`;
       }
-      summaryMd += '\n';
-    });
-  } else {
-    console.log(`Debug: manifestPath: ${manifestPath}`);
-    console.log(`Debug: jsonReportPath target: ${jsonReportPath}`);
-    if (fs.existsSync(MANIFEST_DIR)) {
-      console.log(`Debug: Contents of ${MANIFEST_DIR}:`, fs.readdirSync(MANIFEST_DIR));
-    } else {
-      console.log(`Debug: MANIFEST_DIR does not exist: ${MANIFEST_DIR}`);
     }
-    summaryMd += '⚠️ Detailed JSON report not found. Please check the full HTML report for optimization details.\n';
+  });
+
+  if (!issuesFound) {
+    summaryMd += '✨ All categories reached the 95% threshold! Great job.\n\n';
   }
 
   // Write to GitHub Step Summary
