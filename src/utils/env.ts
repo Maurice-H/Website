@@ -10,7 +10,9 @@ function parseEnv(): EnvConfig {
   const isCiModeStr = import.meta.env.VITE_CI_MODE;
 
   if (isCiModeStr && isCiModeStr !== 'true' && isCiModeStr !== 'false') {
-    console.warn(`[Env] VITE_CI_MODE is set to an unexpected value: ${isCiModeStr}. Expected 'true' or 'false'.`);
+    console.warn(
+      `[Env] VITE_CI_MODE is set to an unexpected value: ${isCiModeStr}. Expected 'true' or 'false'.`
+    );
   }
 
   const isCiMode = isCiModeStr === 'true';
