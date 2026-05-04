@@ -1,6 +1,7 @@
 import { getGPUTier } from 'detect-gpu';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
+import { envConfig } from '../utils/env';
 
 export const usePerformanceStore = defineStore('performance', () => {
   const gpuTier = ref<number | null>(null);
@@ -11,7 +12,7 @@ export const usePerformanceStore = defineStore('performance', () => {
   const isCiMode = computed(() => {
     // Check for explicit environment variable or URL parameter
     const params = new URLSearchParams(window.location.search);
-    return import.meta.env.VITE_CI_MODE === 'true' || params.get('ciMode') === 'true';
+    return envConfig.isCiMode || params.get('ciMode') === 'true';
   });
 
   /**
