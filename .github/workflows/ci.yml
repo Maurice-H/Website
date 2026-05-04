@@ -13,6 +13,7 @@ env:
 permissions:
   contents: write
   pull-requests: write
+  statuses: write
   pages: write
   id-token: write
 
@@ -150,9 +151,9 @@ jobs:
         run: npm install -g @lhci/cli@0.13.0
 
       - name: Run Lighthouse CI (Mobile)
-        run: lhci autorun --collect.settings.preset=perf
+        run: lhci autorun --collect.settings.preset=mobile --upload.githubStatusContextSuffix="-mobile"
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN || secrets.GITHUB_TOKEN }}
           VITE_CI_MODE: "true"
 
       - name: Generate Mobile Summary
@@ -196,9 +197,9 @@ jobs:
         run: npm install -g @lhci/cli@0.13.0
 
       - name: Run Lighthouse CI (Desktop)
-        run: lhci autorun --collect.settings.preset=desktop
+        run: lhci autorun --collect.settings.preset=desktop --upload.githubStatusContextSuffix="-desktop"
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN || secrets.GITHUB_TOKEN }}
           VITE_CI_MODE: "true"
 
       - name: Generate Desktop Summary

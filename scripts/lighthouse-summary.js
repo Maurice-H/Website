@@ -44,17 +44,18 @@ try {
 
     // Custom threshold logic based on URL pattern (Tier 1 requires 95, others 85)
     const isTier1 = url.includes('forceTier=1');
-    const threshold = isTier1 ? 95 : 85;
     
-    const formatScoreWithThreshold = (val, t) => {
+    const formatScore = (val, tier1) => {
       if (val === undefined || val === null) return 'N/A';
       const s = Math.round(val * 100);
-      if (s >= t) return `✅ **${s}**`;
-      if (s >= 50) return `⚠️ **${s}**`;
-      return `❌ **${s}**`;
+      
+      if (s >= 95) return `✅ **${s}**`;
+      // Tier 1 fails (Red) if below 95. Tier 2/3 only warns (Yellow).
+      if (tier1) return `❌ **${s}**`;
+      return `⚠️ **${s}**`;
     };
 
-    summaryMd += `| ${url} | ${formatScoreWithThreshold(perf, threshold)} | ${formatScoreWithThreshold(acc, 95)} | ${formatScoreWithThreshold(bp, 95)} | ${formatScoreWithThreshold(seo, 95)} | [View](${reportUrl || '#'}) |\n`;
+    summaryMd += `| ${url} | ${formatScore(perf, isTier1)} | ${formatScore(acc, true)} | ${formatScore(bp, true)} | ${formatScore(seo, true)} | [View](${reportUrl || '#'}) |\n`;
   });
 
   summaryMd += '\n---\n\n';

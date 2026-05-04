@@ -131,7 +131,7 @@ watchEffect(() => {
     composer.addPass(renderPass);
 
     // 2. Cinematic Bloom Pass (Tier 3 Only)
-    if (isHighEnd.value) {
+    if (isHighEnd.value && !performanceStore.isCiMode) {
       const bloomPass = new UnrealBloomPass(
         new Vector2(sizes.width.value, sizes.height.value),
         0.15, // strength
@@ -180,7 +180,7 @@ watch(
 );
 
 // Generate Indoor Room Dust Particles (Tiered Density)
-const particleCount = isHighEnd.value ? 200 : 50;
+const particleCount = performanceStore.isCiMode ? 10 : isHighEnd.value ? 200 : 50;
 const dustPositions = new Float32Array(particleCount * 3);
 // We also want some varying speeds or offsets for a more organic float,
 // but we'll keep it simple: just position them around the camera.
