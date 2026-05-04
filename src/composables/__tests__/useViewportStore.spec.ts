@@ -495,7 +495,10 @@ describe('updateAll exception conditions part 5', () => {
       } as IntersectionObserverEntry;
 
       const updateAllSpy = vi.spyOn(window, 'requestAnimationFrame');
-      observerCallback([entry], {} as unknown as IntersectionObserver);
+      (observerCallback as IntersectionObserverCallback)(
+        [entry],
+        {} as unknown as IntersectionObserver
+      );
 
       expect(store.registeredComponents.get('test-intersect')?.isVisible).toBe(true);
       expect(updateAllSpy).toHaveBeenCalled();
