@@ -62,3 +62,20 @@ describe('useTheme', () => {
     });
   });
 });
+
+describe('SSR context compatibility', () => {
+  it('initializes safely when window is undefined', async () => {
+    vi.resetModules();
+
+    const originalWindow = globalThis.window;
+
+    delete (globalThis as unknown as Record<string, unknown>).window;
+
+    const { useTheme } = await import('../useTheme');
+    const { isBlueprint } = useTheme();
+
+    expect(isBlueprint.value).toBeDefined(); // Shouldn't crash
+
+    globalThis.window = originalWindow;
+  });
+});
