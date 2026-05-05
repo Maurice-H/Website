@@ -11,7 +11,7 @@
         Establish direct channel for collaboration.
       </p>
 
-      <form @submit.prevent class="flex flex-col gap-3 md:gap-4 flex-1">
+      <form @submit.prevent="handleSubmit" class="flex flex-col gap-3 md:gap-4 flex-1">
         <div class="flex flex-col gap-1.5">
           <label for="contact-name" class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1">
             Name <span class="text-finished-accent" aria-hidden="true">*</span>
@@ -58,9 +58,13 @@
 
         <button
           type="submit"
-          class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-white font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-[var(--finished-accent)] hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-300 active:scale-[0.98] group"
+          :disabled="formState !== 'idle'"
+          aria-live="polite"
+          class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-white font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-[var(--finished-accent)] hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
         >
-          <span class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor]">Send Transmission</span>
+          <span class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor]">
+            {{ formState === 'submitting' ? 'Transmitting...' : formState === 'success' ? 'Transmission Sent' : 'Send Transmission' }}
+          </span>
           <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-finished-accent/60 group-hover:bg-finished-accent group-hover:h-full transition-all duration-300"></div>
         </button>
       </form>
@@ -69,10 +73,27 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
 
 const performance = usePerformanceStore();
+
+const formState = ref<'idle' | 'submitting' | 'success'>('idle');
+
+const handleSubmit = () => {
+  if (formState.value !== 'idle') return;
+  formState.value = 'submitting';
+
+  setTimeout(() => {
+    formState.value = 'success';
+
+    // Reset after a few seconds
+    setTimeout(() => {
+      formState.value = 'idle';
+    }, 3000);
+  }, 1000);
+};
 </script>
 
 <style scoped>
