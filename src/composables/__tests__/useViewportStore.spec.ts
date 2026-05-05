@@ -290,7 +290,7 @@ describe('useViewportStore', () => {
       store.init();
       setPropertySpy.mockClear();
 
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 400 }));
+      window.dispatchEvent(new PointerEvent('pointermove', { clientX: 250, clientY: 400 }));
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       expect(setPropertySpy).not.toHaveBeenCalledWith('--mask-x', expect.anything());
@@ -363,10 +363,10 @@ describe('updateAll exception conditions part 3', () => {
     const store = useViewportStore();
     store.init();
 
-    // Dispatch mousemove to queue handleMouseMove
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 100 }));
+    // Dispatch pointermove to queue handlePointerMove
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 100, clientY: 100 }));
     // Dispatch it again immediately, should return early
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200, clientY: 200 }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 200, clientY: 200 }));
 
     await new Promise((resolve) => requestAnimationFrame(resolve));
     // Should reflect the last raw position, but the callback only ran once
