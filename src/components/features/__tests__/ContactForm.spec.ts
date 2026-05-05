@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ContactForm from '../ContactForm.vue';
 
 describe('ContactForm.vue', () => {
@@ -20,6 +20,36 @@ describe('ContactForm.vue', () => {
 
     expect(wrapper.find('label[for="contact-message"]').exists()).toBe(true);
     expect(wrapper.find('textarea#contact-message').exists()).toBe(true);
+  });
+
+  it('should visually update state during submission', async () => {
+    // Mock setTimeout and vitest timers to control timing
+    vi.useFakeTimers();
+
+    const wrapper = mount(ContactForm);
+    const button = wrapper.find('button[type="submit"]');
+
+    expect(button.text()).toContain('Send Transmission');
+    expect(button.attributes('disabled')).toBeUndefined();
+
+    // Trigger form submit
+    await wrapper.find('form').trigger('submit.prevent');
+
+    // Button should now show transmitting and be disabled
+    expect(button.text()).toContain('Transmitting...');
+    expect(button.attributes('disabled')).toBeDefined();
+
+    // Advance timer by 1000ms to trigger success state
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(button.text()).toContain('Transmission Sent');
+
+    // Advance timer to trigger idle state reset
+    await vi.advanceTimersByTimeAsync(3000);
+
+    expect(button.text()).toContain('Send Transmission');
+
+    vi.useRealTimers();
   });
 
   it('should securely handle malicious payload (Sentinel)', async () => {
