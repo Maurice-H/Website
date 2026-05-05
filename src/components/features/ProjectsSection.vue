@@ -17,7 +17,7 @@
         <span 
           v-for="tag in project.tags" 
           :key="tag"
-          class="px-2 py-0.5 text-[10px] uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-colors"
+          class="px-2 py-0.5 text-xs uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-colors"
         >
           {{ tag }}
         </span>

@@ -1,5 +1,5 @@
 <template>
-  <div class="boot-sequence font-mono text-[10px] uppercase tracking-widest text-emerald-400/80 p-6 relative overflow-hidden h-full flex flex-col">
+  <div class="boot-sequence font-mono text-xs uppercase tracking-widest text-emerald-400/80 p-6 relative overflow-hidden h-full flex flex-col">
     <!-- Scanline Effect -->
     <div class="scanlines"></div>
     <div class="crt-glow"></div>

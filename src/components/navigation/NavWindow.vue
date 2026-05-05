@@ -161,7 +161,7 @@ defineProps<{
 /* --- Theme Specific Content (High-Fidelity) --- */
 :deep(.content-terminal) {
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: clamp(0.65rem, 2.5vw, 0.8rem);
+  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
   line-height: 1.6;
   color: color-mix(in srgb, var(--finished-accent) 80%, transparent);
 }

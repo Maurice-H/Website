@@ -362,7 +362,7 @@ onUnmounted(() => {
 .drag-hint {
   position: absolute;
   bottom: 20px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: bold;
   letter-spacing: 0.4em;
   text-transform: uppercase;

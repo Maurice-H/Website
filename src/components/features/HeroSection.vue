@@ -1,6 +1,6 @@
 <template>
   <div class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-20 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
-    <div class="mb-6 text-[10px] md:text-xs tracking-[0.6em] font-mono text-[var(--finished-accent)] uppercase opacity-60">
+    <div class="mb-6 text-xs tracking-[0.6em] font-mono text-[var(--finished-accent)] uppercase opacity-60">
       [ IDENTITY_PROTOCOL_LOADED ]
     </div>
 
@@ -12,7 +12,7 @@
       A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.
     </p>
     
-    <div class="flex flex-wrap items-center gap-8 text-[10px] md:text-xs tracking-[0.4em] font-mono text-finished-text/30 uppercase">
+    <div class="flex flex-wrap items-center gap-8 text-xs tracking-[0.4em] font-mono text-finished-text/30 uppercase">
       <div class="flex items-center gap-2">
         <span class="w-1 h-1 bg-[var(--finished-accent)] rounded-full"></span>
         DEVELOPER

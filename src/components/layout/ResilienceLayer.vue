@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { useThemeStore } from '@/stores/useThemeStore';
@@ -30,6 +30,22 @@ import { LightingPhase } from '@/types';
 const lighting = useLightingStore();
 const performance = usePerformanceStore();
 const themeStore = useThemeStore();
+
+const mouseX = ref(-100);
+const mouseY = ref(-100);
+
+const onPointerMove = (e: PointerEvent) => {
+  mouseX.value = e.clientX;
+  mouseY.value = e.clientY;
+};
+
+onMounted(() => {
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('pointermove', onPointerMove);
+});
 
 const getAccentColor = (opacity: number) => {
   return themeStore.isBlueprintMode
@@ -54,7 +70,7 @@ const cursorStyle = computed(() => {
   const transparent = getAccentColor(0);
   return {
     // Move the glow using transform to avoid full-screen repaints
-    transform: 'translate(calc(var(--mask-x) - 50px), calc(var(--mask-y) - 50px))',
+    transform: `translate(${mouseX.value - 50}px, ${mouseY.value - 50}px)`,
     background: `radial-gradient(circle 40px at center, ${color} 0%, ${transparent} 100%)`,
   };
 });

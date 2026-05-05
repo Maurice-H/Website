@@ -32,7 +32,7 @@
     <div
       class="ml-2 md:ml-4 flex flex-col items-start transition-colors duration-[var(--theme-transition-duration)]"
     >
-      <span class="text-[10px] md:text-xs uppercase tracking-widest font-bold opacity-60"
+      <span class="text-xs uppercase tracking-widest font-bold opacity-60"
         >System Mode</span
       >
       <span class="font-mono font-bold tracking-wider text-xs md:text-sm mt-0.5 md:mt-1">
