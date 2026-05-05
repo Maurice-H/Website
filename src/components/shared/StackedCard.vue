@@ -2,29 +2,6 @@
   <div class="stacked-card-wrapper perspective-1000">
     <div 
       class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d hover:rotate-y-12"
-      @mousemove="handleMouseMove"
-      @mouseleave="resetRotation"
-      :style="containerStyle"
-    >
-      <!-- Background layers for stack effect -->
-      <div 
-        v-for="i in 3" 
-        :key="i"
-        class="absolute inset-0 rounded-2xl border border-finished-text/10 bg-finished-text/5 backdrop-blur-md transition-transform transition-opacity duration-300 pointer-events-none"
-        :style="getStackLayerStyle(i)"
-      ></div>
-      
-      <!-- Main Content Card -->
-      <BentoCard 
-        id="stacked-main" 
-        class="absolute inset-0 z-10 !bg-finished-text/10 !backdrop-blur-xl border border-finished-text/20 shadow-2xl"
-      >
-        <slot></slot>
-      </BentoCard>
-<template>
-  <div class="stacked-card-wrapper perspective-1000">
-    <div 
-      class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d hover:rotate-y-12"
       @pointermove="handlePointerMove"
       @mouseleave="resetRotation"
       :style="containerStyle"
