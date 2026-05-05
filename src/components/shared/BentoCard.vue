@@ -1,7 +1,7 @@
 <template>
   <div 
     ref="cardRef"
-    class="bento-card relative rounded-2xl p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
+    class="bento-card relative rounded-2xl p-4 md:p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass, { 'is-low-end': isLowEnd }]"
   >
     <!-- Background Layer (Base) -->

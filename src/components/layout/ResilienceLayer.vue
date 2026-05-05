@@ -11,7 +11,7 @@
       :style="navStyle"
     ></div>
 
-    <!-- CONTENT Cursor: Small div moved via transform (compositor-optimized) -->
+    <!-- CONTENT Custom Cursor: Small div moved via transform (compositor-optimized) -->
     <div 
       v-else 
       class="cursor-glow" 

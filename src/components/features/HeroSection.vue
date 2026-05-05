@@ -1,14 +1,14 @@
 <template>
-  <div class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-40 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
+  <div class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-20 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
     <div class="mb-6 text-[10px] md:text-xs tracking-[0.6em] font-mono text-[var(--finished-accent)] uppercase opacity-60">
       [ IDENTITY_PROTOCOL_LOADED ]
     </div>
 
-    <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white mb-6 leading-[1.1] select-none">
-      Hi. I'm <span class="text-[var(--finished-accent)]">Alex</span>
+    <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 leading-[1.1] select-none">
+      Hi. I'm <span class="text-[var(--finished-accent)]">Maurice</span>
     </h1>
     
-    <p class="max-w-xl text-xl md:text-2xl text-finished-text/60 leading-relaxed mb-12 font-sans font-light">
+    <p class="max-w-xl text-lg md:text-2xl text-finished-text/60 leading-relaxed mb-12 font-sans font-light">
       A Junior Software Developer obsessed with performance, dynamic interfaces, and pixel-perfect design.
     </p>
     

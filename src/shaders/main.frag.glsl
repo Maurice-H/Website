@@ -18,8 +18,8 @@ void main() {
   vec3 lightColor = vec3(0.0);
 
   if (uLightingEnabled) {
-    // Normalize coordinates (aspect-ratio corrected)
-    vec2 st = gl_FragCoord.xy / uResolution.xy;
+    // Use vUv (0..1) for stable coordinate mapping across devices
+    vec2 st = vUv;
     float aspect = uResolution.x / uResolution.y;
     st.x *= aspect;
 
@@ -51,32 +51,30 @@ void main() {
       }
     }
 
-    //   CONTENT phase: Cyber-Optic HUD Scanner (Micro)
-    if (uPhase > 0.5) {
+    //   CONTENT phase: custom cursor Cyber-Optic HUD Scanner (Micro)
+    if (uPhase > 0.9) {
       vec2 dir = st - mouse;
       float dist = length(dir);
       float angle = atan(dir.y, dir.x);
       
-      // 1. GRÖSSE: Noch kleiner! (Von 0.05 auf 0.025 halbiert)
+      // 1. GRÖSSE: Still micro
       float outerRadius = 0.025; 
-      float coreRadius = 0.003;  // Der Kern ist jetzt ein winziger Nadelstich
+      float coreRadius = 0.003; 
       
-      // 2. KERN: Extrem scharf
+      // 2. KERN
       float core = smoothstep(coreRadius, 0.0, dist) * 2.5;
       
-      // 3. TECH-RING: Hauchdünn
+      // 3. TECH-RING
       float ring = smoothstep(outerRadius, outerRadius - 0.001, dist) - 
                    smoothstep(outerRadius - 0.001, outerRadius - 0.003, dist);
-                   
-      // 8 rotierende Lücken für mehr Tech-Feeling bei der kleinen Größe
       float gaps = sin(angle * 8.0 + uTime * -3.0); 
       ring *= smoothstep(0.0, 0.5, gaps) * 1.5; 
       
-      // 4. RADAR-SWEEP: Schneller und dezenter
+      // 4. RADAR-SWEEP
       float sweepAngle = fract(angle / 6.28318 + uTime * 1.2); 
       float sweep = sweepAngle * smoothstep(outerRadius, 0.0, dist) * 0.2;
       
-      // 5. AMBIENT: Fast komplett reduziert, nur minimaler Glow
+      // 5. AMBIENT
       float ambient = smoothstep(0.06, 0.0, dist) * 0.1;
       
       lightColor += uAccentColor * (core + ring + sweep + ambient);

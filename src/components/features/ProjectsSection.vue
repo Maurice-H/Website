@@ -7,7 +7,7 @@
     :title="project.title"
     :is-low-end="performance.isLowEnd"
   >
-    <div class="p-8 flex flex-col h-full">
+    <div class="p-4 md:p-8 flex flex-col h-full">
       <div class="flex-1 mt-6">
         <p class="mb-6 text-sm leading-relaxed text-finished-text/50">
           {{ project.description }}

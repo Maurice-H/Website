@@ -3,11 +3,11 @@
     type="button"
     @click="toggleLighting"
     :aria-label="`Lighting ${lightingEnabled ? 'On' : 'Off'}`"
-    class="group relative flex items-center justify-center p-6 w-full rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+    class="group relative flex items-center justify-center md:justify-start p-3 md:p-5 w-full md:w-56 rounded-2xl md:rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     :class="[
       isBlueprint
-        ? 'border-blueprint-border border-dashed text-finished-accent bg-finished-accent/5 shadow-[0_0_20px_rgba(96,165,250,0.1)]'
-        : 'border-finished-border text-finished-accent bg-finished-bg/5 hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30',
+        ? 'border-blueprint-border border-dashed text-finished-accent bg-black/20 backdrop-blur-md shadow-[0_0_20px_rgba(96,165,250,0.1)]'
+        : 'border-finished-border text-finished-accent bg-black/20 backdrop-blur-md hover:bg-finished-accent/10 shadow-[var(--finished-glow)] hover:border-finished-accent/30',
     ]"
     :aria-pressed="lightingEnabled"
   >
@@ -39,12 +39,12 @@
       </template>
     </svg>
     <div
-      class="ml-4 flex flex-col items-start transition-colors duration-[var(--theme-transition-duration)]"
+      class="ml-2 md:ml-4 flex flex-col items-start transition-colors duration-[var(--theme-transition-duration)]"
     >
-      <span class="text-xs uppercase tracking-widest font-bold opacity-60"
+      <span class="text-[10px] md:text-xs uppercase tracking-widest font-bold opacity-60"
         >Lighting</span
       >
-      <span class="font-mono font-bold tracking-wider text-sm mt-1">
+      <span class="font-mono font-bold tracking-wider text-xs md:text-sm mt-0.5 md:mt-1">
         {{ lightingEnabled ? "On" : "Off" }}
       </span>
     </div>

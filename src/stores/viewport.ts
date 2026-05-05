@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia';
 import { markRaw, reactive, ref } from 'vue';
-import { useLightingStore } from './lighting';
-import { useThemeStore } from './useThemeStore';
 
 interface ViewportOffset {
   left: number;
@@ -18,8 +16,6 @@ export const useViewportStore = defineStore('viewport', () => {
   const registeredComponents = reactive<Map<string, ComponentRegistration>>(new Map());
   const mousePosition = reactive({ x: 0, y: 0 });
   const isListening = ref(false);
-  const lighting = useLightingStore();
-  const themeStore = useThemeStore();
 
   /**
    * Non-reactive mouse coordinates for the WebGL uniform bridge.
@@ -35,6 +31,7 @@ export const useViewportStore = defineStore('viewport', () => {
 
   const updateAll = () => {
     if (updateRafId !== null) return;
+    // ... rest of updateAll ...
 
     updateRafId = requestAnimationFrame(() => {
       const updates = [];
@@ -60,7 +57,7 @@ export const useViewportStore = defineStore('viewport', () => {
 
   let rafId: number | null = null;
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handlePointerMove = (e: PointerEvent) => {
     const cx = e.clientX;
     const cy = e.clientY;
 
@@ -75,13 +72,6 @@ export const useViewportStore = defineStore('viewport', () => {
       // Read from rawMouse to ensure we process the absolute latest position for the frame
       mousePosition.x = rawMouse.x;
       mousePosition.y = rawMouse.y;
-
-      // Skip all lighting-related tracking when effects are disabled
-      if (themeStore.lightingEnabled && lighting.phase === 'CONTENT') {
-        // --mask-x/y consumed by FusedReveal mask positioning
-        document.documentElement.style.setProperty('--mask-x', `${rawMouse.x}px`);
-        document.documentElement.style.setProperty('--mask-y', `${rawMouse.y}px`);
-      }
       rafId = null;
     });
   };
@@ -89,17 +79,14 @@ export const useViewportStore = defineStore('viewport', () => {
   const init = () => {
     if (isListening.value) return;
 
-    // Set initial mask positions to center screen
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    document.documentElement.style.setProperty('--mouse-x', `${centerX}px`);
-    document.documentElement.style.setProperty('--mouse-y', `${centerY}px`);
-    document.documentElement.style.setProperty('--mask-x', '50vw');
-    document.documentElement.style.setProperty('--mask-y', '50vh');
-
-    window.addEventListener('scroll', updateAll, { passive: true, capture: true });
+    window.addEventListener('scroll', updateAll, {
+      passive: true,
+      capture: true,
+    });
     window.addEventListener('resize', updateAll, { passive: true });
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('pointermove', handlePointerMove, {
+      passive: true,
+    });
 
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
       observer = new IntersectionObserver(
@@ -168,10 +155,21 @@ export const useViewportStore = defineStore('viewport', () => {
     return registeredComponents.get(id)?.offsets || { left: 0, top: 0 };
   };
 
+  const destroy = () => {
+    if (observer) {
+      observer.disconnect();
+    }
+    window.removeEventListener('scroll', updateAll, { capture: true });
+    window.removeEventListener('resize', updateAll);
+    window.removeEventListener('pointermove', handlePointerMove);
+    isListening.value = false;
+  };
+
   return {
     mousePosition,
     rawMouse,
     init,
+    destroy,
     register,
     getOffsets,
     registeredComponents,
