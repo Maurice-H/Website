@@ -6,14 +6,14 @@
     title="Get In Touch"
     :is-low-end="performance.isLowEnd"
   >
-    <div class="p-10 flex flex-col h-full">
-      <p class="text-slate-400 text-sm mb-8 font-mono tracking-wide">
+    <div class="p-4 md:p-10 flex flex-col h-full">
+      <p class="text-slate-400 text-xs md:text-sm mb-4 md:mb-8 font-mono tracking-wide">
         Establish direct channel for collaboration.
       </p>
 
-      <form @submit.prevent class="flex flex-col gap-4 flex-1">
+      <form @submit.prevent class="flex flex-col gap-3 md:gap-4 flex-1">
         <div class="flex flex-col gap-1.5">
-          <label for="contact-name" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-name" class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1">
             Name <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper">
@@ -26,8 +26,9 @@
             />
           </div>
         </div>
+
         <div class="flex flex-col gap-1.5">
-          <label for="contact-email" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-email" class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1">
             Email <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper">
@@ -40,8 +41,9 @@
             />
           </div>
         </div>
+
         <div class="flex flex-col gap-1.5 flex-1">
-          <label for="contact-message" class="text-[10px] text-slate-400 uppercase tracking-widest font-bold ml-1">
+          <label for="contact-message" class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1">
             Message <span class="text-finished-accent" aria-hidden="true">*</span>
           </label>
           <div class="input-wrapper h-full">
@@ -56,17 +58,10 @@
 
         <button
           type="submit"
-          class="relative w-full py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-white font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-[var(--finished-accent)] hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-300 active:scale-[0.98] group"
+          class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-white font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-[var(--finished-accent)] hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-300 active:scale-[0.98] group"
         >
-          <span
-            class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor]"
-            >Send Transmission</span
-          >
-
-          <!-- Der Tech-Akzent (wird beim Hovern über die ganze Höhe gezogen) -->
-          <div
-            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-finished-accent/60 group-hover:bg-finished-accent group-hover:h-full transition-all duration-300"
-          ></div>
+          <span class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor]">Send Transmission</span>
+          <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-finished-accent/60 group-hover:bg-finished-accent group-hover:h-full transition-all duration-300"></div>
         </button>
       </form>
     </div>

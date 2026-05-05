@@ -1,80 +1,60 @@
-# 📋 Project Roadmap & TODOs
+# 🚀 Project Roadmap: Maurice WebGL Portfolio
 
-## 🏠 Landing Page (UFO Phase)
+## 📱 Milestone 1: Mobile Fine-tuning & UX (Current Priority)
+*Fokus: Stabilität und visuelle Korrektheit auf mobilen Endgeräten.*
 
-### 1. Tabs & Navigation
+- [x] **Mobile Layout Fixes:** Überprüfung von Paddings, Z-Indizes und Breakpoints im Bento-Grid.
+- [x] **Touch Cursor Tracking:** WebGL-Projektion für Touch-Events optimieren (Hover-Ersatz).
+- [x] **Mobile Immersion:** Sicherstellen, dass das "Fused"-Gefühl auch auf kleinen Screens erhalten bleibt.
 
-- [ ] Improve Navigation tabs content (NavConveyor labels)
-- [ ] Make Navigation of tabs snap to center of UFO/Beam
-- [ ] Ensure navigation from tabs (e.g., "Experience", "Get in Touch") scrolls directly down to the respective Bento card.
-- [ ] Include keyboard navigation (WASD and arrow keys to move, ESC to go back)
+## 🕹️ Milestone 2: Navigation Intelligence
+*Fokus: Ein immersives Steuerungs-Gefühl und nahtlose Übergänge.*
 
-### 2. WebGL Lighting (GPU Accelerated)
+- [x] **Navigation Snapping:** Karten im `NavConveyor` exakt im Zentrum des UFO-Beams einrasten lassen.
+- [ ] **Deep Linking:** Navigation von Tabs (z.B. "Experience") direkt zu den Bento-Sektionen scrollen lassen.
+- [ ] **Keyboard Navigation:** WASD und Pfeiltasten zur Steuerung, ESC zum Zurückkehren.
+- [ ] **View Transitions API:** Prüfung und ggf. Implementierung weicher Phasen-Übergänge.
+- [ ] **Nav Labels:** Content der Navigation-Tabs im `NavConveyor` verbessern.
 
-- [x] **Pivot:** Move lighting from CSS Filters to TresJS/WebGL for 60+ FPS.
-- [x] **Asset Update:** Procedural UFO/Drone geometry implemented (zero-latency loading).
-- [x] **Tractor Beam:** Project 3D UFO position to 2D Screen Space for pixel-perfect shader tracking.
+## 🔊 Milestone 3: Audio-Visuelle Immersion
+*Fokus: Satisfaction und High-Fidelity Assets.*
 
-### 3. Ideas
+- [ ] **Asset Upgrade:** Suche und Integration coolerer 3D-Modelle für das UFO und die Drohne.
+- [ ] **Subtle Sound Effects:** Satisfaction-Clicks für Theme-Toggle, Hover und Phasen-Wechsel.
+- [ ] **Particle Effects:** Dezenter "Abduction"-Effekt beim Wechsel in die CONTENT-Phase.
 
-- [ ] Add subtle "abduction" particle effect when switching to CONTENT phase.
+## 📊 Milestone 4: Data & Final Polish
+*Fokus: Dynamische Inhalte und Performance-Tuning.*
 
----
-
-## 📄 Subpages (Cockpit / Drone Phase)
-
-### 1. Visuals
-
-- [x] Fix layout interaction buttons (theme toggle and navigation)
-- [x] Fix outlines of bentoCards to have the depth outlines on the bottom and left instead of top and right
-- [x] Remove white outline of project cards
-- [x] Remove scrollbar (custom themed scrollbar or hidden)
-- [x] Refined Contact Form button into a high-contrast Sci-Fi Ghost Button.
-
-### 2. Lighting (Cockpit Mode)
-
-- [x] **Companion Drone:** Autopilot "Acht-Figur" animation during Content phase.
-- [x] **HUD Scanner:** Micro-optic cursor effect following the drone/mouse.
-- [x] **State Sync:** Centralized lighting store syncing `uPhase` and `uAccentColor` across all components.
-
-### 3. Projects Section
-
-- [ ] Consider fetching projects dynamically from GitHub instead of hardcoding them.
+- [ ] **Dynamic Projects:** Projekte via GitHub API laden statt Hardcoding.
+- [ ] **LHCI Optimization:** Reduzierung auf 1-Run-Tests und Überspringen redundanter Tiers in der CI (Build-Zeit-Optimierung).
 
 ---
 
-## 🌍 Global
+## ✅ Completed / History
 
-### 1. Theming
+### 🏰 Architecture & State
+- [x] **Lighting Store:** Zentrales State Management für `uPhase` und `uAccentColor`.
+- [x] **Viewport Store:** Globaler Service für responsive Breakpoints ohne redundante Listener.
+- [x] **Performance Store:** Hardware-Benchmarking via `detect-gpu` für Tiered Rendering.
+- [x] **State Sync:** Konsistente Anwendung von Blue/Green Themes über WebGL Uniforms.
 
-- [x] Fix theming not being applied correctly and consistently.
-- [x] Ensure Blue and Green theming is constantly applied everywhere (WebGL Uniform Sync).
+### 🛸 WebGL & Rendering
+- [x] **Engine Pivot:** Migration von CSS-Filtern zu TresJS/WebGL (Performance-Boost auf 60+ FPS).
+- [x] **UFO & Drone:** Prozedurale Geometrie und "Acht-Figur" Animationen implementiert.
+- [x] **Tractor Beam:** 3D-zu-2D Projektion für pixelperfektes Shader-Tracking.
+- [x] **Custom Cursor:** WebGL-basierter HUD-Scanner in der CONTENT-Phase.
+- [x] **Resilience:** Sauberes WebGL-Fallback für Low-End Geräte ohne Hardwarebeschleunigung.
 
-### 2. Code Quality (The "Jules" Standard)
+### 🖼️ UI & Interactions
+- [x] **Bento-Grid:** Refined Bento-Layout mit korrigierten Tiefen-Outlines.
+- [x] **Nav-Conveyor:** Refactoring auf reine Mathematik (Scroll-Performance).
+- [x] **Ghost Buttons:** High-Contrast Sci-Fi Styling für Interaktionselemente.
+- [x] **Scrollbar:** Custom-Themed oder Hidden Scrollbar für immersiven Look.
 
-- [x] Fix biome issues
-- [x] **Test Coverage:** Added unit tests for WebGL projection math and Lighting Store.
-- [x] **SEO Fix:** Add a `<meta name="description" content="...">` tag to `index.html`.
-- [x] Anti-Evasion: Implemented check:avoidance script to block AI bypasses.
-
-### 3. Performance & Stability
-
-- [x] **GPU Load:** Swapped heavy CSS `blur(50px)` for WebGL Shaders — Performance stabilized at 60+ FPS.
-- [ ] **Production Check:** Run a final Lighthouse audit against built production files.
-
-### 4. Extra Features & QoL
-
-- [ ] **Page Transitions:** Add smooth page transitions (View Transitions API).
-- [x] **Custom Cursor:** WebGL-based HUD scanner active in CONTENT phase.
-- [ ] **Subtle Sound Effects:** Satisfaction clicks for theme toggle and phase shifts.
-      ver buttons.
-- [x] Custom Cursor: WebGL-based HUD scanner active in CONTENT phase (system cursor hidden dynamically).
-
-## Notes
-
-- changes Lighthouse Audit from warn to error if score below threshold, see .lighthouserc.json (needs implementation below)
-- implement a clean webgl free alternative for low end devices or without hardwareacceleration 
-- look for cooler models for the ufo and the drone
-- improve imersivness of the visuals
-- fix layout bugs for mobile devices
-- fix cursor tracking on mobile devices
+### 🛡️ Quality & Ops
+- [x] **Anti-Evasion:** `check:avoidance` Skript gegen AI-Bypasses.
+- [x] **Test Coverage:** Unit-Tests für WebGL-Projektion und Lighting-Store.
+- [x] **SEO:** Meta-Tags und Lighthouse-Optimierung (>95 Scores).
+- [x] **CI Strategy:** Mobile (Strict) vs. Desktop (Advisory) Checks etabliert.
+- [x] **Biome:** Alle Linting- und Formatting-Issues behoben.

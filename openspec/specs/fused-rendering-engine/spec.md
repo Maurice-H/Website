@@ -12,6 +12,14 @@ The system SHALL provide a centralized service (Store/Composables) that tracks t
 - **WHEN** a bento-style component is mounted
 - **THEN** it SHALL register its element with the viewport coordinator to receive reactive offset updates.
 
+### Requirement: Unified Pointer Input
+The rendering engine must consume pointer events instead of mouse events to ensure parity across devices.
+
+#### Scenario: Pointer Precision
+- **WHEN** a pointer event is received.
+- **THEN** the coordinates must be normalized relative to the canvas dimensions.
+- **AND** the `uMouse` uniform must be updated in the main fragment shader.
+
 ### Requirement: Unified Dual-Layer Rendering
 The system SHALL support a "Single Source of Truth" template pattern where the "Blueprint" and "Finished" visual states are generated from a single content definition.
 

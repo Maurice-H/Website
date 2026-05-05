@@ -39,21 +39,6 @@ describe('useLightingStore', () => {
     expect(store.phase).toBe(LightingPhase.CONTENT);
   });
 
-  it('setPhase should update CSS variables if switching back to NAV', () => {
-    const store = useLightingStore();
-
-    // Start at CONTENT
-    store.phase = LightingPhase.CONTENT;
-
-    // Switch to NAV
-    store.setPhase(LightingPhase.NAV);
-    vi.advanceTimersByTime(300);
-
-    expect(store.phase).toBe(LightingPhase.NAV);
-    expect(document.documentElement.style.setProperty).toHaveBeenCalledWith('--mask-x', '50%');
-    expect(document.documentElement.style.setProperty).toHaveBeenCalledWith('--mask-y', '50%');
-  });
-
   it('setPhase should reject invalid phase enums (Sentinel strict state enforcement)', () => {
     const store = useLightingStore();
     const initialPhase = store.phase;

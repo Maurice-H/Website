@@ -20,9 +20,9 @@
           key="nav"
           class="h-screen w-full relative"
         >
-          <!-- Floating Controls (NAV Phase — Lighting Toggle only) -->
+          <!-- Floating Controls (NAV Phase — Responsive Layout) -->
           <div
-            class="fixed top-8 right-8 z-[100] flex items-center gap-4 pointer-events-auto"
+            class="fixed top-2 right-2 md:top-8 md:right-8 z-[100] flex flex-col md:flex-row items-end md:items-center gap-1.5 md:gap-4 pointer-events-auto"
           >
             <LightingToggle />
             <ThemeToggle />
@@ -36,7 +36,7 @@
             "
           >
             <div
-              class="text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
+              class="text-[10vw] md:text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
             >
               Technical DNA
             </div>
@@ -50,16 +50,16 @@
           key="content"
           class="p-4 md:p-8 lg:p-16 min-h-screen relative"
         >
-          <!-- Floating Controls (Theme Toggle + ESC Back) -->
+          <!-- Floating Controls (Responsive Layout) -->
           <div
-            class="fixed top-8 right-8 z-[100] flex items-center gap-4 pointer-events-auto"
+            class="fixed top-2 right-2 md:top-8 md:right-8 z-[100] flex flex-col md:flex-row items-end md:items-center gap-1.5 md:gap-4 pointer-events-auto"
           >
             <LightingToggle />
             <ThemeToggle />
             <button
               type="button"
               @click="handleBackToNav"
-              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-95"
+              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-95"
             >
               [ ESC ] Back
             </button>
@@ -126,16 +126,20 @@ const isCustomCursorActive = computed(() => {
 /**
  * CSS custom properties set on root element for child access.
  * --reveal-mask is consumed by FusedReveal and App.vue slotted content.
- * Only changes on phase transition (NAV ↔ CONTENT), not on every mouse move.
+ * Only changes on phase transition (NAV \u2194 CONTENT), not on every mouse move.
  */
 const rootCssVars = computed<CSSProperties>(() => {
   if (!themeStore.lightingEnabled) return {};
 
   const isNav = lighting.phase === 'NAV';
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // Use a wider gradient on mobile to cover more of the smaller screen
+  const maskSize = isMobile ? '80% 120%' : '40% 160%';
 
   return {
     '--reveal-mask': isNav
-      ? `radial-gradient(ellipse 40% 160% at 50% -10%, black 0%, rgba(0,0,0,0) 100%)`
+      ? `radial-gradient(ellipse ${maskSize} at 50% -10%, black 0%, rgba(0,0,0,0) 100%)`
       : '',
   } as CSSProperties;
 });
@@ -170,7 +174,8 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100vh; /* Fallback */
+  height: 100dvh;
   overflow: hidden;
   background: black;
   transition: background-color var(--theme-transition-duration) ease-in-out;

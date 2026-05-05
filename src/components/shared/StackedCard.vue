@@ -2,7 +2,7 @@
   <div class="stacked-card-wrapper perspective-1000">
     <div 
       class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d hover:rotate-y-12"
-      @mousemove="handleMouseMove"
+      @pointermove="handlePointerMove"
       @mouseleave="resetRotation"
       :style="containerStyle"
     >
@@ -31,7 +31,7 @@ import BentoCard from './BentoCard.vue';
 
 const rotation = ref({ x: 0, y: 0 });
 
-const handleMouseMove = (e: MouseEvent) => {
+const handlePointerMove = (e: PointerEvent) => {
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
   const x = (e.clientX - rect.left) / rect.width - 0.5;
   const y = (e.clientY - rect.top) / rect.height - 0.5;

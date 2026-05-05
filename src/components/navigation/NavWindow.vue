@@ -1,10 +1,7 @@
 <template>
-  <div 
+  <div
     class="nav-window group focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl"
-    :class="[
-      `theme-${theme}`,
-      { 'is-active': active }
-    ]"
+    :class="[`theme-${theme}`, { 'is-active': active }]"
     role="tab"
     :aria-selected="active"
     tabindex="0"
@@ -13,15 +10,15 @@
     <div class="window-container-wrapper">
       <div class="window-container">
         <WindowFrame :title="label">
-        <!-- Content Area (Slot-based) -->
-        <div class="window-content">
-          <slot></slot>
-        </div>
-      </WindowFrame>
+          <!-- Content Area (Slot-based) -->
+          <div class="window-content">
+            <slot></slot>
+          </div>
+        </WindowFrame>
       </div>
       <div class="window-active-glow"></div>
     </div>
-    
+
     <!-- Label Below -->
     <div class="window-label-wrapper">
       <div class="window-label-base">{{ label }}</div>
@@ -44,7 +41,7 @@ defineProps<{
 <style scoped>
 .nav-window {
   flex-shrink: 0;
-  width: 480px;
+  width: min(480px, 80vw);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -53,6 +50,13 @@ defineProps<{
   cursor: pointer;
   will-change: transform, opacity;
   backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  .nav-window {
+    width: 280px;
+    gap: 12px;
+  }
 }
 
 .nav-window.is-active {
@@ -84,7 +88,7 @@ defineProps<{
   inset: 0;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--finished-accent) 50%, transparent);
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.6),
     0 0 30px color-mix(in srgb, var(--finished-accent) 15%, transparent);
   opacity: 0;
@@ -99,7 +103,7 @@ defineProps<{
 
 .window-content {
   flex: 1;
-  padding: 24px;
+  padding: clamp(12px, 3vw, 16px);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -107,6 +111,12 @@ defineProps<{
   background: #000;
   border-radius: 0 0 12px 12px;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .window-content {
+    padding: 0;
+  }
 }
 
 .window-label-wrapper {
@@ -150,9 +160,9 @@ defineProps<{
 
 /* --- Theme Specific Content (High-Fidelity) --- */
 :deep(.content-terminal) {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 12px; /* Increased from 11px for SEO */
-  line-height: 1.8;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+  line-height: 1.6;
   color: color-mix(in srgb, var(--finished-accent) 80%, transparent);
 }
 :deep(.code-line) {
@@ -167,7 +177,11 @@ defineProps<{
   margin-left: 2px;
   animation: blink 1s infinite;
 }
-@keyframes blink { 50% { opacity: 0; } }
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
 
 :deep(.content-profile) {
   display: flex;
@@ -201,9 +215,9 @@ defineProps<{
 }
 :deep(.comm-link) {
   padding: 8px;
-  border: 1px dashed rgba(255,255,255,0.1);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
   font-family: monospace;
   font-size: 12px; /* Increased from 10px for SEO */
-  color: rgba(255,255,255,0.3);
+  color: rgba(255, 255, 255, 0.3);
 }
 </style>

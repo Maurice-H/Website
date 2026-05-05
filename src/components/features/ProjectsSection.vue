@@ -7,7 +7,7 @@
     :title="project.title"
     :is-low-end="performance.isLowEnd"
   >
-    <div class="p-8 flex flex-col h-full">
+    <div class="p-4 md:p-8 flex flex-col h-full">
       <div class="flex-1 mt-6">
         <p class="mb-6 text-sm leading-relaxed text-finished-text/50">
           {{ project.description }}
@@ -17,7 +17,7 @@
         <span 
           v-for="tag in project.tags" 
           :key="tag"
-          class="px-2 py-0.5 text-[10px] uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-colors"
+          class="px-2 py-0.5 text-xs uppercase tracking-widest rounded border border-finished-text/10 bg-transparent text-finished-text/30 group-hover:border-finished-accent/20 group-hover:text-finished-text/60 transition-colors"
         >
           {{ tag }}
         </span>

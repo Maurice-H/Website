@@ -18,11 +18,6 @@ export const useLightingStore = defineStore('lighting', () => {
     setTimeout(() => {
       phase.value = newPhase;
       isFlashActive.value = false;
-
-      if (newPhase === LightingPhase.NAV) {
-        document.documentElement.style.setProperty('--mask-x', '50%');
-        document.documentElement.style.setProperty('--mask-y', '50%');
-      }
     }, 300);
   };
 

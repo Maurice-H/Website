@@ -4,10 +4,11 @@
     <div class="window-header flex items-center px-6 pt-6 pb-2">
       <!-- Title in Mockup Style (Large, clean, matching subpage mockups) -->
       <div
-        class="window-title text-xl md:text-2xl font-bold tracking-wide"
+        class="window-title font-bold tracking-wide"
+        :style="{ fontSize: 'clamp(1.125rem, 3vw, 1.5rem)' }"
         :class="
           isBracketed
-            ? 'text-finished-text/70 font-mono tracking-widest text-lg'
+            ? 'text-finished-text/70 font-mono tracking-widest'
             : 'text-[var(--finished-accent)]'
         "
       >

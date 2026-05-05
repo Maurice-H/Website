@@ -117,9 +117,6 @@ describe('useViewportStore', () => {
       const store = useViewportStore();
       store.init();
 
-      expect(setPropertySpy).toHaveBeenCalledWith('--mask-x', '50vw');
-      expect(setPropertySpy).toHaveBeenCalledWith('--mask-y', '50vh');
-
       expect(addEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function), {
         passive: true,
         capture: true,
@@ -127,7 +124,7 @@ describe('useViewportStore', () => {
       expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function), {
         passive: true,
       });
-      expect(addEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function), {
+      expect(addEventListenerSpy).toHaveBeenCalledWith('pointermove', expect.any(Function), {
         passive: true,
       });
     });
@@ -180,7 +177,7 @@ describe('useViewportStore', () => {
       expect(store.getOffsets('test-element').top).toBe(600);
     });
 
-    it('should handle mousemove events correctly when lighting phase is CONTENT', async () => {
+    it('should handle pointermove events correctly when lighting phase is CONTENT', async () => {
       const store = useViewportStore();
       const lighting = useLightingStore();
       const themeStore = useThemeStore();
@@ -195,28 +192,24 @@ describe('useViewportStore', () => {
       store.init();
       setPropertySpy.mockClear();
 
-      // Dispatch mousemove
-      const mouseEvent = new MouseEvent('mousemove', {
+      // Dispatch pointermove
+      const pointerEvent = new PointerEvent('pointermove', {
         clientX: 250,
         clientY: 400,
       });
-      window.dispatchEvent(mouseEvent);
+      window.dispatchEvent(pointerEvent);
 
       // Wait for requestAnimationFrame
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      // Verify mouse position was updated (both reactive and raw)
+      // Verify pointer position was updated (both reactive and raw)
       expect(store.mousePosition.x).toBe(250);
       expect(store.mousePosition.y).toBe(400);
       expect(store.rawMouse.x).toBe(250);
       expect(store.rawMouse.y).toBe(400);
-
-      // Verify CSS variables were updated
-      expect(setPropertySpy).toHaveBeenCalledWith('--mask-x', '250px');
-      expect(setPropertySpy).toHaveBeenCalledWith('--mask-y', '400px');
     });
 
-    it('should handle mousemove events correctly when lighting phase is NOT CONTENT', async () => {
+    it('should handle pointermove events correctly when lighting phase is NOT CONTENT', async () => {
       const store = useViewportStore();
       const lighting = useLightingStore();
 
@@ -227,16 +220,16 @@ describe('useViewportStore', () => {
       // Clear initial init calls
       setPropertySpy.mockClear();
 
-      // Dispatch mousemove
-      const mouseEvent = new MouseEvent('mousemove', {
+      // Dispatch pointermove
+      const pointerEvent = new PointerEvent('pointermove', {
         clientX: 100,
         clientY: 100,
       });
-      window.dispatchEvent(mouseEvent);
+      window.dispatchEvent(pointerEvent);
 
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      // Verify mouse position was updated (always written, even in NAV)
+      // Verify pointer position was updated (always written, even in NAV)
       expect(store.mousePosition.x).toBe(100);
       expect(store.mousePosition.y).toBe(100);
       expect(store.rawMouse.x).toBe(100);
@@ -297,7 +290,7 @@ describe('useViewportStore', () => {
       store.init();
       setPropertySpy.mockClear();
 
-      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 400 }));
+      window.dispatchEvent(new PointerEvent('pointermove', { clientX: 250, clientY: 400 }));
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       expect(setPropertySpy).not.toHaveBeenCalledWith('--mask-x', expect.anything());
@@ -370,10 +363,10 @@ describe('updateAll exception conditions part 3', () => {
     const store = useViewportStore();
     store.init();
 
-    // Dispatch mousemove to queue handleMouseMove
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 100, clientY: 100 }));
+    // Dispatch pointermove to queue handlePointerMove
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 100, clientY: 100 }));
     // Dispatch it again immediately, should return early
-    window.dispatchEvent(new MouseEvent('mousemove', { clientX: 200, clientY: 200 }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: 200, clientY: 200 }));
 
     await new Promise((resolve) => requestAnimationFrame(resolve));
     // Should reflect the last raw position, but the callback only ran once

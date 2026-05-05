@@ -24,6 +24,9 @@ export default defineConfig({
       ext: '.gz',
     }),
   ],
+  server: {
+    host: true,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
