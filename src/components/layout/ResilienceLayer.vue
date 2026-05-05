@@ -14,8 +14,9 @@
     <!-- CONTENT Custom Cursor: Small div moved via transform (compositor-optimized) -->
     <div 
       v-else 
+      ref="cursorEl"
       class="cursor-glow" 
-      :style="cursorStyle"
+      :style="baseCursorStyle"
     ></div>
   </div>
 </template>
@@ -31,12 +32,25 @@ const lighting = useLightingStore();
 const performance = usePerformanceStore();
 const themeStore = useThemeStore();
 
-const mouseX = ref(-100);
-const mouseY = ref(-100);
+const cursorEl = ref<HTMLElement | null>(null);
+
+// Plain JS variables to avoid Vue reactivity overhead on high-frequency events
+let rawMouseX = -100;
+let rawMouseY = -100;
+let rafId: number | null = null;
 
 const onPointerMove = (e: PointerEvent) => {
-  mouseX.value = e.clientX;
-  mouseY.value = e.clientY;
+  rawMouseX = e.clientX;
+  rawMouseY = e.clientY;
+
+  if (rafId === null) {
+    rafId = requestAnimationFrame(() => {
+      if (cursorEl.value) {
+        cursorEl.value.style.transform = `translate(${rawMouseX - 50}px, ${rawMouseY - 50}px)`;
+      }
+      rafId = null;
+    });
+  }
 };
 
 onMounted(() => {
@@ -65,12 +79,12 @@ const navStyle = computed(() => {
   };
 });
 
-const cursorStyle = computed(() => {
+const baseCursorStyle = computed(() => {
   const color = getAccentColor(0.8);
   const transparent = getAccentColor(0);
   return {
-    // Move the glow using transform to avoid full-screen repaints
-    transform: `translate(${mouseX.value - 50}px, ${mouseY.value - 50}px)`,
+    // Initial off-screen positioning until the first mouse move
+    transform: 'translate(-100px, -100px)',
     background: `radial-gradient(circle 40px at center, ${color} 0%, ${transparent} 100%)`,
   };
 });

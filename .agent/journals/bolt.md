@@ -10,3 +10,7 @@
 ## 2024-05-04 - Vue Reactivity in WebGL Render Loops
  **Learning:** Accessing reactive Vue proxy objects (like Pinia state or `ref`s) directly inside a high-frequency WebGL render loop (like TresJS `useLoop().onBeforeRender`) triggers Vue's dependency tracking getters on every single frame (60+ FPS). This causes massive CPU overhead and garbage collection pauses.
  **Action:** Isolate the render loop from Vue reactivity. Create a plain JavaScript object (e.g., `renderState`) outside the loop, update it asynchronously via a `watchEffect`, and read strictly from this plain object inside `onBeforeRender`.
+
+## 2024-05-05 - Vue Reactivity Thrashing in Fallback Layers
+**Learning:** Using reactive variables (`ref`) to track high-frequency events like `pointermove` for simple layout transitions (e.g. a custom cursor) forces unnecessary virtual DOM re-renders and degrades performance, which is especially problematic on lower-tier hardware lacking WebGL support.
+**Action:** Always bypass Vue reactivity for high-frequency coordinate tracking if it only drives DOM styles. Cache coordinates in plain JS variables and mutate DOM elements directly via a Vue template `ref` inside a `requestAnimationFrame` loop.
