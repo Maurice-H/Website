@@ -37,10 +37,7 @@ describe('ContactForm.vue', () => {
     const fetchMock = vi.fn().mockImplementation((url: string) => {
       try {
         const parsedUrl = new URL(url);
-        if (
-          parsedUrl.protocol === 'https:' &&
-          parsedUrl.hostname === 'cloudflare-dns.com'
-        ) {
+        if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'cloudflare-dns.com') {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
@@ -183,8 +180,7 @@ describe('ContactForm.vue', () => {
       document.body.appendChild(div);
       document.body.appendChild(input);
 
-        const parsedUrl = new URL(url);
-        if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'cloudflare-dns.com') {
+      await wrapper.find('input#contact-name').setValue('Test');
       await wrapper.find('input#contact-email').setValue('test@example.com');
       await wrapper
         .find('textarea#contact-message')
@@ -192,11 +188,16 @@ describe('ContactForm.vue', () => {
 
       // Mock Fetch
       const fetchMock = vi.fn().mockImplementation((url: string) => {
-        if (url.startsWith('https://cloudflare-dns.com')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
-          });
+        try {
+          const parsedUrl = new URL(url);
+          if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'cloudflare-dns.com') {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
+            });
+          }
+        } catch {
+          // Fall through
         }
         return Promise.resolve({
           ok: true,
@@ -294,14 +295,10 @@ describe('ContactForm.vue', () => {
       const fetchMock = vi.fn().mockImplementation((url: string) => {
         try {
           const parsedUrl = new URL(url);
-          if (
-            parsedUrl.protocol === 'https:' &&
-            parsedUrl.hostname === 'cloudflare-dns.com'
-          ) {
+          if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'cloudflare-dns.com') {
             return Promise.resolve({
               ok: true,
-              json: () =>
-                Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
+              json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
             });
           }
         } catch {
