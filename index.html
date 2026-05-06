@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://unpkg.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: https://unpkg.com; worker-src 'self' blob:; media-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://unpkg.com https://formspree.io https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: https://unpkg.com https://formspree.io https://challenges.cloudflare.com https://cloudflare-dns.com; worker-src 'self' blob:; media-src 'self'; frame-src https://challenges.cloudflare.com" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <link rel="icon" type="image/svg+xml" href="./favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Maurice H. — Junior Software Developer | Frontend-Fokus | Aspiring Full-Stack Software Engineer." />

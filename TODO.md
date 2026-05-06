@@ -7,14 +7,17 @@
 - [x] **Touch Cursor Tracking:** WebGL-Projektion für Touch-Events optimieren (Hover-Ersatz).
 - [x] **Mobile Immersion:** Sicherstellen, dass das "Fused"-Gefühl auch auf kleinen Screens erhalten bleibt.
 
-## 🕹️ Milestone 2: Navigation Intelligence
-*Fokus: Ein immersives Steuerungs-Gefühl und nahtlose Übergänge.*
+## 🕹️ Milestone 2: Navigation Intelligence & Contact
+*Fokus: Ein immersives Steuerungs-Gefühl, nahtlose Übergänge und echte Kommunikation.*
 
 - [x] **Navigation Snapping:** Karten im `NavConveyor` exakt im Zentrum des UFO-Beams einrasten lassen.
-- [ ] **Deep Linking:** Navigation von Tabs (z.B. "Experience") direkt zu den Bento-Sektionen scrollen lassen.
-- [ ] **Keyboard Navigation:** WASD und Pfeiltasten zur Steuerung, ESC zum Zurückkehren.
-- [ ] **View Transitions API:** Prüfung und ggf. Implementierung weicher Phasen-Übergänge.
-- [ ] **Nav Labels:** Content der Navigation-Tabs im `NavConveyor` verbessern.
+- [x] **Keyboard Navigation:** Pfeiltasten zur Steuerung, ESC zum Zurückkehren (WASD dropped).
+- [x] **Deep Linking:** Navigation von Tabs (z.B. "Experience") direkt zu den Bento-Sektionen scrollen lassen.
+- [x] **View Transitions API:** Prüfung und ggf. Implementierung weicher Phasen-Übergänge.
+- [x] **Nav Labels:** Content der Navigation-Tabs im `NavConveyor` verbessern.
+- [x] **Back-to-Top Button:** Floating-Button zum Zurückscrollen in der CONTENT-Phase.
+- [x] **Contact Social Channels:** Sub-Tabs im ContactForm für Discord, Xing und LinkedIn.
+- [x] **Contact Email Backend:** Echte E-Mail-Übermittlung mit Validierung und Anti-Spam.
 
 ## 🔊 Milestone 3: Audio-Visuelle Immersion
 *Fokus: Satisfaction und High-Fidelity Assets.*

@@ -68,6 +68,9 @@ jobs:
 
       - name: Build Application
         run: npm run build
+        env:
+          VITE_FORMSPREE_ID: ${{ secrets.VITE_FORMSPREE_ID }}
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
 
       - name: Generate Bundle Summary
         if: success()
