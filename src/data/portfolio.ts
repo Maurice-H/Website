@@ -1,10 +1,30 @@
 import type { NavTab, PortfolioProject, SkillSection } from '../types';
 
 export const NAV_TABS: NavTab[] = [
-  { id: 'about', label: 'About Me', theme: 'about' },
-  { id: 'projects', label: 'Projects', theme: 'projects' },
-  { id: 'skills', label: 'Experience', theme: 'career' },
-  { id: 'contact', label: 'Get in Touch', theme: 'contact' },
+  {
+    id: 'about',
+    label: 'About Me',
+    theme: 'about',
+    targetSection: 'hero-section',
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    theme: 'projects',
+    targetSection: 'projects-section',
+  },
+  {
+    id: 'skills',
+    label: 'Experience',
+    theme: 'career',
+    targetSection: 'about-discovery',
+  },
+  {
+    id: 'contact',
+    label: 'Get in Touch',
+    theme: 'contact',
+    targetSection: 'contact-form',
+  },
 ];
 
 export const PROJECTS: PortfolioProject[] = [
@@ -47,6 +67,36 @@ export const SKILL_SECTIONS: SkillSection[] = [
       'Three.js',
       'Vite',
       'GraphQL',
+      'PostgreSQL',
     ],
+  },
+];
+
+export interface SocialLink {
+  id: string;
+  label: string;
+  icon: string;
+  url?: string;
+  copyValue?: string;
+}
+
+export const SOCIAL_LINKS: SocialLink[] = [
+  {
+    id: 'discord',
+    label: 'Discord',
+    icon: 'discord',
+    copyValue: 'mauzi_i',
+  },
+  {
+    id: 'xing',
+    label: 'Xing',
+    icon: 'xing',
+    url: 'https://www.xing.com/profile/Maurice_Hanl',
+  },
+  {
+    id: 'linkedin',
+    label: 'LinkedIn',
+    icon: 'linkedin',
+    url: 'https://www.linkedin.com/in/maurice-hanl',
   },
 ];

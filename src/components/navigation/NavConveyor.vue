@@ -23,62 +23,81 @@
         @keydown.enter="selectTab(tab.id, $event)"
         @keydown.space.prevent="selectTab(tab.id, $event)"
       >
-        <!-- The mockup has a large title inside the card for EXPERIENCE -->
+        <!-- EXPERIENCE Card -->
         <div
           v-if="tab.theme === 'career'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
           <h2 class="window-title">EXPERIENCE</h2>
-          <div class="flex flex-col items-start">
+          <div class="flex flex-col items-start gap-1">
             <div class="code-line">
-              <span class="opacity-30">></span> system.boot_sequence(91)...
+              <span class="opacity-30">$</span> career --summary
             </div>
-            <div class="code-line">LOADING DATA...</div>
-            <div class="code-line">
-              2024: FRONTEND DEV - SYSTEM ARCHITECT...
+            <div class="code-line text-finished-accent/60">
+              Frontend Developer &amp; System Architect
             </div>
-            <div class="cursor mt-2"></div>
+            <div class="code-line opacity-50">
+              Vue 3 · TypeScript · WebGL
+            </div>
+            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+              Click to explore →
+            </div>
           </div>
         </div>
 
+        <!-- ABOUT Card -->
         <div
           v-else-if="tab.theme === 'about'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
           <h2 class="window-title">ABOUT ME</h2>
-          <div class="flex flex-col items-start">
+          <div class="flex flex-col items-start gap-1">
             <div class="code-line">
-              <span class="opacity-30">></span> fetch_profile(maurice)...
+              <span class="opacity-30">$</span> whoami
             </div>
-            <div class="code-line">STATUS: ONLINE</div>
-            <div class="code-line">LOCATION: GERMANY</div>
-            <div class="cursor mt-2"></div>
+            <div class="code-line text-finished-accent/60">
+              Maurice — Junior Developer
+            </div>
+            <div class="code-line opacity-50">
+              Germany · Performance Obsessed
+            </div>
+            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+              Click to explore →
+            </div>
           </div>
         </div>
 
+        <!-- PROJECTS Card -->
         <div
           v-else-if="tab.theme === 'projects'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
           <h2 class="window-title">PROJECTS</h2>
-          <div class="flex flex-col items-start">
+          <div class="flex flex-col items-start gap-1">
             <div class="code-line">
-              <span class="opacity-30">></span> ls -la /works
+              <span class="opacity-30">$</span> ls ~/works --count
             </div>
-            <div class="code-line">FOUND: 42 REPOSITORIES</div>
-            <div class="code-line">STACK: VUE3 / TS / NODE</div>
-            <div class="cursor mt-2"></div>
+            <div class="code-line text-finished-accent/60">
+              {{ projectCount }} repositories indexed
+            </div>
+            <div class="code-line opacity-50">
+              Vue 3 · Node.js · Three.js
+            </div>
+            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+              Click to explore →
+            </div>
           </div>
         </div>
 
+        <!-- CONTACT Card -->
         <div
           v-else-if="tab.theme === 'contact'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
           <h2 class="window-title">GET IN TOUCH</h2>
-          <div class="flex justify-center items-center flex-1">
+          <div class="flex flex-col items-center gap-3">
             <svg
-              class="icon-envelope text-finished-text/20"
+              class="icon-envelope text-finished-accent/30"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -90,6 +109,9 @@
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
+            <div class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+              Email · Discord · LinkedIn
+            </div>
           </div>
         </div>
       </NavWindow>
@@ -102,7 +124,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { NAV_TABS as tabs } from '../../data/portfolio';
+import { PROJECTS, NAV_TABS as tabs } from '../../data/portfolio';
 import { useLightingStore } from '../../stores/lighting';
 import { LightingPhase } from '../../types/index';
 import NavWindow from './NavWindow.vue';
@@ -111,6 +133,7 @@ const lightingStore = useLightingStore();
 const trackEl = ref<HTMLElement | null>(null);
 
 const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
+const projectCount = PROJECTS.length;
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
@@ -187,6 +210,8 @@ const selectTab = (id: string, e: PointerEvent | KeyboardEvent) => {
   }
 
   activeId.value = id;
+  const tab = tabs.find((t) => t.id === id);
+  lightingStore.pendingScrollTarget = tab?.targetSection ?? null;
   lightingStore.setPhase(LightingPhase.CONTENT);
 
   // Smooth scroll to the selected tab if it's not centered

@@ -37,27 +37,40 @@ describe('BentoCard.vue', () => {
   });
 
   it('calculates grid span classes based on props', () => {
-    const wrapper = mount(BentoCard, {
-      props: {
-        colSpan: 2,
-        rowSpan: 3,
-      },
-    });
-
+    let wrapper = mount(BentoCard, { props: { colSpan: 2, rowSpan: 2 } });
     expect(wrapper.classes()).toContain('md:col-span-2');
+    expect(wrapper.classes()).toContain('row-span-2');
+
+    wrapper = mount(BentoCard, { props: { colSpan: 3, rowSpan: 3 } });
+    expect(wrapper.classes()).toContain('lg:col-span-3');
     expect(wrapper.classes()).toContain('row-span-3');
+
+    wrapper = mount(BentoCard, { props: { colSpan: 4, rowSpan: 4 } });
+    expect(wrapper.classes()).toContain('lg:col-span-4');
+    expect(wrapper.classes()).toContain('row-span-4');
+
+    wrapper = mount(BentoCard, { props: { colSpan: 1, rowSpan: 1 } });
+    expect(wrapper.classes()).toContain('col-span-1');
+    expect(wrapper.classes()).toContain('row-span-1');
   });
 
-  it('registers itself with the viewport store', () => {
+  it('registers itself with the viewport store and unregisters on unmount', () => {
     const viewportStore = useViewportStore();
-    const registerSpy = vi.spyOn(viewportStore, 'register');
+    const unregisterMock = vi.fn();
+    const registerSpy = vi.spyOn(viewportStore, 'register').mockReturnValue({
+      unregister: unregisterMock,
+      update: vi.fn(),
+    });
 
-    mount(BentoCard, {
+    const wrapper = mount(BentoCard, {
       props: {
         id: 'test-card',
       },
     });
 
     expect(registerSpy).toHaveBeenCalledWith('test-card', expect.any(HTMLElement));
+
+    wrapper.unmount();
+    expect(unregisterMock).toHaveBeenCalled();
   });
 });

@@ -13,7 +13,7 @@
       class="content-stage"
       :style="rootCssVars"
     >
-      <Transition name="fade-overlay" mode="out-in">
+      <Transition name="fade-overlay" mode="out-in" @after-enter="handleAfterEnter">
         <!-- Navigation Phase -->
         <div
           v-if="lighting.phase === 'NAV'"
@@ -59,7 +59,7 @@
             <button
               type="button"
               @click="handleBackToNav"
-              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-95"
+              class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98]"
             >
               [ ESC ] Back
             </button>
@@ -77,6 +77,8 @@
               <ContactForm />
             </BentoLayout>
           </div>
+
+          <BackToTop />
         </div>
       </Transition>
     </div>
@@ -104,6 +106,7 @@ const WebGLBackground = defineAsyncComponent(
 );
 
 import ResilienceLayer from './components/layout/ResilienceLayer.vue';
+import BackToTop from './components/navigation/BackToTop.vue';
 import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
 import ThemeToggle from './components/navigation/ThemeToggle.vue';
@@ -126,7 +129,7 @@ const isCustomCursorActive = computed(() => {
 /**
  * CSS custom properties set on root element for child access.
  * --reveal-mask is consumed by FusedReveal and App.vue slotted content.
- * Only changes on phase transition (NAV \u2194 CONTENT), not on every mouse move.
+ * Only changes on phase transition (NAV ↔ CONTENT), not on every mouse move.
  */
 const rootCssVars = computed<CSSProperties>(() => {
   if (!themeStore.lightingEnabled) return {};
@@ -152,6 +155,20 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && lighting.phase === 'CONTENT') {
     handleBackToNav();
   }
+};
+
+const handleAfterEnter = () => {
+  const target = lighting.pendingScrollTarget;
+  if (!target) return;
+  lighting.pendingScrollTarget = null;
+
+  // Wait for the transition to settle and the DOM to be fully updated
+  setTimeout(() => {
+    const el = document.getElementById(target);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 100);
 };
 
 onMounted(async () => {
@@ -188,14 +205,14 @@ onUnmounted(() => {
   overflow-x: hidden;
   scrollbar-gutter: stable;
   z-index: 1;
+
+  /* Hide scrollbar completely */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.content-stage::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .fade-overlay-enter-active,

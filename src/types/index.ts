@@ -50,6 +50,7 @@ export interface NavTab {
   label: string;
   theme: NavWindowTheme;
   description?: string;
+  targetSection?: string;
 }
 
 export interface HeroData {

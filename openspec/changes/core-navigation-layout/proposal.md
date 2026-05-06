@@ -1,30 +1,42 @@
 ## Why
 
-The current landing page navigation and layout interactions need refinement to meet modern, premium web standards. Navigating through tabs and the bento grid should be seamless, tactile, and visually polished. Additionally, there are visual artifacts (like white outlines) and UX friction (like lack of keyboard navigation, global scrollbars, missing back-to-top button) that detract from the overall quality of the experience. We want to implement keyboard navigation (WASD/ESC) to cater to power users and ensure snapping feels natural.
+The landing page navigation and layout interactions have been partially refined but still lack key features for a premium, immersive experience. Several foundational tasks (scrollbar hiding, phase transitions, scroll snapping, visual fixes) are already complete. The remaining work focuses on deeper navigation intelligence (deep linking from tabs to content sections, improved tab labels), modern browser APIs (View Transitions), utility features (back-to-top), and transforming the Contact Form from a static email-only mock into a real multi-channel communication hub.
 
 ## What Changes
 
-- **Navigation Snapping & Tabs:** Refine the landing page tab content and ensure smooth, intuitive navigation snapping.
-- **Keyboard Navigation:** Implement WASD navigation for moving through the interface and ESC to close overlays/modals.
-- **Visual Polish:** Correct Bento card outlines, remove unwanted white outlines on project cards, and hide global scrollbars to create an app-like feel.
-- **Interaction Buttons:** Fix layout interaction buttons that may be misaligned or unresponsive.
-- **Transitions:** Add smooth page transitions for all navigation events.
-- **Utility:** Add a "back-to-top" button for easier vertical navigation.
+### Already Completed ✅
+- **Scrollbar Hiding:** Global scrollbars hidden via CSS on `App.vue` and `NavConveyor.vue`.
+- **Phase Transitions:** `<Transition name="fade-overlay">` wraps NAV/CONTENT phases with fade animation.
+- **Scroll Snapping:** NavConveyor uses `scroll-snap-type: x proximity` with `scroll-snap-align: center` on cards.
+- **Keyboard Navigation:** ArrowLeft/Right for tab navigation, ESC to return to NAV phase.
+- **Visual Fixes:** BentoCard outlines and hover states use CSS variables, no hardcoded white outlines.
+
+### Remaining Work 🔧
+- **Deep Linking:** Clicking a NavConveyor tab scrolls to the corresponding Bento section after transitioning to CONTENT phase.
+- **Nav Labels:** Improve the content and copy inside NavConveyor tab cards for richer previews.
+- **View Transitions API:** Progressive enhancement using the browser's View Transitions API for smoother phase switches.
+- **Back-to-Top Button:** Floating utility button visible during CONTENT phase.
+- **Contact Form — Social Channels:** Sub-tabs/buttons for Discord, Xing, and LinkedIn alongside the email form.
+- **Contact Form — Real Email:** Replace the fake `setTimeout` with a real backend submission, including email validation and anti-spam measures.
 
 ## Capabilities
 
 ### New Capabilities
-- `keyboard-navigation`: WASD for directional movement, ESC for dismissals.
-- `smooth-transitions`: Global smooth page transitions.
-- `back-to-top`: A back-to-top button component and scroll logic.
+- `deep-linking`: Navigation tabs link directly to Bento content sections.
+- `back-to-top`: Floating scroll-to-top button component.
+- `contact-social-channels`: Multi-channel contact via Discord, Xing, LinkedIn.
+- `contact-email-backend`: Real email submission with validation and anti-spam.
 
 ### Modified Capabilities
-- `landing-page-tabs`: Improving tab content and snapping behavior.
-- `bento-grid`: Fixing interaction buttons, correcting outlines, and removing white outlines on projects.
-- `global-layout`: Removing global scrollbars.
+- `landing-page-tabs`: Improved tab content/labels and View Transitions API integration.
+- `keyboard-navigation`: Simplified to ArrowKeys + ESC (WASD dropped).
+
+### Dropped
+- `wasd-navigation`: Dropped — WASD is excessive for a portfolio site. ArrowKeys + ESC are sufficient.
 
 ## Impact
 
-- **UI/UX:** Enhanced user experience through keyboard shortcuts and smoother transitions.
-- **CSS:** Global CSS changes to remove scrollbars and fix outlines.
-- **Vue Components:** Updates to Bento Grid components, Tab components, and layout wrappers.
+- **UI/UX:** Multi-channel contact options, deep linking for seamless navigation, smoother transitions.
+- **Backend:** Requires a form submission service (Formspree, Netlify Forms, or serverless function).
+- **CSS:** View Transitions API as progressive enhancement.
+- **Vue Components:** New `BackToTop.vue`, updated `ContactForm.vue` with tab switcher, updated `NavConveyor.vue` for deep linking.
