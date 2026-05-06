@@ -31,7 +31,10 @@
           ]"
           @click="activeChannel = channel.id"
         >
-          <span class="w-4 h-4 flex items-center justify-center" v-html="channel.icon"></span>
+          <span
+            class="w-4 h-4 flex items-center justify-center"
+            v-html="channel.icon"
+          ></span>
           {{ channel.label }}
         </button>
       </div>
@@ -306,6 +309,61 @@ const validateEmail = (email: string): boolean => {
   return true;
 };
 
+interface DNSAnswer {
+  type: number;
+  data: string;
+}
+
+interface DNSResponse {
+  Status: number;
+  Answer?: DNSAnswer[];
+}
+
+const checkEmailExistence = async (email: string): Promise<boolean> => {
+  const domain = email.split('@')[1];
+  if (!domain) return false;
+
+  try {
+    // We use Cloudflare DNS-over-HTTPS to check for MX records.
+    const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=MX`, {
+      headers: {
+        Accept: 'application/dns-json',
+      },
+    });
+
+    if (!response.ok) return true;
+
+    const data = (await response.json()) as DNSResponse;
+
+    // Status 3 means NXDOMAIN (domain does not exist)
+    if (data.Status === 3) {
+      return false;
+    }
+
+    // Check if we have Answer records (MX)
+    if (data.Answer && data.Answer.length > 0) {
+      // RFC 7505: Check for "Null MX" (0 .) which means "no mail accepted here"
+      const hasValidMX = data.Answer.some((record) => {
+        const mxData = record.data.toLowerCase();
+        return mxData !== '0 .' && mxData !== '0';
+      });
+
+      if (hasValidMX) return true;
+      // If we only have Null MX records, it's a dead end.
+      return false;
+    }
+
+    // If no MX records are found, we reject it.
+    // While "Implicit MX" (A records) exists in standards, in modern practice,
+    // any legitimate mail domain (Gmail, Yahoo, etc.) will have MX records.
+    // This catches typo domains like "ahoo.de" which only have A records for parking pages.
+    return false;
+  } catch (err) {
+    console.error('DNS verification failed:', err);
+    return true; // Don't block user if verification service is down
+  }
+};
+
 const validateMessage = (msg: string): boolean => {
   const trimmed = msg.trim();
 
@@ -393,6 +451,15 @@ const handleSubmit = async () => {
 
   formState.value = 'submitting';
   errorMessage.value = '';
+
+  // Advanced verification: Check if domain actually exists/receives mail
+  const isDomainValid = await checkEmailExistence(formData.email);
+  if (!isDomainValid) {
+    errorMessage.value =
+      'The email address is not publicly available. Please use a non-internal email that is publicly available or contact via the other platforms.';
+    formState.value = 'error';
+    return;
+  }
 
   try {
     const turnstileResponse = (

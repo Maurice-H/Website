@@ -3,9 +3,13 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ContactForm from '../ContactForm.vue';
 
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 describe('ContactForm.vue', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.stubEnv('VITE_FORMSPREE_ID', 'test-form-id');
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '1x00000000000000000000AA');
   });
 
   it('should render form elements with proper a11y labels', () => {
@@ -30,7 +34,15 @@ describe('ContactForm.vue', () => {
     const fetchPromise = new Promise<Response>((resolve) => {
       resolveFetch = resolve;
     });
-    const fetchMock = vi.fn().mockReturnValue(fetchPromise);
+    const fetchMock = vi.fn().mockImplementation((url) => {
+      if (url.includes('cloudflare-dns.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+        });
+      }
+      return fetchPromise;
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const wrapper = mount(ContactForm);
@@ -170,10 +182,18 @@ describe('ContactForm.vue', () => {
         .setValue('This is a completely valid message to test the cooldown.');
 
       // Mock Fetch
-      const fetchMock = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ ok: true }),
-      } as unknown as Response);
+      const fetchMock = vi.fn().mockImplementation((url) => {
+        if (url.includes('cloudflare-dns.com')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ ok: true }),
+        });
+      });
       vi.stubGlobal('fetch', fetchMock);
 
       await wrapper.find('form').trigger('submit.prevent');
@@ -262,18 +282,98 @@ describe('ContactForm.vue', () => {
         .find('textarea#contact-message')
         .setValue('This is a completely valid message.');
 
-      const fetchMock = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 400,
-        json: () => Promise.resolve({ error: 'Custom API Error' }),
-      } as unknown as Response);
+      const fetchMock = vi.fn().mockImplementation((url) => {
+        if (url.includes('cloudflare-dns.com')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ error: 'Custom API Error' }),
+        });
+      });
       vi.stubGlobal('fetch', fetchMock);
 
       await wrapper.find('form').trigger('submit.prevent');
-      await wrapper.vm.$nextTick();
+      await flushPromises();
 
       expect(wrapper.text()).toContain('Custom API Error');
       document.body.innerHTML = '';
+    });
+
+    it('should reject email if domain has no MX or A records', async () => {
+      const wrapper = mount(ContactForm);
+
+      await wrapper.find('input#contact-name').setValue('Test');
+      await wrapper.find('input#contact-email').setValue('test@nonexistent-domain.com');
+      await wrapper
+        .find('textarea#contact-message')
+        .setValue('This is a completely valid message.');
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ Status: 0, Answer: [] }), // Domain exists but no records
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await wrapper.find('form').trigger('submit.prevent');
+      await flushPromises();
+
+      expect(wrapper.text()).toContain('The email address is not publicly available');
+      vi.unstubAllGlobals();
+    });
+
+    it('should reject email immediately if domain does not exist (NXDOMAIN)', async () => {
+      const wrapper = mount(ContactForm);
+
+      await wrapper.find('input#contact-name').setValue('Test');
+      await wrapper.find('input#contact-email').setValue('test@yahooid.de');
+      await wrapper
+        .find('textarea#contact-message')
+        .setValue('This is a completely valid message.');
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ Status: 3 }), // NXDOMAIN
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await wrapper.find('form').trigger('submit.prevent');
+      await flushPromises();
+
+      expect(wrapper.text()).toContain('The email address is not publicly available');
+      // Verify that it didn't even try the A record fallback
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      vi.unstubAllGlobals();
+    });
+
+    it('should reject email if domain has a Null MX record (RFC 7505)', async () => {
+      const wrapper = mount(ContactForm);
+
+      await wrapper.find('input#contact-name').setValue('Test');
+      await wrapper.find('input#contact-email').setValue('test@yahood.de');
+      await wrapper
+        .find('textarea#contact-message')
+        .setValue('This is a completely valid message.');
+
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            Status: 0,
+            Answer: [{ type: 15, data: '0 .' }], // Null MX
+          }),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await wrapper.find('form').trigger('submit.prevent');
+      await flushPromises();
+
+      expect(wrapper.text()).toContain('The email address is not publicly available');
+      vi.unstubAllGlobals();
     });
   });
 });
