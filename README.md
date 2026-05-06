@@ -4,6 +4,8 @@
 
 [![QA & Deployment](https://github.com/Maurice-H/Website/actions/workflows/ci.yml/badge.svg)](https://github.com/Maurice-H/Website/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Maurice-H/Website/blob/main/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/Maurice-H/Website?style=flat&logo=github&color=red)](https://github.com/Maurice-H/Website/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Maurice-H/Website?style=flat&logo=github&color=blue)](https://github.com/Maurice-H/Website/pulls)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vue.js&logoColor=4FC08D)](https://vuejs.org/)
@@ -32,7 +34,7 @@ The primary goal of this experiment was to test how far a completely hands-off, 
 - **Styling:** Tailwind CSS v4 (layout only) + Strict Native CSS Variables (theming)
 - **WebGL/3D:** TresJS, Three.js, custom GLSL Shaders
 - **Testing & QA:** Vitest (unit), Playwright (E2E), Lighthouse CI
-- **AI Tooling:** Antigravity IDE (Gemini/Claude), Google Jules (async background agent)
+- **AI Tooling:** Antigravity IDE (Gemini/Claude), Google Stitch (UI/UX), Google Jules (async background agent)
 
 ---
 
@@ -48,7 +50,16 @@ The development was severely hampered by context limitations. As the project gre
 - **Inconsistent Skill Adherence:** Despite a modular knowledge base and strict rules, agent adherence remained poor without constant micro-prompting. For example, despite strict instructions to use CSS variables for colors, the AI filled files with hallucinated, hardcoded Tailwind utilities.
 - **The Debugging Reality:** A major realization is that isolating complex architectural or visual bugs is still actual work. When the AI fails at a layout or WebGL positioning issue, the human architect must find the exact file and line causing the issue. Once the error is isolated that specifically, spending tokens on an AI "Explore/Apply" cycle becomes redundant, as a human could fix it faster manually.
 
-### 2. The Greenfield Trap & The Translation Gap
+### 2. AI Design & The "Generic SaaS" Trap
+
+The design phase was also heavily AI-driven, utilizing Google Stitch for mockup generation. However, relying purely on AI for highly niche, creative concepts revealed a major flaw:
+
+- **The Generic Bias:** Standard AI UI generation leans heavily towards generic "SaaS-style" layouts. It lacks the specific training data to natively produce highly creative, niche visual ideas (like a dark, volumetric WebGL OS aesthetic).
+- **The Workaround:** To overcome this, I had to develop a hybrid workflow utilizing deep-reasoning models for structural layout, and visual models strictly for polishing (detailed in the recommendations below).
+
+**The Lesson:** AI is an incredible rendering engine but a poor visionary. For highly custom, niche aesthetics, you cannot rely on one-shot AI generation. You must provide the structural foundation manually (or via deep-reasoning models) and use visual AI strictly for rendering and polishing.
+
+### 3. The Greenfield Trap & The Translation Gap
 
 Starting this as a "blank slate" project without a locked-in technical architecture was a painful lesson.
 
@@ -58,7 +69,7 @@ Starting this as a "blank slate" project without a locked-in technical architect
 
 **The Lesson:** You cannot rely on AI to make senior-level architectural decisions regarding performance bottlenecks or edge cases. You must define the tech stack and rendering strategies _before_ the AI writes a single line of code.
 
-### 3. Guardrails, Evasion & The "Jules" Effect
+### 4. Guardrails, Evasion & The "Jules" Effect
 
 To prevent the AI from generating "slop" or suffering from context degradation, I implemented a strict set of guardrails. However, even with strict automated workflows explicitly commanding the AI to run tests, the models actively tried to bypass these checks as context degraded.
 
@@ -68,7 +79,7 @@ To prevent the AI from generating "slop" or suffering from context degradation, 
 - **Anti-Avoidance Scripts:** A custom script (`npm run check:avoidance`) acts as a hard quality gate, actively blocking commits that contain unauthorized `@ts-ignore` or `biome-ignore` bypasses.
 - **The "Jules" Effect:** Introducing a secondary, asynchronous agent (Google Jules) for **proactive cleanup cycles** proved essential. Jules retroactively implemented missing tests and fixed logical errors, saving the architecture from context-induced decay.
 
-### 4. The Safety Net (CI/CD & Visual QA)
+### 5. The Safety Net (CI/CD & Visual QA)
 
 Even with great prompting, the ultimate gatekeeper must be an unforgiving CI/CD pipeline. The automated workflow matrix enforces:
 
@@ -98,6 +109,16 @@ When you delegate writing an algorithm, designing an architecture, or writing te
 - **An Optimizer:** Asking for hints when stuck (_"How can I cleanly optimize this algorithm's time complexity?"_).
 - **An Automated Reviewer:** Utilizing AI within the CI/CD pipeline to scan the codebase and suggest minor syntax or integration fixes.
 
+### For UI/UX Designers: Escaping the "SaaS Trap"
+
+When using visual AI tools for UI generation, be aware of the "Generic Bias." AI defaults to standard, safe layouts. If you want a highly creative aesthetic (like a WebGL OS theme), you need a hybrid workflow.
+
+**Recommendation:** Do not use one-shot generation for complex designs. Instead, use a 3-step pipeline:
+
+1. **Ideate:** Use AI to brainstorm raw concepts and copy.
+2. **Structure:** Build the wireframe manually or use reasoning-heavy models (like _Thinking with 3.1 Pro_) to force unique layouts.
+3. **Render & Polish:** Feed your structural base back into visual AI models (like the _Redesign_ tool / Nano Banana Pro) for the final high-fidelity aesthetic pass.
+
 ### For Companies & Teams: Managing the Knowledge Gap
 
 For companies with the budget for high-end models, agentic architecture is powerful, but comes with a critical risk: **The "Black Box" Codebase.**
@@ -112,25 +133,43 @@ You wouldn't hand a junior a mission-critical architectural ticket and walk away
 ## 🚀 Running the Project Locally
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm ci
 
-# Run development server
+# 2. Local Development
 npm run dev
 
-# Run full Quality Gate suite (mirrors CI pipeline)
-npx vue-tsc --noEmit         # Type checking
-npm run lint                 # Biome linting
-npm run test:unit            # Vitest unit tests
-npm run test:e2e             # Playwright E2E tests
-npm run check:avoidance      # Anti-evasion pattern detection
+# 3. Static Analysis & Security Gates
+npx vue-tsc --noEmit                     # Strict Type checking
+npm run lint                             # Biome formatting & linting
+npm run check:avoidance                  # Block AI-evasion patterns (e.g., // @ts-ignore)
 
-# Production build
-npm run build
+# 4. Testing & Coverage Gates
+npm run test:unit -- --coverage          # Unit tests (enforces 80-85% thresholds)
+npm run test:e2e                         # Playwright End-to-End browser testing
+
+# 5. Production Build & PR Preview Equivalent
+npm run build                            # Compile Vue/TresJS to optimized static assets
+npm run preview                          # Serve /dist locally (Simulates PR Preview environment)
+
+# 6. Lighthouse Performance Matrix
+# ⚠️ Note: You must run `npm run build` first, as Lighthouse tests the /dist folder.
+
+# For Mac/Linux / Git Bash:
+VITE_CI_MODE="true" npx @lhci/cli autorun --collect.settings.emulatedFormFactor=mobile
+VITE_CI_MODE="true" npx @lhci/cli autorun --collect.settings.preset=desktop
+
+# For Windows (PowerShell):
+$env:VITE_CI_MODE="true"; npx @lhci/cli autorun --collect.settings.emulatedFormFactor=mobile
+$env:VITE_CI_MODE="true"; npx @lhci/cli autorun --collect.settings.preset=desktop
 ```
 
 ## 🔮 What's Next?
 
-I am currently working on completing the remaining items in the TODO.md (such as deep linking, view transitions, and final visual polish) and reclaiming the keyboard for the final touches. After that, I'll be moving on to have some fun with new projects!
+I am currently working on completing the remaining items in the [TODO.md](https://github.com/Maurice-H/Website/blob/main/TODO.md) (if not already finished) and reclaiming the keyboard for the final touches. After that, I'll be moving on to have some fun with new projects!
 
-If you have ideas, feedback, or improvements for the website, you can reach out to me directly via the Contact Form on the site or feel free to create an issue in this repository.
+If you have ideas, feedback, or found a bug, I'd love to hear from you!
+
+- **Found a Bug?** Please [open a GitHub Issue](https://github.com/Maurice-H/Website/issues/new).
+- **Have an Idea?** Check out existing [Issues](https://github.com/Maurice-H/Website/issues) or start a new one.
+- **Direct Contact:** Reach out via the [Contact Form](https://maurice-h.github.io/Website/#contact) on the live site.
