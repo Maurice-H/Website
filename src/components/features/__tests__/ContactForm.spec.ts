@@ -183,7 +183,8 @@ describe('ContactForm.vue', () => {
       document.body.appendChild(div);
       document.body.appendChild(input);
 
-      await wrapper.find('input#contact-name').setValue('Test');
+        const parsedUrl = new URL(url);
+        if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'cloudflare-dns.com') {
       await wrapper.find('input#contact-email').setValue('test@example.com');
       await wrapper
         .find('textarea#contact-message')
