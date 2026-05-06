@@ -31,10 +31,10 @@ test.describe('Contact Form & Turnstile Integration', () => {
   test('should include turnstile token in form submission', async ({ page }) => {
     // Fill the form fields
     await page.fill('#contact-name', 'Test User');
-    await page.fill('#contact-email', 'test@example.com');
+    await page.fill('#contact-email', 'test@gmail.com');
     await page.fill('#contact-message', 'This is a test message for Playwright.');
 
-    // Mock Turnstile response for Playwright headless mode (since real Turnstile blocks it)
+    // Mock Turnstile response for Playwright headless mode
     await page.evaluate(() => {
       let input = document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement;
       if (!input) {
@@ -49,6 +49,21 @@ test.describe('Contact Form & Turnstile Integration', () => {
     const turnstileToken = page.locator('[name="cf-turnstile-response"]');
     await expect(turnstileToken).not.toHaveValue('');
 
+    // Mock Cloudflare DNS verification
+    await page.route(
+      'https://cloudflare-dns.com/dns-query?name=gmail.com&type=MX',
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/dns-json',
+          body: JSON.stringify({
+            Status: 0,
+            Answer: [{ type: 15, data: '10 mail.google.com' }],
+          }),
+        });
+      }
+    );
+
     // Intercept the fetch request to verify the payload
     await page.route('https://formspree.io/f/*', async (route) => {
       const request = route.request();
@@ -56,7 +71,7 @@ test.describe('Contact Form & Turnstile Integration', () => {
 
       expect(postData).toMatchObject({
         name: 'Test User',
-        email: 'test@example.com',
+        email: 'test@gmail.com',
         message: 'This is a test message for Playwright.',
       });
 

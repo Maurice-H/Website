@@ -34,11 +34,11 @@ describe('ContactForm.vue', () => {
     const fetchPromise = new Promise<Response>((resolve) => {
       resolveFetch = resolve;
     });
-    const fetchMock = vi.fn().mockImplementation((url) => {
-      if (url.includes('cloudflare-dns.com')) {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.startsWith('https://cloudflare-dns.com')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+          json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
         });
       }
       return fetchPromise;
@@ -182,11 +182,11 @@ describe('ContactForm.vue', () => {
         .setValue('This is a completely valid message to test the cooldown.');
 
       // Mock Fetch
-      const fetchMock = vi.fn().mockImplementation((url) => {
-        if (url.includes('cloudflare-dns.com')) {
+      const fetchMock = vi.fn().mockImplementation((url: string) => {
+        if (url.startsWith('https://cloudflare-dns.com')) {
           return Promise.resolve({
             ok: true,
-            json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+            json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
           });
         }
         return Promise.resolve({
@@ -282,11 +282,11 @@ describe('ContactForm.vue', () => {
         .find('textarea#contact-message')
         .setValue('This is a completely valid message.');
 
-      const fetchMock = vi.fn().mockImplementation((url) => {
-        if (url.includes('cloudflare-dns.com')) {
+      const fetchMock = vi.fn().mockImplementation((url: string) => {
+        if (url.startsWith('https://cloudflare-dns.com')) {
           return Promise.resolve({
             ok: true,
-            json: () => Promise.resolve({ Answer: [{ data: '10 mail.example.com' }] }),
+            json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
           });
         }
         return Promise.resolve({
