@@ -35,11 +35,19 @@ describe('ContactForm.vue', () => {
       resolveFetch = resolve;
     });
     const fetchMock = vi.fn().mockImplementation((url: string) => {
-      if (url.startsWith('https://cloudflare-dns.com')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
-        });
+      try {
+        const parsedUrl = new URL(url);
+        if (
+          parsedUrl.protocol === 'https:' &&
+          parsedUrl.hostname === 'cloudflare-dns.com'
+        ) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
+          });
+        }
+      } catch {
+        // Non-URL input should not match the DNS mock branch
       }
       return fetchPromise;
     });
