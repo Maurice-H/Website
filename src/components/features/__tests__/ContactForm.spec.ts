@@ -292,11 +292,20 @@ describe('ContactForm.vue', () => {
         .setValue('This is a completely valid message.');
 
       const fetchMock = vi.fn().mockImplementation((url: string) => {
-        if (url.startsWith('https://cloudflare-dns.com')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
-          });
+        try {
+          const parsedUrl = new URL(url);
+          if (
+            parsedUrl.protocol === 'https:' &&
+            parsedUrl.hostname === 'cloudflare-dns.com'
+          ) {
+            return Promise.resolve({
+              ok: true,
+              json: () =>
+                Promise.resolve({ Status: 0, Answer: [{ data: '10 mail.example.com' }] }),
+            });
+          }
+        } catch {
+          // Non-URL input should fall through to error response.
         }
         return Promise.resolve({
           ok: false,
