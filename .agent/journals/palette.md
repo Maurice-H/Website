@@ -9,3 +9,7 @@
 ## 2024-05-04 - Keyboard Shortcuts & Tactile Feedback
  Learning: Floating UI controls that advertise keyboard shortcuts (e.g. `[ ESC ] Back`) must actually implement those shortcuts globally to meet user expectations. Additionally, floating buttons often miss visual focus indicators and tactile active states.
  Action: Ensure that explicit keyboard listeners are implemented for advertised shortcuts, and always apply `focus-visible:ring-*` and `active:scale-*` to floating controls for proper accessibility and tactile feedback.
+
+## 2024-05-06 - Interactive Components Missing Accessibility Controls
+ Learning: Vue components mimicking interactive elements must pair `cursor-pointer` with full keyboard accessibility (`tabindex`, `role`, event listeners, and `focus-visible` outlines).
+ Action: When adding `cursor-pointer` to an element, ensure it also implements `tabindex="0"`, `role="button"|"link"`, `focus-visible` styles, and explicit `@keydown.enter` / `@keydown.space` handlers.
