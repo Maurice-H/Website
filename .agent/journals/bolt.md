@@ -14,3 +14,6 @@
 ## 2024-05-05 - Vue Reactivity Thrashing in Fallback Layers
 **Learning:** Using reactive variables (`ref`) to track high-frequency events like `pointermove` for simple layout transitions (e.g. a custom cursor) forces unnecessary virtual DOM re-renders and degrades performance, which is especially problematic on lower-tier hardware lacking WebGL support.
 **Action:** Always bypass Vue reactivity for high-frequency coordinate tracking if it only drives DOM styles. Cache coordinates in plain JS variables and mutate DOM elements directly via a Vue template `ref` inside a `requestAnimationFrame` loop.
+## 2026-05-06 - requestAnimationFrame closure staleness
+ **Learning:** When using requestAnimationFrame to throttle high-frequency events (like pointermove), caching coordinates directly in the callback closure can lead to stale data. If multiple events fire before the frame renders, the RAF uses the coordinates from the *first* event, not the latest.
+ **Action:** Store the latest coordinates in plain variables defined outside the RAF closure. Update these variables immediately in the event handler, and have the RAF read from them. This ensures the frame always renders the most up-to-date position.
