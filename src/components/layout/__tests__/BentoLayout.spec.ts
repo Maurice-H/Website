@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import HeroSection from '../HeroSection.vue';
+import BentoLayout from '../BentoLayout.vue';
 
-describe('HeroSection.vue', () => {
+describe('BentoLayout.vue', () => {
   it('mounts successfully', () => {
-    const wrapper = shallowMount(HeroSection);
+    const wrapper = shallowMount(BentoLayout);
     expect(wrapper.exists()).toBe(true);
   });
 });
