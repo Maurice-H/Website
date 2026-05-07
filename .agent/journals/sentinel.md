@@ -12,3 +12,7 @@
 ## 2026-05-07 - Remove Hardcoded Turnstile Site Key
  **Learning:** Even dummy keys or test keys should not be hardcoded in the source code as fallbacks. This violates best practices for secret management and can lead to accidental exposure if keys are later swapped for production ones without moving them to environment variables.
  **Action:** Refactored `ContactForm.vue` to remove the hardcoded Turnstile site key fallback and centralized the configuration in `src/utils/env.ts`. Updated unit tests to mock the centralized environment configuration correctly.
+
+## 2026-05-07 - Refactor Static SVGs to Avoid v-html DOM XSS
+ **Learning:** Using v-html for static SVGs or strings opens up the potential for DOM Cross-Site Scripting (XSS) risks, even if the static strings seem safe. It violates strict security quality gates and builds bad habits.
+ **Action:** Refactored static SVG strings in ContactForm.vue into reusable Vue components wrapped with markRaw, eliminating the unsafe use of v-html.
