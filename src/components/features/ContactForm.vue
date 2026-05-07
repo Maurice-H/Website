@@ -166,7 +166,7 @@
             class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 transition-all duration-200 active:scale-95"
             @click="copyToClipboard(discordUser)"
           >
-            {{ copyState === "copied" ? "✓ Copied" : "Copy" }}
+            {{ copyState === 'copied' ? '✓ Copied' : copyState === 'error' ? 'Failed to copy' : 'Copy' }}
           </button>
         </div>
       </div>
@@ -234,7 +234,7 @@ const activeChannel = ref<ChannelId>('email');
 const formState = ref<FormState>('idle');
 const errorMessage = ref('');
 const emailError = ref('');
-const copyState = ref<'idle' | 'copied'>('idle');
+const copyState = ref<'idle' | 'copied' | 'error'>('idle');
 const honeypot = ref('');
 const lastSubmitTime = ref<number>(0);
 
@@ -517,14 +517,9 @@ const copyToClipboard = async (text: string) => {
     setTimeout(() => {
       copyState.value = 'idle';
     }, 2000);
-  } catch {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    copyState.value = 'copied';
+  } catch (error) {
+    console.error('Failed to copy text to clipboard:', error);
+    copyState.value = 'error';
     setTimeout(() => {
       copyState.value = 'idle';
     }, 2000);
