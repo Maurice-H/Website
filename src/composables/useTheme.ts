@@ -14,6 +14,7 @@ if (typeof window !== 'undefined') {
 export function useTheme() {
   const toggleTheme = () => {
     isBlueprint.value = !isBlueprint.value;
+    console.log('[Theme] Toggle Triggered. New state:', isBlueprint.value);
 
     // Imperatively update the DOM to guarantee it takes effect
     if (isBlueprint.value) {
