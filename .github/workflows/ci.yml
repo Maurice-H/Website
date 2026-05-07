@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -109,29 +109,25 @@ jobs:
           name: dist
           path: dist
 
-      - name: Get Playwright version
-        id: playwright-version
-        run: echo "version=$(npx playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
-
       - name: Cache Playwright Browsers
         id: playwright-cache
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browsers & Deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium webkit --with-deps
 
       - name: Install Playwright Dependencies (OS level)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps
+        run: npx playwright install-deps chromium webkit
 
-      - name: Run E2E Tests (Shard ${{ matrix.shard }}/3)
-        run: npx playwright test --shard=${{ matrix.shard }}/3
+      - name: Run E2E Tests (Shard ${{ matrix.shard }}/4)
+        run: npx playwright test --shard=${{ matrix.shard }}/4
 
       - name: Generate Playwright Summary
         if: always()
@@ -146,6 +142,20 @@ jobs:
           name: playwright-report-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 30
+
+  test-e2e-status:
+    name: "🎭 E2E Tests Summary"
+    needs: test-e2e
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check Shard Results
+        if: needs.test-e2e.result != 'success'
+        run: |
+          echo "❌ Einige Playwright Shards sind fehlgeschlagen."
+          exit 1
+      - name: Success
+        run: echo "✅ Alle Playwright Shards erfolgreich abgeschlossen."
 
   lighthouse-mobile:
     needs: build
@@ -243,7 +253,7 @@ jobs:
 
 
   deploy:
-    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
+    needs: [build, test-e2e-status, lighthouse-mobile, lighthouse-desktop]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -265,7 +275,7 @@ jobs:
           keep_files: true
 
   pr-preview:
-    needs: [build, test-e2e, lighthouse-mobile, lighthouse-desktop]
+    needs: [build, test-e2e-status, lighthouse-mobile, lighthouse-desktop]
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     concurrency:
