@@ -8,3 +8,7 @@
 ## 2026-05-04 - Strict Environment Variable Type Enforcement
  **Learning:** Using `import.meta.env` directly throughout the application bypasses strict typing and can lead to unexpected runtime issues if Vite's AST replacement does not resolve properly, or if undefined values are expected as booleans.
  **Action:** Implemented `src/utils/env.ts` to act as a centralized, strict validation and parsing layer for all environment configurations, ensuring missing or malformed variables are caught and logged during initialization.
+
+## 2026-05-07 - Remove Hardcoded Turnstile Site Key
+ **Learning:** Even dummy keys or test keys should not be hardcoded in the source code as fallbacks. This violates best practices for secret management and can lead to accidental exposure if keys are later swapped for production ones without moving them to environment variables.
+ **Action:** Refactored `ContactForm.vue` to remove the hardcoded Turnstile site key fallback and centralized the configuration in `src/utils/env.ts`. Updated unit tests to mock the centralized environment configuration correctly.
