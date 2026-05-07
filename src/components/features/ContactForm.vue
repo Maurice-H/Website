@@ -26,7 +26,7 @@
           role="tab"
           :aria-selected="activeChannel === channel.id"
           :class="[
-            'channel-tab flex items-center gap-2',
+            'channel-tab flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black',
             { 'channel-tab--active': activeChannel === channel.id },
           ]"
           @click="activeChannel = channel.id"
@@ -91,10 +91,12 @@
                 required
                 v-model="formData.email"
                 placeholder="Enter comm-link"
+                :aria-invalid="!!emailError"
+                :aria-describedby="emailError ? 'email-error' : undefined"
                 class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
               />
             </div>
-            <p v-if="emailError" class="text-red-400 text-xs mt-1 ml-1">
+            <p v-if="emailError" id="email-error" aria-live="polite" class="text-red-400 text-xs mt-1 ml-1">
               {{ emailError }}
             </p>
           </div>
@@ -113,12 +115,14 @@
                 required
                 v-model="formData.message"
                 placeholder="Transmit payload..."
+                :aria-invalid="formState === 'error'"
+                :aria-describedby="formState === 'error' ? 'message-error' : undefined"
                 class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none"
               ></textarea>
             </div>
           </div>
 
-          <p v-if="formState === 'error'" class="text-red-400 text-xs ml-1">
+          <p v-if="formState === 'error'" id="message-error" aria-live="polite" class="text-red-400 text-xs ml-1">
             {{ errorMessage }}
           </p>
 
@@ -164,7 +168,7 @@
           }}</span>
           <button
             type="button"
-            class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 transition-all duration-200 active:scale-95"
+            class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-200 active:scale-95"
             @click="copyToClipboard(discordUser)"
           >
             {{ copyState === "copied" ? "✓ Copied" : "Copy" }}
@@ -185,7 +189,7 @@
           :href="xingUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="social-link-btn"
+          class="social-link-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           Open Xing Profile →
         </a>
@@ -204,7 +208,7 @@
           :href="linkedinUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="social-link-btn"
+          class="social-link-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           Open LinkedIn Profile →
         </a>
