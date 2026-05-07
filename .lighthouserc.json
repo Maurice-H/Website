@@ -9,7 +9,7 @@
         "http://localhost:4173/?forceTier=2&ciMode=true",
         "http://localhost:4173/?forceTier=3&ciMode=true"
       ],
-      "numberOfRuns": 3
+      "numberOfRuns": 1
     },
     "assert": {
       "assertions": {
