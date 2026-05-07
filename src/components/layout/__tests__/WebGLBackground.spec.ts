@@ -1,0 +1,16 @@
+import { createTestingPinia } from '@pinia/testing';
+import { shallowMount } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
+import WebGLBackground from '../WebGLBackground.vue';
+
+describe('WebGLBackground.vue', () => {
+  it('mounts successfully', () => {
+    const wrapper = shallowMount(WebGLBackground, {
+      global: {
+        plugins: [createTestingPinia()],
+        stubs: { TresCanvas: true, WebGLScene: true },
+      },
+    });
+    expect(wrapper.exists()).toBe(true);
+  });
+});
