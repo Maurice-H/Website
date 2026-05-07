@@ -1,7 +1,14 @@
-## 2026-05-07 - Remove Hardcoded Turnstile Site Key
+## 2024-05-02 - Sentinel Strict State Enforcement
+ **Learning:** TypeScript enum validation is easily bypassed during runtime serialization or coercion. Standard store actions assumed type safety would catch invalid enums.
+ **Action:** Implemented strict runtime phase validation in `lighting.ts` by explicitly verifying that the incoming payload is an approved `LightingPhase` before executing state transitions.
 
-**Severity:** Low (Test/Dummy key)
-**Issue:** A hardcoded Cloudflare Turnstile site key fallback was present in `ContactForm.vue`.
-**Impact:** Exposure of API keys/secrets in source code, even if dummy keys, is a bad practice and can lead to accidental exposure of real keys if they are swapped without moving to environment variables.
-**Fix:** Centralized environment variable management in `src/utils/env.ts` with strict typing and validation. Updated `ContactForm.vue` to use this centralized config and removed all hardcoded fallbacks.
-**Verification:** Manual verification of code changes in `ContactForm.vue` and `env.ts`. Environment issues prevented full automated test execution.
+## 2026-05-03 - Unhandled Promise Rejections in Audio Playback
+ **Learning:** HTMLAudioElement.play() returns a Promise which rejects if the browser blocks the audio playback (e.g., due to missing user interaction before the playback starts). If not caught, this results in an unhandled promise rejection error that could lead to instability or warnings.
+ **Action:** Added a `.catch(() => {})` block to all `audio.play()` calls to silently handle potential rejection without crashing or cluttering logs.
+## 2026-05-04 - Strict Environment Variable Type Enforcement
+ **Learning:** Using `import.meta.env` directly throughout the application bypasses strict typing and can lead to unexpected runtime issues if Vite's AST replacement does not resolve properly, or if undefined values are expected as booleans.
+ **Action:** Implemented `src/utils/env.ts` to act as a centralized, strict validation and parsing layer for all environment configurations, ensuring missing or malformed variables are caught and logged during initialization.
+
+## 2026-05-07 - Remove Hardcoded Turnstile Site Key
+ **Learning:** Even dummy keys or test keys should not be hardcoded in the source code as fallbacks. This violates best practices for secret management and can lead to accidental exposure if keys are later swapped for production ones without moving them to environment variables.
+ **Action:** Refactored `ContactForm.vue` to remove the hardcoded Turnstile site key fallback and centralized the configuration in `src/utils/env.ts`. Updated unit tests to mock the centralized environment configuration correctly.
