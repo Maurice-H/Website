@@ -13,9 +13,11 @@
       @wheel.prevent="onWheel"
       @scroll="handleScroll"
     >
+      <!-- ⚡ Bolt: Use v-memo to skip virtual DOM diffing for inactive tabs during scroll events -->
       <NavWindow
         v-for="tab in tabs"
         :key="tab.id"
+        v-memo="[activeId === tab.id]"
         :theme="tab.theme"
         :label="tab.label"
         :active="activeId === tab.id"
