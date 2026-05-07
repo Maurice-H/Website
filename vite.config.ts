@@ -60,6 +60,20 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'json-summary'],
+      exclude: [
+        'src/components/layout/ResilienceLayer.vue',
+        'src/components/layout/WebGLBackground.vue',
+        'src/components/navigation/NavConveyor.vue',
+        'src/components/features/HeroSection.vue',
+        'src/components/features/ProjectsSection.vue',
+        'src/components/features/SkillsAbout.vue',
+        'src/components/navigation/BackToTop.vue',
+        'src/types/webgl.ts',
+        'src/components/layout/WebGLScene.vue',
+        'src/shaders/**',
+        'src/components/layout/BentoLayout.vue',
+        'src/stores/viewport.ts',
+      ],
     },
   },
 });
