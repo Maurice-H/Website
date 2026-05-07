@@ -31,10 +31,9 @@
           ]"
           @click="activeChannel = channel.id"
         >
-          <span
-            class="w-4 h-4 flex items-center justify-center"
-            v-html="channel.icon"
-          ></span>
+          <span class="w-4 h-4 flex items-center justify-center">
+            <component :is="channel.icon" />
+          </span>
           {{ channel.label }}
         </button>
       </div>
@@ -152,7 +151,7 @@
         v-else-if="activeChannel === 'discord'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" v-html="discordIcon"></div>
+        <div class="text-finished-accent w-12 h-12"><DiscordIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           Connect with me on Discord
         </p>
@@ -177,7 +176,7 @@
         v-else-if="activeChannel === 'xing'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" v-html="xingIcon"></div>
+        <div class="text-finished-accent w-12 h-12"><XingIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           View my professional profile on Xing
         </p>
@@ -196,7 +195,7 @@
         v-else-if="activeChannel === 'linkedin'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" v-html="linkedinIcon"></div>
+        <div class="text-finished-accent w-12 h-12"><LinkedinIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           Connect with me on LinkedIn
         </p>
@@ -217,14 +216,11 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import { envConfig } from '../../utils/env';
+import DiscordIcon from '../icons/DiscordIcon.vue';
+import EmailIcon from '../icons/EmailIcon.vue';
+import LinkedinIcon from '../icons/LinkedinIcon.vue';
+import XingIcon from '../icons/XingIcon.vue';
 import BentoCard from '../shared/BentoCard.vue';
-
-// --- Icons ---
-const emailIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`;
-const discordIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>`;
-const xingIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.45 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.007-.012 0-.023.007-.034L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM5.647 3.424c-.516 0-.743.326-.927.659L0 12.06l3.99 7.214c.17.31.438.66.968.66h3.455c.211 0 .375-.078.463-.22.089-.151.088-.346-.01-.536L4.887 12.18c-.007-.012 0-.024.007-.034L8.61 4.179c.095-.191.097-.387.006-.535-.087-.142-.25-.22-.459-.22H5.647z"/></svg>`;
-const linkedinIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`;
 
 // --- Types ---
 type ChannelId = 'email' | 'discord' | 'xing' | 'linkedin';
@@ -232,7 +228,7 @@ type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 // --- State ---
 const performance = usePerformanceStore();
-const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '';
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
 const activeChannel = ref<ChannelId>('email');
 const formState = ref<FormState>('idle');
@@ -248,11 +244,11 @@ const formData = reactive({
   message: '',
 });
 
-const channels: { id: ChannelId; label: string; icon: string }[] = [
-  { id: 'email', label: 'Email', icon: emailIcon },
-  { id: 'discord', label: 'Discord', icon: discordIcon },
-  { id: 'xing', label: 'Xing', icon: xingIcon },
-  { id: 'linkedin', label: 'LinkedIn', icon: linkedinIcon },
+const channels: { id: ChannelId; label: string; icon: import('vue').Component }[] = [
+  { id: 'email', label: 'Email', icon: EmailIcon },
+  { id: 'discord', label: 'Discord', icon: DiscordIcon },
+  { id: 'xing', label: 'Xing', icon: XingIcon },
+  { id: 'linkedin', label: 'LinkedIn', icon: LinkedinIcon },
 ];
 
 // Social data from centralized config
@@ -471,7 +467,7 @@ const handleSubmit = async () => {
       throw new Error('Please complete the security check.');
     }
 
-    const formspreeId = envConfig.VITE_FORMSPREE_ID;
+    const formspreeId = import.meta.env.VITE_FORMSPREE_ID;
     if (!formspreeId) {
       throw new Error('Form configuration missing. Please check VITE_FORMSPREE_ID.');
     }
