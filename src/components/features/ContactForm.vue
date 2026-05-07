@@ -216,7 +216,6 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import { envConfig } from '../../utils/env';
 import DiscordIcon from '../icons/DiscordIcon.vue';
 import EmailIcon from '../icons/EmailIcon.vue';
 import LinkedinIcon from '../icons/LinkedinIcon.vue';
