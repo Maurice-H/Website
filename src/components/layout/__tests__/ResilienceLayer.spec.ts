@@ -11,7 +11,5 @@ describe('ResilienceLayer.vue', () => {
       global: { plugins: [pinia] },
     });
     expect(wrapper.exists()).toBe(true);
-
-
   });
 });
