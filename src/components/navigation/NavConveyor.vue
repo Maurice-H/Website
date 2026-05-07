@@ -96,19 +96,7 @@
         >
           <h2 class="window-title">GET IN TOUCH</h2>
           <div class="flex flex-col items-center gap-3">
-            <svg
-              class="icon-envelope text-finished-accent/30"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
+            <EnvelopeIcon />
             <div class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
               Email · Discord · LinkedIn
             </div>
@@ -127,6 +115,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { PROJECTS, NAV_TABS as tabs } from '../../data/portfolio';
 import { useLightingStore } from '../../stores/lighting';
 import { LightingPhase } from '../../types/index';
+import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
 import NavWindow from './NavWindow.vue';
 
 const lightingStore = useLightingStore();
