@@ -13,3 +13,7 @@
 ## 2024-05-06 - Interactive Components Missing Accessibility Controls
  Learning: Vue components mimicking interactive elements must pair `cursor-pointer` with full keyboard accessibility (`tabindex`, `role`, event listeners, and `focus-visible` outlines).
  Action: When adding `cursor-pointer` to an element, ensure it also implements `tabindex="0"`, `role="button"|"link"`, `focus-visible` styles, and explicit `@keydown.enter` / `@keydown.space` handlers.
+
+## 2024-05-07 - Form Error State ARIA Binding
+ Learning: Form inputs in Vue templates must dynamically link to their corresponding error messages for screen readers using `aria-invalid` and `aria-describedby` pointing to the error message ID. Furthermore, error message elements should use `aria-live="polite"` so screen readers announce them when they conditionally render into the DOM.
+ Action: Ensure that conditional error messages have an `id` and `aria-live="polite"`, and pair the related inputs with `:aria-invalid="!!error"` and `:aria-describedby="error ? 'id' : undefined"`.
