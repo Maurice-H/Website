@@ -173,4 +173,4 @@ If you have ideas, feedback, or found a bug, I'd love to hear from you!
 
 - **Found a Bug?** Please [open a GitHub Issue](https://github.com/Maurice-H/Website/issues/new).
 - **Have an Idea?** Check out existing [Issues](https://github.com/Maurice-H/Website/issues) or start a new one.
-- **Direct Contact:** Reach out via the [Contact Form](https://maurice-h.github.io/Website/#contact) on the live site.
+- **Direct Contact:** Reach out via the `Contact Form` on the live site.

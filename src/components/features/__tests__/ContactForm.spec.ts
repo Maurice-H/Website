@@ -390,5 +390,43 @@ describe('ContactForm.vue', () => {
       expect(wrapper.text()).toContain('The email address is not publicly available');
       vi.unstubAllGlobals();
     });
+
+    it('should continue submission if DNS verification fails', async () => {
+      const wrapper = mount(ContactForm);
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Setup Turnstile mock
+      const input = document.createElement('input');
+      input.name = 'cf-turnstile-response';
+      input.value = 'fake-token';
+      document.body.appendChild(input);
+
+      await wrapper.find('input#contact-name').setValue('Test');
+      await wrapper.find('input#contact-email').setValue('test@example.com');
+      await wrapper
+        .find('textarea#contact-message')
+        .setValue('This is a completely valid message.');
+
+      const fetchMock = vi.fn().mockImplementation((url: string) => {
+        if (url.startsWith('https://cloudflare-dns.com/')) {
+          return Promise.reject(new Error('DNS Service Down'));
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ ok: true }),
+        });
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await wrapper.find('form').trigger('submit.prevent');
+      await flushPromises();
+
+      expect(consoleSpy).toHaveBeenCalledWith('DNS verification failed:', expect.any(Error));
+      expect(wrapper.text()).toContain('Transmission Sent');
+
+      consoleSpy.mockRestore();
+      vi.unstubAllGlobals();
+      document.body.innerHTML = '';
+    });
   });
 });
