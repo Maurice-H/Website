@@ -216,7 +216,6 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import { envConfig } from '../../utils/env';
 import DiscordIcon from '../icons/DiscordIcon.vue';
 import EmailIcon from '../icons/EmailIcon.vue';
 import LinkedinIcon from '../icons/LinkedinIcon.vue';
@@ -229,7 +228,7 @@ type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 // --- State ---
 const performance = usePerformanceStore();
-const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '';
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
 const activeChannel = ref<ChannelId>('email');
 const formState = ref<FormState>('idle');
@@ -468,7 +467,7 @@ const handleSubmit = async () => {
       throw new Error('Please complete the security check.');
     }
 
-    const formspreeId = envConfig.VITE_FORMSPREE_ID;
+    const formspreeId = import.meta.env.VITE_FORMSPREE_ID;
     if (!formspreeId) {
       throw new Error('Form configuration missing. Please check VITE_FORMSPREE_ID.');
     }
