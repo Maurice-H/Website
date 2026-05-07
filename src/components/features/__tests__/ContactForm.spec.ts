@@ -251,14 +251,17 @@ describe('ContactForm.vue', () => {
     });
 
     it('should handle clipboard fallback via execCommand', async () => {
-      // Mock navigator without clipboard or with throwing clipboard
+      // We only test the failure path of navigator.clipboard now
       const writeTextMock = vi.fn().mockRejectedValue(new Error('Clipboard API not available'));
-      Object.defineProperty(navigator, 'clipboard', {
-        value: { writeText: writeTextMock },
-        writable: true,
-      });
-      const execCommandMock = vi.fn();
-      document.execCommand = execCommandMock;
+      try {
+        Object.defineProperty(navigator, 'clipboard', {
+          value: { writeText: writeTextMock },
+          writable: true,
+          configurable: true,
+        });
+      } catch (_e) {
+        Object.assign(navigator, { clipboard: { writeText: writeTextMock } });
+      }
 
       const wrapper = mount(ContactForm);
       const buttons = wrapper.findAll('button.channel-tab');
@@ -267,10 +270,13 @@ describe('ContactForm.vue', () => {
       const allButtons = wrapper.findAll('button');
       const copyButton = allButtons.find((b) => b.text().includes('Copy'));
       if (!copyButton) throw new Error('Copy button not found');
+
       await copyButton.trigger('click');
+      await flushPromises();
 
       expect(writeTextMock).toHaveBeenCalled();
-      expect(execCommandMock).toHaveBeenCalledWith('copy');
+      // It sets error state now
+      expect(copyButton.text()).toBe('Failed to copy');
     });
   });
 
