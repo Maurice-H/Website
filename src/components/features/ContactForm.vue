@@ -151,7 +151,7 @@
         v-else-if="activeChannel === 'discord'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" ><DiscordIcon /></div>
+        <div class="text-finished-accent w-12 h-12"><DiscordIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           Connect with me on Discord
         </p>
@@ -176,7 +176,7 @@
         v-else-if="activeChannel === 'xing'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" ><XingIcon /></div>
+        <div class="text-finished-accent w-12 h-12"><XingIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           View my professional profile on Xing
         </p>
@@ -195,7 +195,7 @@
         v-else-if="activeChannel === 'linkedin'"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
-        <div class="text-finished-accent w-12 h-12" ><LinkedinIcon /></div>
+        <div class="text-finished-accent w-12 h-12"><LinkedinIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
           Connect with me on LinkedIn
         </p>
@@ -216,6 +216,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
+import { envConfig } from '../../utils/env';
 import DiscordIcon from '../icons/DiscordIcon.vue';
 import EmailIcon from '../icons/EmailIcon.vue';
 import LinkedinIcon from '../icons/LinkedinIcon.vue';
@@ -228,7 +229,7 @@ type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 // --- State ---
 const performance = usePerformanceStore();
-const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '';
 
 const activeChannel = ref<ChannelId>('email');
 const formState = ref<FormState>('idle');
@@ -467,7 +468,7 @@ const handleSubmit = async () => {
       throw new Error('Please complete the security check.');
     }
 
-    const formspreeId = import.meta.env.VITE_FORMSPREE_ID;
+    const formspreeId = envConfig.VITE_FORMSPREE_ID;
     if (!formspreeId) {
       throw new Error('Form configuration missing. Please check VITE_FORMSPREE_ID.');
     }
