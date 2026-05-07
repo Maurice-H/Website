@@ -1,8 +1,6 @@
 export interface EnvConfig {
   VITE_CI_MODE: string | undefined;
   isCiMode: boolean;
-  VITE_TURNSTILE_SITE_KEY: string | undefined;
-  VITE_FORMSPREE_ID: string | undefined;
 }
 
 /**
@@ -10,8 +8,6 @@ export interface EnvConfig {
  */
 function parseEnv(): EnvConfig {
   const isCiModeStr = import.meta.env.VITE_CI_MODE;
-  const turnstileKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
-  const formspreeId = import.meta.env.VITE_FORMSPREE_ID;
 
   if (isCiModeStr && isCiModeStr !== 'true' && isCiModeStr !== 'false') {
     console.warn(
@@ -19,21 +15,11 @@ function parseEnv(): EnvConfig {
     );
   }
 
-  if (!turnstileKey && isCiModeStr !== 'true') {
-    console.warn('[Env] VITE_TURNSTILE_SITE_KEY is missing.');
-  }
-
-  if (!formspreeId && isCiModeStr !== 'true') {
-    console.warn('[Env] VITE_FORMSPREE_ID is missing.');
-  }
-
   const isCiMode = isCiModeStr === 'true';
 
   return {
     VITE_CI_MODE: isCiModeStr,
     isCiMode,
-    VITE_TURNSTILE_SITE_KEY: turnstileKey,
-    VITE_FORMSPREE_ID: formspreeId,
   };
 }
 

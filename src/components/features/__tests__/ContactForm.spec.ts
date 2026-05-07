@@ -5,17 +5,11 @@ import ContactForm from '../ContactForm.vue';
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-vi.mock('../../../utils/env', () => ({
-  envConfig: {
-    VITE_FORMSPREE_ID: 'test-form-id',
-    VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
-    isCiMode: false,
-  },
-}));
-
 describe('ContactForm.vue', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.stubEnv('VITE_FORMSPREE_ID', 'test-form-id');
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '1x00000000000000000000AA');
   });
 
   it('should render form elements with proper a11y labels', () => {
@@ -414,7 +408,7 @@ describe('ContactForm.vue', () => {
         .setValue('This is a completely valid message.');
 
       const fetchMock = vi.fn().mockImplementation((url: string) => {
-        if (url.includes('cloudflare-dns.com')) {
+        if (url.startsWith('https://cloudflare-dns.com/')) {
           return Promise.reject(new Error('DNS Service Down'));
         }
         return Promise.resolve({

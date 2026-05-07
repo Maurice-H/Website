@@ -60,14 +60,7 @@
 
 <script setup lang="ts">
 import { useLoop, useTresContext } from '@tresjs/core';
-import {
-  type Camera,
-  Color,
-  type Mesh,
-  type ShaderMaterial,
-  Vector2,
-  type WebGLRenderer,
-} from 'three';
+import { Color, Vector2, type WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -224,28 +217,11 @@ render(() => {
 let lastMouse = new Vector2(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
 // Pre-cache reactive Vue state to avoid hitting getters inside the high-frequency render loop
-const rawMouse = viewportStore.rawMouse;
-
-const renderState: {
-  isNavPhase: boolean;
-  isContentPhase: boolean;
-  isBlueprintMode: number;
-  lightingEnabled: boolean;
-  ufo: Mesh | null;
-  drone: Mesh | null;
-  dust: Mesh | null;
-  shaderMaterial: ShaderMaterial | null;
-  activeCamera: Camera | null;
-} = {
+const renderState = {
   isNavPhase: true,
   isContentPhase: false,
   isBlueprintMode: 0.0,
   lightingEnabled: true,
-  ufo: null,
-  drone: null,
-  dust: null,
-  shaderMaterial: null,
-  activeCamera: null,
 };
 
 // Update accent color only if theme changes
@@ -265,56 +241,51 @@ watchEffect(() => {
   renderState.isContentPhase = lightingStore.phase === 'CONTENT';
   renderState.isBlueprintMode = themeStore.isBlueprintMode ? 1.0 : 0.0;
   renderState.lightingEnabled = themeStore.lightingEnabled;
-  renderState.ufo = ufoRef.value;
-  renderState.drone = droneRef.value;
-  renderState.dust = dustRef.value;
-  renderState.shaderMaterial = shaderMaterialRef.value;
-  renderState.activeCamera = camera.activeCamera.value;
 });
 
 onBeforeRender(({ elapsed, delta }) => {
-  if (renderState.ufo && renderState.activeCamera) {
-    if (renderState.ufo.visible !== renderState.isNavPhase) {
-      renderState.ufo.visible = renderState.isNavPhase;
+  if (ufoRef.value && camera.activeCamera.value) {
+    if (ufoRef.value.visible !== renderState.isNavPhase) {
+      ufoRef.value.visible = renderState.isNavPhase;
     }
 
     if (renderState.isNavPhase) {
-      renderState.ufo.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
+      ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
 
       // PROJECT 3D TO 2D: Track the UFO for the shader's tractor beam
-      if (renderState.shaderMaterial) {
+      if (shaderMaterialRef.value) {
         projectToScreenSpace(
-          renderState.ufo.position,
-          renderState.activeCamera,
-          renderState.shaderMaterial.uniforms.uUfoPosition.value
+          ufoRef.value.position,
+          camera.activeCamera.value,
+          shaderMaterialRef.value.uniforms.uUfoPosition.value
         );
       }
     }
   }
 
-  if (renderState.drone) {
-    if (renderState.drone.visible !== renderState.isContentPhase) {
-      renderState.drone.visible = renderState.isContentPhase;
+  if (droneRef.value) {
+    if (droneRef.value.visible !== renderState.isContentPhase) {
+      droneRef.value.visible = renderState.isContentPhase;
     }
 
     if (renderState.isContentPhase) {
-      renderState.drone.position.x = Math.sin(elapsed * 0.4) * 5;
-      renderState.drone.position.y = Math.cos(elapsed * 0.3) * 2;
-      renderState.drone.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
+      droneRef.value.position.x = Math.sin(elapsed * 0.4) * 5;
+      droneRef.value.position.y = Math.cos(elapsed * 0.3) * 2;
+      droneRef.value.position.z = -4 + Math.sin(elapsed * 0.6) * 2;
 
-      renderState.drone.rotation.x = elapsed * 0.5;
-      renderState.drone.rotation.y = elapsed * 0.8;
+      droneRef.value.rotation.x = elapsed * 0.5;
+      droneRef.value.rotation.y = elapsed * 0.8;
     }
   }
 
-  if (renderState.dust) {
-    renderState.dust.rotation.y += 0.05 * delta;
-    renderState.dust.rotation.x += 0.02 * delta;
+  if (dustRef.value) {
+    dustRef.value.rotation.y += 0.05 * delta;
+    dustRef.value.rotation.x += 0.02 * delta;
   }
 
   if (rgbShiftPass) {
-    const currentMouseX = rawMouse.x;
-    const currentMouseY = rawMouse.y;
+    const currentMouseX = viewportStore.rawMouse.x;
+    const currentMouseY = viewportStore.rawMouse.y;
 
     const dx = currentMouseX - lastMouse.x;
     const dy = currentMouseY - lastMouse.y;
@@ -326,11 +297,11 @@ onBeforeRender(({ elapsed, delta }) => {
     rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
   }
 
-  if (!renderState.shaderMaterial) return;
+  if (!shaderMaterialRef.value) return;
 
-  const u = renderState.shaderMaterial.uniforms;
+  const u = shaderMaterialRef.value.uniforms;
   u.uTime.value = elapsed;
-  u.uMouse.value.set(rawMouse.x, rawMouse.y);
+  u.uMouse.value.set(viewportStore.rawMouse.x, viewportStore.rawMouse.y);
 
   if (u.uThemeState.value !== renderState.isBlueprintMode) {
     u.uThemeState.value = renderState.isBlueprintMode;
