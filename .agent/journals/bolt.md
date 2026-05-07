@@ -17,3 +17,7 @@
 ## 2026-05-06 - requestAnimationFrame closure staleness
  **Learning:** When using requestAnimationFrame to throttle high-frequency events (like pointermove), caching coordinates directly in the callback closure can lead to stale data. If multiple events fire before the frame renders, the RAF uses the coordinates from the *first* event, not the latest.
  **Action:** Store the latest coordinates in plain variables defined outside the RAF closure. Update these variables immediately in the event handler, and have the RAF read from them. This ensures the frame always renders the most up-to-date position.
+
+## 2026-05-07 - Optimize Reactivity in Render Loop
+ **Learning:** Accessing Vue `ref` properties (e.g., `ufoRef.value`, `camera.activeCamera.value`) directly inside the TresJS `onBeforeRender` hook triggers Vue's reactive track getters 60 times a second per property. This leads to massive CPU profiling overhead.
+ **Action:** We implemented a generic plain JS object cache `renderState` that is updated separately via `watchEffect()`. The high-frequency WebGL render loop now only reads from standard Javascript properties.

@@ -14,6 +14,7 @@ interface ComponentRegistration {
 
 export const useViewportStore = defineStore('viewport', () => {
   const registeredComponents = reactive<Map<string, ComponentRegistration>>(new Map());
+  const elToReg = new WeakMap<HTMLElement, ComponentRegistration>();
   const mousePosition = reactive({ x: 0, y: 0 });
   const isListening = ref(false);
 
@@ -92,15 +93,13 @@ export const useViewportStore = defineStore('viewport', () => {
       observer = new IntersectionObserver(
         (entries) => {
           let needsUpdate = false;
-          entries.forEach((entry) => {
-            for (const reg of registeredComponents.values()) {
-              if (reg.el === entry.target) {
-                reg.isVisible = entry.isIntersecting;
-                needsUpdate = true;
-                break;
-              }
+          for (const entry of entries) {
+            const reg = elToReg.get(entry.target as HTMLElement);
+            if (reg) {
+              reg.isVisible = entry.isIntersecting;
+              needsUpdate = true;
             }
-          });
+          }
           if (needsUpdate) {
             updateAll();
           }
@@ -122,11 +121,18 @@ export const useViewportStore = defineStore('viewport', () => {
 
   const register = (id: string, el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
-    registeredComponents.set(id, {
+    const reg: ComponentRegistration = {
       el,
       offsets: { left: rect.left || 0, top: rect.top || 0 },
       isVisible: true,
-    });
+    };
+
+    registeredComponents.set(id, reg);
+    // Store the reactive proxy from the Map to ensure reactivity works
+    const reactiveReg = registeredComponents.get(id);
+    if (reactiveReg) {
+      elToReg.set(el, reactiveReg);
+    }
 
     if (observer) {
       observer.observe(el);
@@ -143,8 +149,11 @@ export const useViewportStore = defineStore('viewport', () => {
       },
       unregister: () => {
         const reg = registeredComponents.get(id);
-        if (reg && observer) {
-          observer.unobserve(reg.el);
+        if (reg) {
+          if (observer) {
+            observer.unobserve(reg.el);
+          }
+          elToReg.delete(reg.el);
         }
         registeredComponents.delete(id);
       },
