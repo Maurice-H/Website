@@ -28,17 +28,16 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useThemeStore } from "../../stores/useThemeStore";
-import LampIcon from "../icons/LampIcon.vue";
+import { storeToRefs } from 'pinia';
+import { useThemeStore } from '../../stores/useThemeStore';
+import LampIcon from '../icons/LampIcon.vue';
 
 const themeStore = useThemeStore();
-const { lightingEnabled, isBlueprintMode: isBlueprint } =
-  storeToRefs(themeStore);
+const { lightingEnabled, isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
 const playSwitchSound = () => {
   try {
-    const audio = new Audio("audio/switch15.ogg");
+    const audio = new Audio('audio/switch15.ogg');
     audio.volume = 0.5;
     audio.play().catch(() => {
       // Silently ignore if audio fails (e.g. browser policy)

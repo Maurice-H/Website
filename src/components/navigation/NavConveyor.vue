@@ -115,8 +115,8 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import { PROJECTS, NAV_TABS as tabs } from '../../data/portfolio';
 import { useLightingStore } from '../../stores/lighting';
 import { LightingPhase } from '../../types/index';
-import NavWindow from './NavWindow.vue';
 import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
+import NavWindow from './NavWindow.vue';
 
 const lightingStore = useLightingStore();
 const trackEl = ref<HTMLElement | null>(null);
