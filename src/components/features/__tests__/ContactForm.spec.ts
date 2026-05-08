@@ -3,13 +3,20 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ContactForm from '../ContactForm.vue';
 
+vi.mock('../../../utils/env', () => ({
+  envConfig: {
+    VITE_CI_MODE: 'false',
+    isCiMode: false,
+    VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+    VITE_FORMSPREE_ID: 'test-form-id',
+  },
+}));
+
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe('ContactForm.vue', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.stubEnv('VITE_FORMSPREE_ID', 'test-form-id');
-    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '1x00000000000000000000AA');
   });
 
   it('should render form elements with proper a11y labels', () => {
