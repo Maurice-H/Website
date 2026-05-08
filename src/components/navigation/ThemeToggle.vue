@@ -29,23 +29,17 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { useAudioFeedback } from '../../composables/useAudioFeedback';
 import { useThemeStore } from '../../stores/useThemeStore';
 import ThemeToggleIcon from '../icons/ThemeToggleIcon.vue';
 
 const themeStore = useThemeStore();
 const { isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
-const playSwitchSound = () => {
-  try {
-    const audio = new Audio('audio/switch2.ogg');
-    audio.volume = 0.5;
-    audio.play().catch(() => {
-      // Silently ignore if audio fails (e.g. browser policy)
-    });
-  } catch (e) {
-    // Silently ignore if audio fails (e.g. browser policy)
-  }
-};
+const { play: playSwitchSound } = useAudioFeedback({
+  src: 'audio/switch2.ogg',
+  volume: 0.3,
+});
 
 const toggleTheme = () => {
   themeStore.toggleTheme();

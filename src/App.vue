@@ -4,7 +4,7 @@
     'is-ci-mode': performance.isCiMode
   }">
     <!-- WebGL Canvas Background (replaces SpotlightMask, PerspectiveGrid, VolumetricBeam) -->
-    <WebGLBackground v-if="performance.isWebGLSupported" />
+    <WebGLBackground />
     <ResilienceLayer />
 
     <!-- Scrolling Content Layer -->

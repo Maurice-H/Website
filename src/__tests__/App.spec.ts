@@ -158,16 +158,18 @@ describe('App.vue', () => {
     expect(lightingStore.setPhase).not.toHaveBeenCalled();
   });
 
-  it('renders WebGLBackground conditionally', async () => {
+  it('renders WebGLBackground always (handles fallback internally)', async () => {
     const wrapper = createWrapper();
     const performanceStore = usePerformanceStore();
 
     expect(wrapper.find('web-g-l-background-stub').exists()).toBe(true);
 
+    // Even with WebGL unsupported, WebGLBackground stays mounted
+    // (it renders CSSBackground internally as fallback)
     performanceStore.isWebGLSupported = false;
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find('web-g-l-background-stub').exists()).toBe(false);
+    expect(wrapper.find('web-g-l-background-stub').exists()).toBe(true);
   });
 
   it('tests handleAfterEnter scrolling logic with element found', async () => {
