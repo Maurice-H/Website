@@ -1,6 +1,8 @@
 export interface EnvConfig {
   VITE_CI_MODE: string | undefined;
   isCiMode: boolean;
+  VITE_TURNSTILE_SITE_KEY: string | undefined;
+  VITE_FORMSPREE_ID: string | undefined;
 }
 
 /**
@@ -20,6 +22,8 @@ function parseEnv(): EnvConfig {
   return {
     VITE_CI_MODE: isCiModeStr,
     isCiMode,
+    VITE_TURNSTILE_SITE_KEY: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+    VITE_FORMSPREE_ID: import.meta.env.VITE_FORMSPREE_ID,
   };
 }
 
