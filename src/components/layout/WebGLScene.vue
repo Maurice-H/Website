@@ -523,8 +523,12 @@ const lightingStore = useLightingStore();
 
 // ── Organic Drone Flight System (§7) ──
 function getOrganicFlightPosition(time: number, target: Vector3): void {
-  // X: Wide horizontal sweeps from -6 to +6 (figure-8 patterns)
-  const x = Math.sin(time * 0.2) * 4 + Math.sin(time * 0.5) * 2;
+  // Scale X movement based on screen width to keep drone visible on mobile
+  const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const xLimitScale = Math.max(0.35, Math.min(1.0, screenWidth / 1200));
+
+  // X: Wide horizontal sweeps from -6 to +6 (figure-8 patterns), scaled by screen width
+  const x = (Math.sin(time * 0.2) * 4 + Math.sin(time * 0.5) * 2) * xLimitScale;
 
   // Y: Height variation from -1.5 to 1.5
   const y = Math.cos(time * 0.3) * 1.0 + Math.sin(time * 0.8) * 0.5;
