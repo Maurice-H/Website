@@ -77,15 +77,20 @@
         :decay="2"
         :position="[0, 0, 0]"
       />
-      <TresObject3D ref="droneSpotTargetRef" :position="[0, -3, 0]" />
+      <TresObject3D ref="droneSpotTargetRef" :position="[0, 0, 0]" />
 
       <!-- Visible Light Cone -->
       <TresMesh :position="[-0.78, -0.67, 1.2]" :rotation="[5, 0, 0]">
-        <TresConeGeometry :args="[0.4, 3, 16, 1, true]" />
-        <TresMeshBasicMaterial
-          :color="accentColorStr"
+        <TresConeGeometry
+          v-if="themeStore.lightingEnabled"
+          :args="[0.4, 3, 16, 1, true]"
+        />
+        <TresShaderMaterial
+          :vertex-shader="beamVertShader"
+          :fragment-shader="beamFragShader"
+          :uniforms="beamUniforms"
           :transparent="true"
-          :opacity="0.08"
+          :blending="2"
           :depth-write="false"
           :side="2"
         />
@@ -95,7 +100,7 @@
 
   <!-- Drone Area Scan (grid sweep shader) -->
   <TresMesh ref="scanRingRef" :visible="false" :rotation="[0, 0, 0]">
-    <TresPlaneGeometry :args="[10, 10]" />
+    <TresPlaneGeometry :args="[20, 20]" />
     <TresShaderMaterial
       :vertex-shader="scanVertShader"
       :fragment-shader="scanFragShader"
@@ -114,14 +119,18 @@
 import { useLoop, useTresContext } from "@tresjs/core";
 import {
   Box3,
+  BufferAttribute,
+  CanvasTexture,
   Color,
   type Group,
   type Material,
   type Mesh,
+  type Texture,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  Object3D,
+  Quaternion,
   type SpotLight,
-  type Object3D,
   Vector2,
   Vector3,
   type WebGLRenderer,
@@ -132,7 +141,28 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { GLTFLoader } from "three-stdlib";
-import { computed, onMounted, shallowRef, watch, watchEffect } from "vue";
+import { onMounted, shallowRef, watch } from "vue";
+
+// --- TRESJS CRASH PREVENTION PATCH ---
+// TresJS memory profiler crashes if it encounters a Mesh without a position attribute
+// (e.g. HighlightMesh from DevTools). We intercept all traverses to guarantee stability.
+const originalTraverse = Object3D.prototype.traverse;
+Object3D.prototype.traverse = function (callback: (object: Object3D) => any) {
+  if ((this as any).isMesh) {
+    const mesh = this as any;
+    if (mesh.geometry && !mesh.geometry.attributes.position) {
+      mesh.geometry.setAttribute(
+        "position",
+        new BufferAttribute(new Float32Array([0, 0, 0]), 3),
+      );
+    }
+  }
+  return originalTraverse.call(this, callback);
+};
+
+// -------------------------------------
+
+import { computed, watchEffect } from "vue";
 import fragmentShader from "../../shaders/main.frag.glsl?raw";
 import vertexShader from "../../shaders/main.vert.glsl?raw";
 import { useLightingStore } from "../../stores/lighting";
@@ -140,6 +170,54 @@ import { usePerformanceStore } from "../../stores/usePerformanceStore";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useViewportStore } from "../../stores/viewport";
 import { projectToScreenSpace } from "../../utils/webgl";
+
+function grayscaleTexture(tex: Texture | null): Texture | null {
+  if (!tex || !tex.image) return tex;
+  const img = tex.image;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width || 1024;
+  canvas.height = img.height || 1024;
+
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return tex;
+
+  try {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      const sum = r + g + b || 1;
+      const gRatio = g / sum;
+
+      if (gRatio > 0.35 && g > 15) {
+        const l = Math.min(255, (0.299 * r + 0.587 * g + 0.114 * b) * 2.0);
+        data[i] = l;
+        data[i + 1] = l;
+        data[i + 2] = l;
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    const newTex = new CanvasTexture(canvas);
+    newTex.flipY = tex.flipY;
+    newTex.colorSpace = tex.colorSpace;
+    newTex.wrapS = tex.wrapS;
+    newTex.wrapT = tex.wrapT;
+    newTex.magFilter = tex.magFilter;
+    newTex.minFilter = tex.minFilter;
+    newTex.needsUpdate = true;
+    return newTex;
+  } catch (e) {
+    console.error("Grayscale texture failed:", e);
+    return tex;
+  }
+}
 
 /**
  * Normalizes a loaded GLB scene to fit within a target size.
@@ -208,6 +286,7 @@ function prepareForScreenBlend(scene: Group): void {
       if (!mesh.userData.__originalEmissive) {
         mesh.userData.__originalEmissive = mat.emissive.clone();
         mesh.userData.__hadEmissiveMap = !!mat.emissiveMap;
+        mesh.userData.__originalColor = mat.color.clone();
       }
 
       const isGlass = mat.transparent && mat.opacity < 0.9;
@@ -222,8 +301,15 @@ function prepareForScreenBlend(scene: Group): void {
         mat.emissive.copy(mat.color);
         mat.emissiveIntensity = 0.8;
 
-        if (mat.map && !mat.emissiveMap) {
-          mat.emissiveMap = mat.map;
+        // The UFO has green lights painted directly into its texture maps.
+        // By replacing the green with grayscale on the canvas, it allows `mat.emissive.set()`
+        // in recolorAccentMeshes to work perfectly without complex shader hacks.
+        if (mat.userData.isUfoMaterial) {
+           if (mat.emissiveMap && !mat.userData.__grayscaledEmissive) {
+             mat.emissiveMap = grayscaleTexture(mat.emissiveMap);
+             mat.userData.__grayscaledEmissive = true;
+           }
+           mat.needsUpdate = true;
         }
       }
 
@@ -236,7 +322,7 @@ function prepareForScreenBlend(scene: Group): void {
     if (mat instanceof MeshBasicMaterial) {
       const hsl = { h: 0, s: 0, l: 0 };
       mat.color.getHSL(hsl);
-      mat.color.setHSL(hsl.h, hsl.s, Math.min(mat.l * 1.5, 1.0));
+      mat.color.setHSL(hsl.h, hsl.s, Math.min(hsl.l * 1.5, 1.0));
       mat.needsUpdate = true;
     }
   });
@@ -261,6 +347,13 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
     const original = mesh.userData.__originalEmissive as Color | undefined;
     if (!original) return;
 
+    if (mat.userData.isUfoMaterial) {
+      mat.emissive.set(newColorHex);
+      mat.emissiveIntensity = 0.9;
+      mat.needsUpdate = true;
+      return;
+    }
+
     if (mesh.userData.__hadEmissiveMap && mat.emissiveMap) {
       mat.emissive.set(newColorHex);
       mat.emissiveIntensity = 0.9;
@@ -278,9 +371,23 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
       meshName.includes("glass") ||
       meshName.includes("eye");
 
-    if (isLens) {
+    const isAccent =
+      matName.includes("glow") ||
+      matName.includes("accent") ||
+      matName.includes("light") ||
+      matName.includes("neon") ||
+      matName.includes("ring") ||
+      matName.includes("emitter") ||
+      meshName.includes("glow") ||
+      meshName.includes("accent") ||
+      meshName.includes("light") ||
+      meshName.includes("neon") ||
+      meshName.includes("ring") ||
+      meshName.includes("emitter");
+
+    if (isLens || isAccent) {
       mat.emissive.set(newColorHex);
-      mat.color.set(newColorHex);
+      if (isAccent) mat.color.set(newColorHex);
       mat.emissiveIntensity = 1.0;
       mat.needsUpdate = true;
       return;
@@ -288,8 +395,17 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
 
     const hsl = { h: 0, s: 0, l: 0 };
     original.getHSL(hsl);
-    const isGreenHue = hsl.h >= 0.278 && hsl.h <= 0.5 && hsl.s > 0.1;
+    let isGreenHue = hsl.h >= 0.278 && hsl.h <= 0.5 && hsl.s > 0.1;
+
+    // Fallback: check original albedo color if emissive was black
+    if (!isGreenHue && mesh.userData.__originalColor) {
+      const origColor = mesh.userData.__originalColor as Color;
+      origColor.getHSL(hsl);
+      isGreenHue = hsl.h >= 0.278 && hsl.h <= 0.5 && hsl.s > 0.1;
+    }
+
     if (isGreenHue) {
+      mat.color.set(newColorHex);
       mat.emissive.set(newColorHex);
       mat.emissiveIntensity = 0.9;
       mat.needsUpdate = true;
@@ -339,6 +455,15 @@ onMounted(() => {
     "/models/ufo.glb",
     (gltf) => {
       logModelDiagnostics("UFO", gltf.scene);
+
+      // Tag UFO materials definitively so they can be identified in prepareForScreenBlend
+      gltf.scene.traverse((child) => {
+        const mesh = child as Mesh;
+        if (mesh.isMesh && mesh.material) {
+          (mesh.material as Material).userData.isUfoMaterial = true;
+        }
+      });
+
       prepareForScreenBlend(gltf.scene);
       normalizeModel(gltf.scene, UFO_TARGET_SIZE);
       recolorAccentMeshes(gltf.scene, accentColorStr.value);
@@ -359,6 +484,7 @@ onMounted(() => {
       logModelDiagnostics("Drone", gltf.scene);
       prepareForScreenBlend(gltf.scene);
       normalizeModel(gltf.scene, DRONE_TARGET_SIZE);
+      recolorAccentMeshes(gltf.scene, accentColorStr.value);
       droneScene.value = gltf.scene;
     },
     undefined,
@@ -373,6 +499,11 @@ onMounted(() => {
 
 watch(accentColorStr, (newColor) => {
   if (ufoScene.value) recolorAccentMeshes(ufoScene.value, newColor);
+
+  // Sync the hex color to the WebGL color uniforms
+  const c = new Color(newColor);
+  scanUniforms.uColor.value = [c.r, c.g, c.b];
+  beamUniforms.uColor.value.set(c);
 });
 
 const performanceStore = usePerformanceStore();
@@ -390,53 +521,25 @@ const scanRingRef = shallowRef();
 const viewportStore = useViewportStore();
 const lightingStore = useLightingStore();
 
-// ── Drone Patrol Waypoint System (§7) ──
-interface PatrolWaypoint {
-  position: Vector3;
-  t: number;
+// ── Organic Drone Flight System (§7) ──
+function getOrganicFlightPosition(time: number, target: Vector3): void {
+  // X: Wide horizontal sweeps from -6 to +6 (figure-8 patterns)
+  const x = Math.sin(time * 0.2) * 4 + Math.sin(time * 0.5) * 2;
+
+  // Y: Height variation from -1.5 to 1.5
+  const y = Math.cos(time * 0.3) * 1.0 + Math.sin(time * 0.8) * 0.5;
+
+  // Z: Depth variation from -5 to -1
+  const z = Math.sin(time * 0.25) * 2 - 3;
+
+  target.set(x, y, z);
 }
 
-const PATROL_CYCLE_DURATION = 45;
-const patrolWaypoints: PatrolWaypoint[] = [
-  { position: new Vector3(-5, 0.5, -3), t: 0 },
-  { position: new Vector3(0, 1.0, -4), t: 0.17 },
-  { position: new Vector3(5, 0.5, -3), t: 0.33 },
-  { position: new Vector3(3, -0.5, -1), t: 0.44 },
-  { position: new Vector3(0, -1.0, 1), t: 0.56 },
-  { position: new Vector3(0, -1.0, 1), t: 0.67 },
-  { position: new Vector3(-3, 0.0, -1), t: 0.78 },
-  { position: new Vector3(-5, 0.5, -3), t: 1.0 },
-];
-
-const droneForward = new Vector3();
-
-function smoothstep(t: number): number {
-  return t * t * (3 - 2 * t);
-}
-
-function getPatrolPosition(elapsed: number, target: Vector3): void {
-  const cycleT = (elapsed % PATROL_CYCLE_DURATION) / PATROL_CYCLE_DURATION;
-
-  let fromIdx = 0;
-  for (let i = 0; i < patrolWaypoints.length - 1; i++) {
-    if (cycleT >= patrolWaypoints[i].t && cycleT < patrolWaypoints[i + 1].t) {
-      fromIdx = i;
-      break;
-    }
-  }
-
-  const from = patrolWaypoints[fromIdx];
-  const to = patrolWaypoints[fromIdx + 1] ?? patrolWaypoints[0];
-  const segmentDuration = to.t - from.t;
-  const segmentT =
-    segmentDuration > 0 ? (cycleT - from.t) / segmentDuration : 0;
-  const eased = smoothstep(Math.min(Math.max(segmentT, 0), 1));
-
-  target.lerpVectors(from.position, to.position, eased);
-}
+const droneCurrentPos = new Vector3(0, 0, -2);
+const droneDummyObj = new Object3D();
 
 // ── Scan Grid State & Shader (§9) ──
-const SCAN_INTERVAL = 30;
+const SCAN_INTERVAL = 20;
 let lastScanTime = 0;
 let scanActive = false;
 let scanElapsed = 0;
@@ -456,26 +559,57 @@ const scanFragShader = `
   uniform float uOpacity;
   varying vec2 vUv;
 
+  float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+  }
+
   void main() {
     vec2 p = vUv * 2.0 - 1.0;
     float dist = length(p);
     if (dist > 1.0) discard;
 
-    float sweepW = 0.12;
-    float sweep = smoothstep(uProgress - sweepW, uProgress, dist)
-                * (1.0 - smoothstep(uProgress, uProgress + 0.03, dist));
+    // ── Expanding Wave ──
+    // Leading edge: sharp cut off ahead of the wave
+    float leadingEdge = smoothstep(uProgress + 0.01, uProgress, dist);
+    
+    // Trailing fade: long soft tail behind the wave
+    float tailLength = 0.6; // How far the tail stretches backwards
+    float trailingFade = smoothstep(uProgress - tailLength, uProgress, dist);
+    // Exponential fade makes it look more explosive/natural
+    trailingFade = pow(trailingFade, 1.5); 
+    
+    float wave = leadingEdge * trailingFade;
 
-    float rings = 1.0 - smoothstep(0.005, 0.02, abs(fract(dist * 8.0) - 0.5));
+    // ── Holographic Matrix Grid ──
+    float gridScale = 120.0;
+    vec2 gridId = floor(p * gridScale);
+    vec2 gridUv = fract(p * gridScale);
+    
+    // Distance from center of current cell
+    float dotDist = length(gridUv - vec2(0.5));
+    
+    // Noise to make dots flicker/vary organically
+    float noise = random(gridId);
+    
+    // Glowing dots
+    float dots = smoothstep(0.4, 0.1, dotDist) * (0.3 + 0.7 * noise);
+    
+    // Concentric radar rings
+    float rings = smoothstep(0.01, 0.0, abs(fract(dist * 12.0) - 0.5));
+    
+    // Combine patterns
+    float techPattern = max(dots, rings * 0.4);
 
-    float angle = atan(p.y, p.x);
-    float sector = abs(fract(angle * 6.0 / PI) - 0.5);
-    float radials = 1.0 - smoothstep(0.005, 0.04, sector);
-
-    float gridMask = smoothstep(uProgress + 0.05, uProgress - 0.05, dist);
-    float grid = max(rings, radials) * gridMask * 0.3;
-
-    float alpha = (sweep * 0.9 + grid) * uOpacity;
-    alpha *= smoothstep(1.0, 0.85, dist);
+    // Apply the wave to the pattern
+    float alpha = techPattern * wave;
+    
+    // Add a solid glowing core ring at the exact leading edge
+    float coreRing = smoothstep(uProgress - 0.015, uProgress, dist) * smoothstep(uProgress + 0.015, uProgress, dist);
+    alpha += coreRing * 0.8;
+    
+    alpha *= smoothstep(1.0, 0.8, dist);
+    alpha *= uOpacity;
+    
     gl_FragColor = vec4(uColor, alpha);
   }`;
 
@@ -483,6 +617,51 @@ const scanUniforms = {
   uProgress: { value: 0.0 },
   uColor: { value: [0.063, 0.725, 0.506] },
   uOpacity: { value: 0.0 },
+};
+
+// ── Volumetric Light Beam Shader (§8) ──
+const beamVertShader = `
+  varying vec2 vUv;
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+  void main() {
+    vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewPosition = -mvPosition.xyz;
+    gl_Position = projectionMatrix * mvPosition;
+  }`;
+
+const beamFragShader = `
+  uniform vec3 uColor;
+  varying vec2 vUv;
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+
+  void main() {
+    vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(vViewPosition);
+    
+    // Fresnel-like effect: brightest when looking directly through the center
+    float viewDot = abs(dot(normal, viewDir));
+    
+    // Soft core and subtle aura
+    float core = smoothstep(0.7, 1.0, viewDot) * 0.8;
+    float aura = smoothstep(0.0, 0.8, viewDot) * 0.2;
+    float intensity = core + aura;
+    
+    // Vertical fade: vUv.y is 1.0 at the narrow tip (lens), 0.0 at the wide base.
+    // By squaring vUv.y, it creates a smooth exponential fade that completely
+    // dissipates to 0.0 at the end of the beam!
+    float verticalFade = pow(vUv.y, 1.5);
+    
+    float alpha = intensity * verticalFade * 0.6;
+    
+    gl_FragColor = vec4(uColor, alpha);
+  }`;
+
+const beamUniforms = {
+  uColor: { value: new Color(accentColorStr.value) },
 };
 
 const { renderer, scene, camera, sizes } = useTresContext();
@@ -652,28 +831,48 @@ onBeforeRender(({ elapsed, delta }) => {
     }
 
     if (droneVisible) {
-      const prevPos = new Vector3().copy(droneRef.value.position);
-      getPatrolPosition(elapsed, droneRef.value.position);
+      // ── Organic Physics-Based Flight (§7) ──
+      const targetPos = new Vector3();
+      getOrganicFlightPosition(elapsed, targetPos);
 
-      droneRef.value.position.y += Math.sin(elapsed * 2.5) * 0.15;
+      // 1. Smoothly interpolate position (adds weight/inertia)
+      const posSmoothing = 1.0 - Math.exp(-2.0 * delta);
+      droneCurrentPos.lerp(targetPos, posSmoothing);
 
-      droneForward.subVectors(droneRef.value.position, prevPos);
-      if (droneForward.lengthSq() > 0.0001) {
-        const lookTarget = new Vector3().addVectors(
-          droneRef.value.position,
-          droneForward,
-        );
-        droneRef.value.rotation.set(0, 0, 0);
-        droneRef.value.lookAt(lookTarget);
+      // Add micro-hover bobbing to the physical position
+      const hoverY = Math.sin(elapsed * 3.5) * 0.1;
+      droneRef.value.position.copy(droneCurrentPos);
+      droneRef.value.position.y += hoverY;
 
-        droneRef.value.rotateZ(Math.sin(elapsed * 1.5) * 0.15);
-        droneRef.value.rotateX(Math.sin(elapsed * 2) * 0.05);
-      }
+      // 2. Calculate ideal rotation (look at future point on the curve)
+      const lookAtPos = new Vector3();
+      getOrganicFlightPosition(elapsed + 0.4, lookAtPos);
+
+      droneDummyObj.position.copy(droneCurrentPos);
+      droneDummyObj.lookAt(lookAtPos);
+
+      // Dynamic pitch based on vertical climb/dive
+      const vY = targetPos.y - droneCurrentPos.y;
+      const targetPitch = -vY * 0.8;
+
+      // Dynamic bank (roll) based on turning
+      const yawDiff = droneDummyObj.rotation.y - droneRef.value.rotation.y;
+      const normYaw = Math.atan2(Math.sin(yawDiff), Math.cos(yawDiff));
+      const targetBank = normYaw * 1.5;
+
+      droneDummyObj.rotateX(targetPitch);
+      droneDummyObj.rotateZ(targetBank);
+
+      // 3. Smoothly interpolate rotation (adds heavy, fluid feel)
+      const rotSmoothing = 1.0 - Math.exp(-3.5 * delta);
+      droneRef.value.quaternion.slerp(droneDummyObj.quaternion, rotSmoothing);
 
       // ── Spotlight target rigidly follows drone (§8) ──
       if (droneSpotlightRef.value && droneSpotTargetRef.value) {
+        // Bind the spotlight to its local target
         droneSpotlightRef.value.target = droneSpotTargetRef.value;
 
+        // Subtle intensity flicker/breathing
         droneSpotlightRef.value.intensity =
           3 + Math.sin(elapsed * 8) * 0.5 + Math.sin(elapsed * 13) * 0.3;
       }
