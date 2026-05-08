@@ -28,16 +28,16 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useAudioFeedback } from '../../composables/useAudioFeedback';
-import { useThemeStore } from '../../stores/useThemeStore';
-import ThemeToggleIcon from '../icons/ThemeToggleIcon.vue';
+import { storeToRefs } from "pinia";
+import { useAudioFeedback } from "../../composables/useAudioFeedback";
+import { useThemeStore } from "../../stores/useThemeStore";
+import ThemeToggleIcon from "../icons/ThemeToggleIcon.vue";
 
 const themeStore = useThemeStore();
 const { isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
 const { play: playSwitchSound } = useAudioFeedback({
-  src: 'audio/switch2.ogg',
+  src: "audio/sci-fi-theme-glitch-click.ogg",
   volume: 0.3,
 });
 

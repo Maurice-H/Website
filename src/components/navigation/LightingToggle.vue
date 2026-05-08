@@ -37,7 +37,7 @@ const themeStore = useThemeStore();
 const { lightingEnabled, isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
 const { play: playSwitchSound } = useAudioFeedback({
-  src: 'audio/switch15.ogg',
+  src: 'audio/sci-fi-light-click.ogg',
   volume: 0.3,
 });
 
