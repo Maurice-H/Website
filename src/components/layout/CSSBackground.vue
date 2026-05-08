@@ -12,7 +12,7 @@
         <div class="ufo-dome" />
         <div class="ufo-hull" />
         <div class="ufo-ring" />
-        <div class="ufo-glow" />
+        <div v-if="isLightingEnabled" class="ufo-glow" />
       </div>
     </div>
 
@@ -25,30 +25,40 @@
       }"
     >
       <div class="drone-body">
+        <div v-if="isLightingEnabled" class="drone-scanner" />
+        <div class="drone-base" />
+        <div class="drone-pulse" />
         <div class="drone-core" />
         <div class="drone-ring" />
-        <div class="drone-pulse" />
       </div>
     </div>
 
     <!-- Ambient particles -->
     <div class="css-particles">
-      <span v-for="i in 12" :key="i" class="particle" :style="particleStyle(i)" />
+      <span
+        v-for="i in 12"
+        :key="i"
+        class="particle"
+        :style="particleStyle(i)"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { type CSSProperties, computed } from 'vue';
-import { useLightingStore } from '@/stores/lighting';
-import { useThemeStore } from '@/stores/useThemeStore';
-import { LightingPhase } from '@/types';
+import { type CSSProperties, computed } from "vue";
+import { useLightingStore } from "@/stores/lighting";
+import { useThemeStore } from "@/stores/useThemeStore";
+import { LightingPhase } from "@/types";
 
 const lightingStore = useLightingStore();
 const themeStore = useThemeStore();
 
 const isNavPhase = computed(() => lightingStore.phase === LightingPhase.NAV);
-const isContentPhase = computed(() => lightingStore.phase === LightingPhase.CONTENT);
+const isContentPhase = computed(
+  () => lightingStore.phase === LightingPhase.CONTENT,
+);
+const isLightingEnabled = computed(() => themeStore.lightingEnabled);
 const isBlueprintMode = computed(() => themeStore.isBlueprintMode);
 
 /**
@@ -63,8 +73,8 @@ const particleStyle = (index: number): CSSProperties => {
   const size = 2 + (index % 3);
 
   return {
-    '--p-delay': `${delay}s`,
-    '--p-duration': `${duration}s`,
+    "--p-delay": `${delay}s`,
+    "--p-duration": `${duration}s`,
     left: `${left}%`,
     top: `${top}%`,
     width: `${size}px`,
@@ -88,9 +98,9 @@ const particleStyle = (index: number): CSSProperties => {
 
 .css-ufo {
   position: absolute;
-  top: 18%;
+  top: 16%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(1.25);
   opacity: 0;
   transition: opacity 0.8s ease;
   perspective: 600px;
@@ -161,47 +171,53 @@ const particleStyle = (index: number): CSSProperties => {
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
-  width: 80px;
-  height: 120px;
+  width: 650px;
+  height: 700px;
   background: radial-gradient(
     ellipse at top,
-    var(--ufo-accent-glow, rgba(16, 185, 129, 0.15)) 0%,
-    transparent 70%
+    var(--ufo-accent-glow, rgba(16, 185, 129, 0.4)) 0%,
+    transparent 80%
   );
-  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  clip-path: polygon(calc(50% - 25px) 0%, calc(50% + 25px) 0%, 100% 100%, 0% 100%);
   animation: ufo-beam 3s ease-in-out infinite;
 }
 
 /* Blueprint mode overrides */
 .css-ufo.ufo-blueprint {
   --ufo-accent: #38bdf8;
-  --ufo-accent-glow: rgba(56, 189, 248, 0.12);
-}
-
-.css-ufo.ufo-blueprint .ufo-hull {
-  background: transparent;
-  border: 1px dashed rgba(56, 189, 248, 0.4);
-  box-shadow: none;
-}
-
-.css-ufo.ufo-blueprint .ufo-dome {
-  background: transparent;
-  border: 1px dashed rgba(56, 189, 248, 0.3);
+  --ufo-accent-glow: rgba(56, 189, 248, 0.35);
 }
 
 @keyframes ufo-hover {
-  0%, 100% { transform: translateY(0) rotateX(2deg); }
-  50% { transform: translateY(-12px) rotateX(-2deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotateX(2deg);
+  }
+  50% {
+    transform: translateY(-12px) rotateX(-2deg);
+  }
 }
 
 @keyframes ufo-ring-pulse {
-  0%, 100% { opacity: 0.4; transform: translateX(-50%) scaleX(1); }
-  50% { opacity: 0.8; transform: translateX(-50%) scaleX(1.05); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(-50%) scaleX(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) scaleX(1.05);
+  }
 }
 
 @keyframes ufo-beam {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ─── DRONE ──────────────────────────────────────── */
@@ -223,6 +239,18 @@ const particleStyle = (index: number): CSSProperties => {
   width: 40px;
   height: 40px;
   animation: drone-orbit 12s linear infinite;
+}
+
+.drone-base {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 30, 0.95) 0%,
+    rgba(10, 10, 10, 0.98) 100%
+  );
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 .drone-core {
@@ -266,29 +294,63 @@ const particleStyle = (index: number): CSSProperties => {
   --drone-accent-glow: rgba(56, 189, 248, 0.15);
 }
 
-.css-drone.drone-blueprint .drone-core {
-  background: transparent;
-  border: 1px dashed rgba(56, 189, 248, 0.4);
-  box-shadow: none;
-}
-
 @keyframes drone-orbit {
   0% {
     transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
   }
   100% {
-    transform: translate(-50%, -50%) rotate(360deg) translateX(180px) rotate(-360deg);
+    transform: translate(-50%, -50%) rotate(360deg) translateX(180px)
+      rotate(-360deg);
   }
 }
 
 @keyframes drone-ring-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes drone-pulse-anim {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+.drone-scanner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    var(--drone-accent, #10b981) 0%,
+    var(--drone-accent-glow, rgba(16, 185, 129, 0.3)) 30%,
+    transparent 70%
+  );
+  animation: drone-glow-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes drone-glow-pulse {
+  0% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
 }
 
 /* ─── AMBIENT PARTICLES ──────────────────────────── */
@@ -302,11 +364,13 @@ const particleStyle = (index: number): CSSProperties => {
   position: absolute;
   border-radius: 50%;
   background: rgba(248, 250, 252, 0.15);
-  animation: particle-float var(--p-duration) var(--p-delay) ease-in-out infinite;
+  animation: particle-float var(--p-duration) var(--p-delay) ease-in-out
+    infinite;
 }
 
 @keyframes particle-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
     opacity: 0.15;
   }
