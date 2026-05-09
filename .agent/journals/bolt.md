@@ -17,3 +17,6 @@
 ## 2026-05-06 - requestAnimationFrame closure staleness
  **Learning:** When using requestAnimationFrame to throttle high-frequency events (like pointermove), caching coordinates directly in the callback closure can lead to stale data. If multiple events fire before the frame renders, the RAF uses the coordinates from the *first* event, not the latest.
  **Action:** Store the latest coordinates in plain variables defined outside the RAF closure. Update these variables immediately in the event handler, and have the RAF read from them. This ensures the frame always renders the most up-to-date position.
+## 2024-05-07 - IntersectionObserver Callback Performance
+ **Learning:** Iterating over maps/arrays (O(N)) inside a high-frequency `IntersectionObserver` callback blocks the main thread.
+ **Action:** For performance-critical observers in stores like `useViewportStore`, cache registered Vue component proxies in a `WeakMap<HTMLElement, ComponentRegistration>` during registration. This enables O(1) lookups inside the observer callback, avoiding performance degradation as the number of registered elements grows.
