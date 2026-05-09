@@ -124,7 +124,7 @@ watchEffect(() => {
   const activeCamera = camera.activeCamera.value;
 
   if (activeRenderer && scene.value && activeCamera && !composer) {
-    composer = new EffectComposer(activeRenderer as unknown as WebGLRenderer);
+    composer = new EffectComposer(activeRenderer as WebGLRenderer);
 
     // 1. Base Scene Pass
     const renderPass = new RenderPass(scene.value, activeCamera);

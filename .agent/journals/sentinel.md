@@ -8,3 +8,6 @@
 ## 2026-05-04 - Strict Environment Variable Type Enforcement
  **Learning:** Using `import.meta.env` directly throughout the application bypasses strict typing and can lead to unexpected runtime issues if Vite's AST replacement does not resolve properly, or if undefined values are expected as booleans.
  **Action:** Implemented `src/utils/env.ts` to act as a centralized, strict validation and parsing layer for all environment configurations, ensuring missing or malformed variables are caught and logged during initialization.
+## 2026-05-09 - Strict Type Enforcement for Externally Bound Objects
+ **Learning:** Type casting global objects like `window` to interfaces extending it using `as unknown as Type` bypasses TypeScript's natural inheritance checks, potentially hiding upstream type changes. `activeRenderer` from TresJS was also cast as `unknown` before `WebGLRenderer`, masking potential API drifts.
+ **Action:** Replaced `as unknown as` with direct `as` casting where types naturally align (e.g., `window as TurnstileWindow`, `activeRenderer as WebGLRenderer`), enforcing standard TypeScript bounds.

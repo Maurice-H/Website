@@ -154,7 +154,7 @@ describe('usePerformanceStore', () => {
     it('handles successful detectGpu (Tier 3)', async () => {
       vi.mocked(detectGpu.getGPUTier).mockResolvedValue({
         tier: 3,
-      } as unknown as detectGpu.TierResult);
+      } as detectGpu.TierResult);
       const store = usePerformanceStore();
       await store.checkPerformance();
       expect(detectGpu.getGPUTier).toHaveBeenCalled();
@@ -166,7 +166,7 @@ describe('usePerformanceStore', () => {
     it('handles successful detectGpu (Tier 1)', async () => {
       vi.mocked(detectGpu.getGPUTier).mockResolvedValue({
         tier: 1,
-      } as unknown as detectGpu.TierResult);
+      } as detectGpu.TierResult);
       const store = usePerformanceStore();
       await store.checkPerformance();
       expect(detectGpu.getGPUTier).toHaveBeenCalled();
