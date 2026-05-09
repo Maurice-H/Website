@@ -288,7 +288,7 @@ interface TurnstileWindow extends Window {
 }
 
 const renderTurnstile = () => {
-  const win = window as unknown as TurnstileWindow;
+  const win = window as TurnstileWindow;
   if (win.turnstile) {
     nextTick(() => {
       const container = document.querySelector('.cf-turnstile');
