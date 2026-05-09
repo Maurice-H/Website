@@ -14,6 +14,7 @@ interface ComponentRegistration {
 
 export const useViewportStore = defineStore('viewport', () => {
   const registeredComponents = reactive<Map<string, ComponentRegistration>>(new Map());
+  const elementMap = new WeakMap<HTMLElement, ComponentRegistration>();
   const mousePosition = reactive({ x: 0, y: 0 });
   const isListening = ref(false);
 
@@ -93,12 +94,10 @@ export const useViewportStore = defineStore('viewport', () => {
         (entries) => {
           let needsUpdate = false;
           entries.forEach((entry) => {
-            for (const reg of registeredComponents.values()) {
-              if (reg.el === entry.target) {
-                reg.isVisible = entry.isIntersecting;
-                needsUpdate = true;
-                break;
-              }
+            const reg = elementMap.get(entry.target as HTMLElement);
+            if (reg) {
+              reg.isVisible = entry.isIntersecting;
+              needsUpdate = true;
             }
           });
           if (needsUpdate) {
@@ -128,6 +127,11 @@ export const useViewportStore = defineStore('viewport', () => {
       isVisible: true,
     });
 
+    const reg = registeredComponents.get(id);
+    if (reg) {
+      elementMap.set(el, reg);
+    }
+
     if (observer) {
       observer.observe(el);
     }
@@ -143,8 +147,11 @@ export const useViewportStore = defineStore('viewport', () => {
       },
       unregister: () => {
         const reg = registeredComponents.get(id);
-        if (reg && observer) {
-          observer.unobserve(reg.el);
+        if (reg) {
+          if (observer) {
+            observer.unobserve(reg.el);
+          }
+          elementMap.delete(reg.el);
         }
         registeredComponents.delete(id);
       },
