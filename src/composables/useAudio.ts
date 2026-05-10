@@ -43,7 +43,7 @@ export function useAudio() {
   };
 
   const playClick = () => {
-    const audio = getAudioFromPool('/audio/sci-fi-light-click.ogg', 0.05);
+    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-light-click.ogg`, 0.05);
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));
@@ -51,7 +51,7 @@ export function useAudio() {
   };
 
   const playGlitch = () => {
-    const audio = getAudioFromPool('/audio/sci-fi-theme-glitch-click.ogg', 0.05);
+    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-theme-glitch-click.ogg`, 0.05);
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));
@@ -59,7 +59,7 @@ export function useAudio() {
   };
 
   const playSwoosh = () => {
-    const audio = getAudioFromPool('/audio/sci-fi-swoosh.ogg', 0.05);
+    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-swoosh.ogg`, 0.05);
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));

@@ -505,7 +505,7 @@ function loadDroneModel() {
   droneLoadStarted = true;
 
   gltfLoader.load(
-    '/models/drone.glb',
+    `${import.meta.env.BASE_URL}models/drone.glb`,
     (gltf) => {
       logModelDiagnostics('Drone', gltf.scene);
 
@@ -534,7 +534,7 @@ function loadDroneModel() {
 
 onMounted(() => {
   gltfLoader.load(
-    '/models/ufo.glb',
+    `${import.meta.env.BASE_URL}models/ufo.glb`,
     (gltf) => {
       logModelDiagnostics('UFO', gltf.scene);
 
