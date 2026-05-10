@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { useShortcutStore } from '../useShortcutStore';
 
 describe('useShortcutStore', () => {
@@ -133,5 +134,33 @@ describe('useShortcutStore', () => {
     localStorage.setItem('portfolio-shortcuts', 'invalid-json');
     const store = useShortcutStore();
     expect(store.getKey('theme')).toBe('t');
+  });
+
+  it('handles localStorage errors during persistence gracefully', async () => {
+    const store = useShortcutStore();
+
+    // We spy on the global localStorage object
+    const setItemSpy = vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+
+    // Make sure we actually start a rebind so tryRebind does something
+    store.startRebind('theme');
+
+    // Try to rebind, this should trigger the watcher which will call localStorage.setItem
+    const success = store.tryRebind('x');
+    expect(success).toBe(true);
+
+    // Wait for the Vue watcher to trigger asynchronously and run the setItem
+    await nextTick();
+
+    // The store should still have updated the value in memory
+    expect(store.getKey('theme')).toBe('x');
+
+    // Verify the mock was actually called and thus threw the error internally
+    expect(setItemSpy).toHaveBeenCalled();
+
+    // Restore original behavior
+    setItemSpy.mockRestore();
   });
 });
