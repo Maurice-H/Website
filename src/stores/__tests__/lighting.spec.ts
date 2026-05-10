@@ -14,7 +14,6 @@ describe('useLightingStore', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
-    vi.clearAllTimers();
   });
 
   it('should initialize with default state', () => {

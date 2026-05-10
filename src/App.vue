@@ -172,6 +172,7 @@ const handleAfterEnter = () => {
 onMounted(async () => {
   window.addEventListener('keydown', handleGlobalKeydown);
 
+  console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
 
   // Run GPU performance benchmark early to determine rendering tier

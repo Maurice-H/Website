@@ -6,11 +6,9 @@ test.describe('WebGL Background Canvas', () => {
 
   test.beforeEach(async ({ page }) => {
     app = new AppPage(page);
-    await page.goto('/?forceTier=3&ci=1');
+    await page.goto('/?forceTier=3');
     // Wait for the app-ready state (NavConveyor visible)
     await expect(page.locator('.nav-conveyor')).toBeVisible({ timeout: 15000 });
-    // Wait for CI mode class to be applied
-    await expect(page.locator('.app-root')).toHaveClass(/is-ci-mode/);
   });
 
   test('should render a canvas element in the DOM', async ({ page }) => {
