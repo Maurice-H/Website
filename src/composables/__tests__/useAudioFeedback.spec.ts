@@ -17,7 +17,12 @@ describe('useAudioFeedback', () => {
     it('initializes Audio with correct src, volume and preload', () => {
       const mockPlay = vi.fn().mockResolvedValue(undefined);
 
-      const MockAudioClass = vi.fn().mockImplementation(function(this: any) {
+      const MockAudioClass = vi.fn().mockImplementation(function (this: {
+        volume: number;
+        preload: string;
+        currentTime: number;
+        play: unknown;
+      }) {
         this.volume = 1;
         this.preload = '';
         this.currentTime = 0;
@@ -38,7 +43,12 @@ describe('useAudioFeedback', () => {
     it('uses default volume of 0.3 if not provided', () => {
       const mockPlay = vi.fn().mockResolvedValue(undefined);
 
-      const MockAudioClass = vi.fn().mockImplementation(function(this: any) {
+      const MockAudioClass = vi.fn().mockImplementation(function (this: {
+        volume: number;
+        preload: string;
+        currentTime: number;
+        play: unknown;
+      }) {
         this.volume = 1;
         this.preload = '';
         this.currentTime = 0;
@@ -54,7 +64,7 @@ describe('useAudioFeedback', () => {
 
     it('handles Audio constructor failure gracefully', () => {
       // Simulate SSR or unsupported environment where Audio throws
-      const MockAudioClass = vi.fn().mockImplementation(function(this: any) {
+      const MockAudioClass = vi.fn().mockImplementation(() => {
         throw new Error('Audio is not defined');
       });
       globalThis.Audio = MockAudioClass as unknown as typeof Audio;
@@ -70,7 +80,12 @@ describe('useAudioFeedback', () => {
     it('resets currentTime and calls play() on the audio element', () => {
       const mockPlay = vi.fn().mockResolvedValue(undefined);
 
-      const MockAudioClass = vi.fn().mockImplementation(function(this: any) {
+      const MockAudioClass = vi.fn().mockImplementation(function (this: {
+        volume: number;
+        preload: string;
+        currentTime: number;
+        play: unknown;
+      }) {
         this.volume = 1;
         this.preload = '';
         this.currentTime = 10;
@@ -90,7 +105,12 @@ describe('useAudioFeedback', () => {
     it('silently catches play() promise rejections (e.g. autoplay policy)', async () => {
       const mockPlay = vi.fn().mockRejectedValue(new Error('NotAllowedError'));
 
-      const MockAudioClass = vi.fn().mockImplementation(function(this: any) {
+      const MockAudioClass = vi.fn().mockImplementation(function (this: {
+        volume: number;
+        preload: string;
+        currentTime: number;
+        play: unknown;
+      }) {
         this.volume = 1;
         this.preload = '';
         this.currentTime = 10;
@@ -104,7 +124,7 @@ describe('useAudioFeedback', () => {
       expect(() => play()).not.toThrow();
 
       // We should also wait a tick to make sure the unhandled promise rejection is swallowed
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
     });
   });
 });
