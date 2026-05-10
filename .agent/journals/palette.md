@@ -21,3 +21,7 @@
 ## 2024-05-08 - SVG Icons Missing aria-hidden Attribute
  Learning: Purely decorative SVGs packaged as Vue components often miss the `aria-hidden="true"` attribute, which can lead to screen readers announcing unnecessary elements, particularly when these components are nested inside buttons or links that already have sufficient accessible names (e.g. `aria-label`).
  Action: Ensure that all newly created standalone SVG icon components include `aria-hidden="true"` on their root `<svg>` element unless they specifically serve a unique semantic purpose and provide their own accessible title.
+
+## 2026-05-09 - Dynamic Text State Announcements
+ Learning: When a button's text dynamically updates to indicate a state change (e.g., from "Copy" to "✓ Copied") without focusing another element or reloading the page, screen readers will not announce the updated text by default, leaving non-visual users unaware of the successful interaction.
+ Action: When dynamically updating UI text to indicate temporary or changed states, ensure the element uses `aria-live="polite"` so screen readers appropriately announce the visual change.

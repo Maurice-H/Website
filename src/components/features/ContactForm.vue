@@ -179,6 +179,7 @@
           }}</span>
           <button
             type="button"
+            aria-live="polite"
             class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-200 active:scale-95"
             @click="copyToClipboard(discordUser)"
           >
@@ -310,7 +311,7 @@ interface TurnstileWindow extends Window {
 }
 
 const renderTurnstile = () => {
-  const win = window as unknown as TurnstileWindow;
+  const win = window as TurnstileWindow;
   if (win.turnstile) {
     nextTick(() => {
       const container = document.querySelector('.cf-turnstile');
