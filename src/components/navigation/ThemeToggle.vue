@@ -3,6 +3,7 @@
     type="button"
     @click="toggleTheme"
     :aria-label="`System Mode ${isBlueprint ? 'Blueprint' : 'Finished'}`"
+    data-testid="theme-toggle"
     class="group relative flex items-center justify-center md:justify-start p-3 md:p-5 w-full md:w-56 rounded-2xl md:rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     :class="[
       isBlueprint
@@ -29,23 +30,14 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { useAudio } from '../../composables/useAudio';
 import { useThemeStore } from '../../stores/useThemeStore';
 import ThemeToggleIcon from '../icons/ThemeToggleIcon.vue';
 
 const themeStore = useThemeStore();
 const { isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
-const playSwitchSound = () => {
-  try {
-    const audio = new Audio('audio/switch2.ogg');
-    audio.volume = 0.5;
-    audio.play().catch(() => {
-      // Silently ignore if audio fails (e.g. browser policy)
-    });
-  } catch (e) {
-    // Silently ignore if audio fails (e.g. browser policy)
-  }
-};
+const { playGlitch: playSwitchSound } = useAudio();
 
 const toggleTheme = () => {
   themeStore.toggleTheme();

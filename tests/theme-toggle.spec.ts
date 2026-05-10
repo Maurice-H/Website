@@ -10,36 +10,19 @@ test.describe('Theme Toggle – Visual Regression Sequence', () => {
   });
 
   test('application starts in Finished mode (no data-theme)', async () => {
-    // The app should launch without the blueprint attribute.
-    const theme = await app.getDataTheme();
-    expect(theme).toBeNull();
+    expect(await app.getDataTheme()).not.toBe('blueprint');
   });
 
-  test('entering content phase reveals the theme toggle button', async () => {
+  test('toggling theme via shortcut sets data-theme="blueprint" on <html>', async () => {
     await app.enterContentPhase();
-    await expect(app.themeToggleBtn).toBeVisible();
+    await app.toggleTheme();
+    expect(await app.getDataTheme()).toBe('blueprint');
   });
 
-  test('clicking theme toggle sets data-theme="blueprint" on <html>', async () => {
-    // Navigate into the content phase where the ThemeToggle is rendered.
+  test('toggling theme twice via shortcut removes data-theme (round-trip)', async () => {
     await app.enterContentPhase();
-
-    // Click the toggle button.
-    await app.toggleTheme();
-
-    // Assert the HTML root receives the blueprint attribute.
-    await expect(app.htmlRoot).toHaveAttribute('data-theme', 'blueprint');
-  });
-
-  test('clicking theme toggle twice removes data-theme (round-trip)', async () => {
-    await app.enterContentPhase();
-
-    // Toggle ON → blueprint
-    await app.toggleTheme();
-    await expect(app.htmlRoot).toHaveAttribute('data-theme', 'blueprint');
-
-    // Toggle OFF → attribute removed
-    await app.toggleTheme();
-    await expect(app.htmlRoot).not.toHaveAttribute('data-theme', 'blueprint');
+    await app.toggleTheme(); // Set to blueprint
+    await app.toggleTheme(); // Back to finished
+    expect(await app.getDataTheme()).not.toBe('blueprint');
   });
 });

@@ -8,7 +8,7 @@
   >
     <div class="p-4 md:p-10 flex flex-col h-full">
       <p
-        class="text-slate-400 text-xs md:text-sm mb-4 md:mb-6 font-mono tracking-wide"
+        class="text-finished-text/50 text-xs md:text-sm mb-4 md:mb-6 font-mono tracking-wide transition-colors duration-[var(--theme-transition-duration)]"
       >
         Establish direct channel for collaboration.
       </p>
@@ -58,10 +58,10 @@
           <div class="flex flex-col gap-1.5">
             <label
               for="contact-name"
-              class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1"
+              class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
               Name
-              <span class="text-finished-accent" aria-hidden="true">*</span>
+              <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper">
               <input
@@ -70,7 +70,7 @@
                 required
                 v-model="formData.name"
                 placeholder="Enter your designation"
-                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+                class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors duration-[var(--theme-transition-duration)]"
               />
             </div>
           </div>
@@ -78,10 +78,10 @@
           <div class="flex flex-col gap-1.5">
             <label
               for="contact-email"
-              class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1"
+              class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
               Email
-              <span class="text-finished-accent" aria-hidden="true">*</span>
+              <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper">
               <input
@@ -92,10 +92,15 @@
                 placeholder="Enter comm-link"
                 :aria-invalid="!!emailError"
                 :aria-describedby="emailError ? 'email-error' : undefined"
-                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+                class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors duration-[var(--theme-transition-duration)]"
               />
             </div>
-            <p v-if="emailError" id="email-error" aria-live="polite" class="text-red-400 text-xs mt-1 ml-1">
+            <p
+              v-if="emailError"
+              id="email-error"
+              aria-live="polite"
+              class="text-red-400 text-xs mt-1 ml-1"
+            >
               {{ emailError }}
             </p>
           </div>
@@ -103,10 +108,10 @@
           <div class="flex flex-col gap-1.5 flex-1">
             <label
               for="contact-message"
-              class="text-xs text-slate-400 uppercase tracking-widest font-bold ml-1"
+              class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
               Message
-              <span class="text-finished-accent" aria-hidden="true">*</span>
+              <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper h-full">
               <textarea
@@ -115,31 +120,44 @@
                 v-model="formData.message"
                 placeholder="Transmit payload..."
                 :aria-invalid="formState === 'error'"
-                :aria-describedby="formState === 'error' ? 'message-error' : undefined"
-                class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none"
+                :aria-describedby="
+                  formState === 'error' ? 'message-error' : undefined
+                "
+                class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-finished-text placeholder-finished-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors duration-[var(--theme-transition-duration)] resize-none"
               ></textarea>
             </div>
           </div>
 
-          <p v-if="formState === 'error'" id="message-error" aria-live="polite" class="text-red-400 text-xs ml-1">
+          <p
+            v-if="formState === 'error'"
+            id="message-error"
+            aria-live="polite"
+            class="text-red-400 text-xs ml-1"
+          >
             {{ errorMessage }}
           </p>
 
-          <!-- Cloudflare Turnstile Widget -->
+          <!-- Cloudflare Turnstile Widget (Dynamic Size & Scale) -->
           <div
+            :key="isMobile ? 'mobile' : 'desktop'"
             class="cf-turnstile mb-2"
             :data-sitekey="turnstileSiteKey"
             data-theme="dark"
+            :data-size="isMobile ? 'compact' : 'normal'"
+            :style="{ 
+              transform: `scale(${captchaScale})`,
+              display: widgetId ? 'block' : 'none' 
+            }"
           ></div>
 
           <button
             type="submit"
             :disabled="formState === 'submitting'"
             aria-live="polite"
-            class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-white font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-[var(--finished-accent)] hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
+            class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-finished-text font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-finished-accent hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-[var(--theme-transition-duration)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             <span
-              class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor]"
+              class="relative z-10 group-hover:drop-shadow-[0_0_8px_currentColor] transition-colors duration-[var(--theme-transition-duration)]"
             >
               {{ submitLabel }}
             </span>
@@ -171,7 +189,13 @@
             class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-200 active:scale-95"
             @click="copyToClipboard(discordUser)"
           >
-            {{ copyState === 'copied' ? '✓ Copied' : copyState === 'error' ? 'Failed to copy' : 'Copy' }}
+            {{
+              copyState === "copied"
+                ? "✓ Copied"
+                : copyState === "error"
+                  ? "Failed to copy"
+                  : "Copy"
+            }}
           </button>
         </div>
       </div>
@@ -218,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import { envConfig } from '../../utils/env';
@@ -243,6 +267,7 @@ const emailError = ref('');
 const copyState = ref<'idle' | 'copied' | 'error'>('idle');
 const honeypot = ref('');
 const lastSubmitTime = ref<number>(0);
+const isMobile = ref(false);
 
 const formData = reactive({
   name: '',
@@ -250,7 +275,11 @@ const formData = reactive({
   message: '',
 });
 
-const channels: { id: ChannelId; label: string; icon: import('vue').Component }[] = [
+const channels: {
+  id: ChannelId;
+  label: string;
+  icon: import('vue').Component;
+}[] = [
   { id: 'email', label: 'Email', icon: EmailIcon },
   { id: 'discord', label: 'Discord', icon: DiscordIcon },
   { id: 'xing', label: 'Xing', icon: XingIcon },
@@ -284,22 +313,51 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // --- Methods ---
 interface TurnstileWindow extends Window {
   turnstile?: {
-    render: (selector: string, options: { sitekey: string; theme: string }) => void;
+    render: (
+      selector: string,
+      options: { sitekey: string; theme: string; size?: string }
+    ) => string;
+    reset: (id?: string) => void;
+    remove: (id: string) => void;
   };
 }
+
+const widgetId = ref<string | null>(null);
+const captchaScale = ref(1);
 
 const renderTurnstile = () => {
   const win = window as TurnstileWindow;
   if (win.turnstile) {
     nextTick(() => {
       const container = document.querySelector('.cf-turnstile');
+      // We don't need to manually remove if we use a :key on the element,
+      // as Vue replaces the element for us.
       if (container && !container.querySelector('iframe')) {
-        win.turnstile?.render('.cf-turnstile', {
-          sitekey: turnstileSiteKey,
-          theme: 'dark',
-        });
+        widgetId.value =
+          win.turnstile?.render('.cf-turnstile', {
+            sitekey: turnstileSiteKey,
+            theme: 'dark',
+            size: isMobile.value ? 'compact' : 'normal',
+          }) || null;
+
+        updateCaptchaScale();
       }
     });
+  }
+};
+
+const updateCaptchaScale = () => {
+  const container = document.querySelector('.cf-turnstile');
+  if (!container?.parentElement) return;
+
+  const parentWidth = container.parentElement.clientWidth;
+  const targetWidth = isMobile.value ? 130 : 300;
+
+  if (parentWidth < targetWidth && parentWidth > 0) {
+    // Math.max(0.3, ...) ensures it never scales to 0 and becomes invisible
+    captchaScale.value = Math.max(0.3, Math.min(1, (parentWidth - 10) / targetWidth));
+  } else {
+    captchaScale.value = 1;
   }
 };
 
@@ -533,7 +591,37 @@ const copyToClipboard = async (text: string) => {
 };
 
 // --- Lifecycle & Watchers ---
+let resizeObserver: ResizeObserver | null = null;
+
 onMounted(() => {
+  isMobile.value = window.innerWidth < 480;
+  renderTurnstile();
+
+  // Dynamic scaling observer
+  nextTick(() => {
+    const container = document.querySelector('.cf-turnstile');
+    if (container?.parentElement) {
+      resizeObserver = new ResizeObserver(() => {
+        updateCaptchaScale();
+
+        const mobile = window.innerWidth < 480;
+        if (mobile !== isMobile.value) {
+          isMobile.value = mobile;
+          // Re-render handled by watch(isMobile) below
+        }
+      });
+      resizeObserver.observe(container.parentElement);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
+
+watch(isMobile, () => {
   renderTurnstile();
 });
 
@@ -622,5 +710,12 @@ watch(activeChannel, (newChannel) => {
 
 .social-link-btn:active {
   transform: scale(0.98);
+}
+
+.cf-turnstile {
+  transform-origin: left top;
+  transition: transform 0.2s ease-out;
+  /* Ensure the container doesn't collapse its height when scaled */
+  min-height: v-bind('isMobile ? "120px" : "65px"');
 }
 </style>

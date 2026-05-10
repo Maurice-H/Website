@@ -20,3 +20,10 @@ The system initialization (e.g., GPU benchmarking, state hydration) SHALL NOT bl
 - **WHEN** the `detect-gpu` process takes more than 500ms
 - **THEN** the main content and text elements MUST still be visible to the user.
 - **AND** the LCP metric SHOULD NOT be delayed by more than 100ms beyond the initial script execution.
+
+### Requirement: performance-switching
+The application shall dynamically choose the rendering engine at runtime based on the detected GPU tier.
+
+#### Scenario: Tier 1 Detection
+- **WHEN** `gpuTier` is 1 or `isWebGLSupported` is false.
+- **THEN** the `WebGLBackground` component shall render `CSSBackground` instead of `TresCanvas`.

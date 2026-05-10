@@ -4,6 +4,9 @@
     :id="id"
     class="bento-card relative rounded-2xl p-4 md:p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass, { 'is-low-end': isLowEnd }]"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+    :data-drone-target="isHovered ? 'true' : 'false'"
   >
     <!-- Background Layer (Base) -->
     <div class="absolute inset-0 bg-finished-bg/40 z-[-1]"></div>
@@ -39,6 +42,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useLightingStore } from '../../stores/lighting';
 import { useViewportStore } from '../../stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
@@ -62,7 +66,28 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
+const lighting = useLightingStore();
 let unregisterFn: (() => void) | null = null;
+
+const isHovered = ref(false);
+
+const handleMouseEnter = () => {
+  isHovered.value = true;
+  if (!cardRef.value) return;
+  const rect = cardRef.value.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  lighting.focusedElementPos = {
+    x: (centerX / window.innerWidth) * 2 - 1,
+    y: -((centerY / window.innerHeight) * 2 - 1),
+  };
+};
+
+const handleMouseLeave = () => {
+  isHovered.value = false;
+  lighting.focusedElementPos = null;
+};
 
 const revealStyle = computed(() => {
   return {

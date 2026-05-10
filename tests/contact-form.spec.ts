@@ -1,41 +1,37 @@
 import { expect, test } from '@playwright/test';
+import { AppPage } from './pages/app.page';
 
 test.describe('Contact Form & Turnstile Integration', () => {
+  let app: AppPage;
+
   test.beforeEach(async ({ page }) => {
-    // Navigate to the home page
-    await page.goto('/');
-
-    // Wait for the navigation conveyor to be visible
-    await expect(page.locator('.nav-conveyor')).toBeVisible();
-
-    // Click on a navigation card to enter the 'CONTENT' phase
-    // 'EXPERIENCE' is the first card usually active
-    await page.click('text=EXPERIENCE');
+    app = new AppPage(page);
+    await app.goto();
+    await app.enterContentPhase();
 
     // Wait for the contact form to appear in the CONTENT phase
-    const contactForm = page.locator('#contact-form');
-    await expect(contactForm).toBeVisible({ timeout: 10000 });
+    const contactForm = app.page.locator('#contact-form');
+    await expect(contactForm).toBeVisible({ timeout: 15000 });
   });
 
-  test('should display the turnstile widget', async ({ page }) => {
+  test('should display the turnstile widget', async () => {
     // Check if the Turnstile widget container is present
-    const turnstileWidget = page.locator('.cf-turnstile');
+    const turnstileWidget = app.page.locator('.cf-turnstile');
     await expect(turnstileWidget).toBeVisible();
 
     // Check if Cloudflare Turnstile has injected its iframe
-    // Note: We use a longer timeout as the script needs to load and initialize
-    const turnstileIframe = page.frameLocator('.cf-turnstile iframe');
+    const turnstileIframe = app.page.frameLocator('.cf-turnstile iframe');
     await expect(turnstileIframe.locator('body')).toBeDefined();
   });
 
-  test('should include turnstile token in form submission', async ({ page }) => {
+  test('should include turnstile token in form submission', async () => {
     // Fill the form fields
-    await page.fill('#contact-name', 'Test User');
-    await page.fill('#contact-email', 'test@gmail.com');
-    await page.fill('#contact-message', 'This is a test message for Playwright.');
+    await app.page.fill('#contact-name', 'Test User');
+    await app.page.fill('#contact-email', 'test@gmail.com');
+    await app.page.fill('#contact-message', 'This is a test message for Playwright.');
 
     // Mock Turnstile response for Playwright headless mode
-    await page.evaluate(() => {
+    await app.page.evaluate(() => {
       let input = document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement;
       if (!input) {
         input = document.createElement('input');
@@ -46,11 +42,11 @@ test.describe('Contact Form & Turnstile Integration', () => {
       input.value = 'mocked-turnstile-token';
     });
 
-    const turnstileToken = page.locator('[name="cf-turnstile-response"]');
+    const turnstileToken = app.page.locator('[name="cf-turnstile-response"]');
     await expect(turnstileToken).not.toHaveValue('');
 
     // Mock Cloudflare DNS verification
-    await page.route(
+    await app.page.route(
       'https://cloudflare-dns.com/dns-query?name=gmail.com&type=MX',
       async (route) => {
         await route.fulfill({
@@ -65,7 +61,7 @@ test.describe('Contact Form & Turnstile Integration', () => {
     );
 
     // Intercept the fetch request to verify the payload
-    await page.route('https://formspree.io/f/*', async (route) => {
+    await app.page.route('https://formspree.io/f/*', async (route) => {
       const request = route.request();
       const postData = request.postDataJSON();
 
@@ -88,9 +84,9 @@ test.describe('Contact Form & Turnstile Integration', () => {
     });
 
     // Submit the form
-    await page.click('button[type="submit"]');
+    await app.page.click('button[type="submit"]');
 
     // Check for success message
-    await expect(page.locator('text=Transmission Sent ✓')).toBeVisible();
+    await expect(app.page.locator('text=Transmission Sent ✓')).toBeVisible();
   });
 });

@@ -7,13 +7,15 @@
       <WebGLScene />
     </TresCanvas>
   </div>
+  <CSSBackground v-else-if="performance.isReady" />
 </template>
 
 <script setup lang="ts">
+import { usePerformanceStore } from '@stores/usePerformanceStore';
 import { TresCanvas } from '@tresjs/core';
 import { BasicShadowMap, NoToneMapping, SRGBColorSpace } from 'three';
 import { computed } from 'vue';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
+import CSSBackground from './CSSBackground.vue';
 import WebGLScene from './WebGLScene.vue';
 
 const performance = usePerformanceStore();

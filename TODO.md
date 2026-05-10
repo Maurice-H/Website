@@ -22,15 +22,16 @@
 ## 🔊 Milestone 3: Audio-Visuelle Immersion
 *Fokus: Satisfaction und High-Fidelity Assets.*
 
-- [ ] **Asset Upgrade:** Suche und Integration coolerer 3D-Modelle für das UFO und die Drohne.
-- [ ] **Subtle Sound Effects:** Satisfaction-Clicks für Theme-Toggle, Hover und Phasen-Wechsel.
-- [ ] **Particle Effects:** Dezenter "Abduction"-Effekt beim Wechsel in die CONTENT-Phase.
+- [x] **Asset Upgrade:** Suche und Integration coolerer 3D-Modelle für das UFO und die Drohne.
+- [x] **Subtle Sound Effects:** Satisfaction-Clicks für Theme-Toggle, Hover und Phasen-Wechsel.
+- [x] **Particle Effects:** Dezenter "Abduction"-Effekt beim Wechsel in die CONTENT-Phase.
 
 ## 📊 Milestone 4: Data & Final Polish
 *Fokus: Dynamische Inhalte und Performance-Tuning.*
 
+- [ ] **Update existing Data:** Update project data of personal infos.
 - [ ] **Dynamic Projects:** Projekte via GitHub API laden statt Hardcoding.
-- [ ] **LHCI Optimization:** Reduzierung auf 1-Run-Tests und Überspringen redundanter Tiers in der CI (Build-Zeit-Optimierung).
+- [x] **LHCI Optimization:** Reduzierung auf 1-Run-Tests und Überspringen redundanter Tiers in der CI (Build-Zeit-Optimierung).
 
 ---
 

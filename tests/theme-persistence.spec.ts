@@ -1,34 +1,36 @@
 import { expect, test } from '@playwright/test';
+import { AppPage } from './pages/app.page';
 
 test.describe('Theme Persistence and Navigation', () => {
-  test('persists theme mode when navigating and back', async ({ page }) => {
-    await page.goto('/');
+  let app: AppPage;
 
+  test.beforeEach(async ({ page }) => {
+    app = new AppPage(page);
+    await app.goto();
+  });
+
+  test('persists theme mode when navigating and back', async () => {
     // Verify initial theme is "finished" (no data-theme="blueprint")
-    await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'blueprint');
+    expect(await app.getDataTheme()).not.toBe('blueprint');
 
     // In NAV phase, Technical DNA should be visible
-    await expect(page.getByText('Technical DNA').first()).toBeVisible();
+    await expect(app.page.getByText('Technical DNA').first()).toBeVisible();
 
-    // Wait for the initial centering scroll to settle
-    await page.waitForTimeout(500);
-
-    // Click the active nav window (Experience) to navigate to the content phase
-    // We click the active one because it's centered on load, making the test more stable
-    await page.locator('.nav-window.is-active').first().click();
+    // Navigate to content phase
+    await app.enterContentPhase();
 
     // Discovery Path should appear in the Bento Grid
-    await expect(page.getByText('Discovery Path').first()).toBeVisible({ timeout: 15000 });
+    await expect(app.page.getByText('Discovery Path').first()).toBeVisible({ timeout: 15000 });
 
     // Now in content phase, Toggle theme to Blueprint
-    await page.getByRole('button', { name: /System Mode/ }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'blueprint');
+    await app.toggleTheme();
+    expect(await app.getDataTheme()).toBe('blueprint');
 
-    // Click ESC back button to go back to Nav
-    await page.getByRole('button', { name: '[ ESC ] Back' }).click();
+    // Click Back button to go back to Nav
+    await app.backToNavBtn.click();
 
     // Verify back to NAV phase and theme is STILL blueprint
-    await expect(page.getByText('Technical DNA').first()).toBeVisible();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'blueprint');
+    await expect(app.page.getByText('Technical DNA').first()).toBeVisible();
+    expect(await app.getDataTheme()).toBe('blueprint');
   });
 });

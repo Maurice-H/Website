@@ -46,3 +46,21 @@ The system SHALL synchronize the CSS `--reveal-mask` variable across all active 
 #### Scenario: Transitioning to Content Phase
 - **WHEN** the `setPhase(CONTENT)` action is triggered
 - **THEN** all rendered layers SHALL update their mask positions relative to the absolute viewport origin within 300ms.
+
+### Requirement: 3d-asset-pipeline
+The system shall support external GLB models with automatic scale and rotation adjustment to fit the existing scene hierarchy.
+
+#### Scenario: UFO Model Loading
+- **WHEN** the application is in NAV phase and a valid `ufo.glb` exists.
+- **THEN** the GLB model shall be rendered at position `[0, 1.6, 0]`, replacing the cylinder primitive.
+
+#### Scenario: CSP Blob Access
+- **WHEN** the GLTFLoader extracts embedded textures as blob URLs.
+- **THEN** the CSP `connect-src` directive shall include `blob:` to allow texture fetching.
+
+### Requirement: css-cinematic-fallback
+Low-end devices (Tier 1) shall display an equivalent visual experience using DOM elements and CSS animations.
+
+#### Scenario: Phase Transition in CSS
+- **WHEN** the `lightingStore.phase` changes from NAV to CONTENT on a Tier 1 device.
+- **THEN** the CSS UFO shall fade out and the CSS Drone shall fade in and begin its orbital path.

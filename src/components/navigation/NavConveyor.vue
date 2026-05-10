@@ -38,10 +38,10 @@
             <div class="code-line text-finished-accent/60">
               Frontend Developer &amp; System Architect
             </div>
-            <div class="code-line opacity-50">
-              Vue 3 · TypeScript · WebGL
-            </div>
-            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+            <div class="code-line opacity-50">Vue 3 · TypeScript · WebGL</div>
+            <div
+              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+            >
               Click to explore →
             </div>
           </div>
@@ -63,7 +63,9 @@
             <div class="code-line opacity-50">
               Germany · Performance Obsessed
             </div>
-            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+            <div
+              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+            >
               Click to explore →
             </div>
           </div>
@@ -82,10 +84,10 @@
             <div class="code-line text-finished-accent/60">
               {{ projectCount }} repositories indexed
             </div>
-            <div class="code-line opacity-50">
-              Vue 3 · Node.js · Three.js
-            </div>
-            <div class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+            <div class="code-line opacity-50">Vue 3 · Node.js · Three.js</div>
+            <div
+              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+            >
               Click to explore →
             </div>
           </div>
@@ -99,7 +101,9 @@
           <h2 class="window-title">GET IN TOUCH</h2>
           <div class="flex flex-col items-center gap-3">
             <EnvelopeIcon />
-            <div class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase">
+            <div
+              class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+            >
               Email · Discord · LinkedIn
             </div>
           </div>
@@ -107,20 +111,75 @@
       </NavWindow>
     </div>
 
-    <!-- Hint matching the mockup 'TECHNICAL DNA' text -->
-    <div class="drag-hint">TECHNICAL DNA</div>
+    <!-- Keyboard Shortcut Display -->
+    <div class="shortcut-bar">
+      <div class="shortcut-items">
+        <div
+          v-for="action in shortcutActions"
+          :key="action"
+          class="shortcut-item"
+          :class="{ 'shortcut-item--rebinding': shortcutStore.rebindingAction === action }"
+          @click.stop="handleShortcutClick(action)"
+        >
+          <kbd>{{ shortcutStore.rebindingAction === action ? '...' : shortcutStore.getDisplay(action) }}</kbd>
+          <span>{{ shortcutStore.getLabel(action) }}</span>
+        </div>
+      </div>
+      <button
+        v-if="!isMobile"
+        type="button"
+        class="shortcut-edit-btn"
+        title="Edit shortcuts"
+        :class="{ 'shortcut-edit-btn--active': shortcutStore.rebindingAction }"
+        @click.stop="shortcutStore.rebindingAction ? shortcutStore.cancelRebind() : shortcutStore.startRebind('lighting')"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useAudio } from '../../composables/useAudio';
 import { PROJECTS, NAV_TABS as tabs } from '../../data/portfolio';
 import { useLightingStore } from '../../stores/lighting';
+import { type ShortcutAction, useShortcutStore } from '../../stores/useShortcutStore';
+import { useThemeStore } from '../../stores/useThemeStore';
 import { LightingPhase } from '../../types/index';
 import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
 import NavWindow from './NavWindow.vue';
 
 const lightingStore = useLightingStore();
+const shortcutStore = useShortcutStore();
+const themeStore = useThemeStore();
+const { playClick, playGlitch } = useAudio();
+
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 768);
+const updateMobileState = () => {
+  isMobile.value = typeof window !== 'undefined' && window.innerWidth < 768;
+};
+
+const shortcutActions = computed<ShortcutAction[]>(() =>
+  isMobile.value ? ['lighting', 'theme'] : ['lighting', 'theme', 'back']
+);
+
+const handleShortcutClick = (action: ShortcutAction) => {
+  if (isMobile.value) {
+    if (action === 'lighting') {
+      themeStore.toggleLighting();
+      playClick();
+    } else if (action === 'theme') {
+      themeStore.toggleTheme();
+      playGlitch();
+    }
+  } else {
+    shortcutStore.startRebind(action);
+  }
+};
 const trackEl = ref<HTMLElement | null>(null);
 
 const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
@@ -169,7 +228,6 @@ const stopDrag = (_e: PointerEvent) => {
 
 const handleScroll = () => {
   if (isProgrammaticScroll || !trackEl.value?.children[0]) return;
-
   const firstChild = trackEl.value.children[0] as HTMLElement;
   const gap = window.innerWidth < 768 ? 40 : 120;
   const step = firstChild.offsetWidth + gap;
@@ -190,22 +248,7 @@ const onWheel = (e: WheelEvent) => {
   });
 };
 
-const selectTab = (id: string, e: PointerEvent | KeyboardEvent) => {
-  if (e instanceof PointerEvent) {
-    // Distance-based check is much more robust for E2E tests than a simple flag
-    const moveDistance = Math.abs(e.pageX - (mouseDownX || e.pageX));
-
-    if (moveDistance > 15) {
-      return;
-    }
-  }
-
-  activeId.value = id;
-  const tab = tabs.find((t) => t.id === id);
-  lightingStore.pendingScrollTarget = tab?.targetSection ?? null;
-  lightingStore.setPhase(LightingPhase.CONTENT);
-
-  // Smooth scroll to the selected tab if it's not centered
+const scrollToTab = (id: string) => {
   const index = tabs.findIndex((t) => t.id === id);
   if (trackEl.value?.children[index]) {
     isProgrammaticScroll = true;
@@ -221,6 +264,29 @@ const selectTab = (id: string, e: PointerEvent | KeyboardEvent) => {
       isProgrammaticScroll = false;
     }, 600);
   }
+};
+
+const selectTab = (id: string, e: PointerEvent | KeyboardEvent) => {
+  if (e instanceof PointerEvent) {
+    // Distance-based check is much more robust for E2E tests than a simple flag
+    const moveDistance = Math.abs(e.pageX - (mouseDownX || e.pageX));
+    if (moveDistance > 15) {
+      return;
+    }
+  }
+
+  // ── Two-Step Navigation ──
+  // Step 1: Clicking an inactive tab only highlights it
+  if (activeId.value !== id) {
+    activeId.value = id;
+    scrollToTab(id);
+    return;
+  }
+
+  // Step 2: Clicking the already-highlighted tab navigates
+  const tab = tabs.find((t) => t.id === id);
+  lightingStore.pendingScrollTarget = tab?.targetSection ?? null;
+  lightingStore.setPhase(LightingPhase.CONTENT);
 };
 
 const navigate = (direction: 'prev' | 'next') => {
@@ -254,6 +320,7 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
 };
 
 onMounted(() => {
+  window.addEventListener('resize', updateMobileState);
   window.addEventListener('pointermove', onDrag);
   window.addEventListener('pointerup', stopDrag);
   window.addEventListener('keydown', handleGlobalKeydown);
@@ -276,6 +343,7 @@ onMounted(() => {
   }
 });
 onUnmounted(() => {
+  window.removeEventListener('resize', updateMobileState);
   window.removeEventListener('pointermove', onDrag);
   window.removeEventListener('pointerup', stopDrag);
   window.removeEventListener('keydown', handleGlobalKeydown);
@@ -286,6 +354,7 @@ onUnmounted(() => {
 <style scoped>
 .nav-conveyor {
   height: 100vh;
+  height: 100dvh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -374,25 +443,126 @@ onUnmounted(() => {
   height: clamp(2rem, 10vw, 3rem);
 }
 
-/* ---- Hint ---- */
-.drag-hint {
+/* ---- Shortcut Bar ---- */
+.shortcut-bar {
   position: absolute;
-  bottom: 20px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  opacity: 0.3;
-  color: #fff;
-  pointer-events: none;
+  bottom: max(48px, calc(env(safe-area-inset-bottom, 0px) + 32px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
   z-index: 10;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--finished-accent) 20%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--finished-accent) 4%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.shortcut-items {
+  display: flex;
+  gap: 12px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  opacity: 0.55;
+}
+
+.shortcut-item:hover {
+  opacity: 0.7;
+}
+
+.shortcut-item--rebinding {
+  opacity: 1;
+}
+
+.shortcut-item--rebinding kbd {
+  border-color: var(--finished-accent);
+  color: var(--finished-accent);
+  animation: rebind-pulse 0.8s ease-in-out infinite;
+}
+
+.shortcut-item kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--finished-accent);
+  background: color-mix(in srgb, var(--finished-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--finished-accent) 25%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--finished-accent) 8%, transparent);
+  transition: all 0.2s ease;
+}
+
+.shortcut-item span {
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.shortcut-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: color-mix(in srgb, var(--finished-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--finished-accent) 20%, transparent);
+  border-radius: 3px;
+  color: var(--finished-accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.shortcut-edit-btn:hover {
+  opacity: 1;
+  color: var(--finished-accent);
+  border-color: color-mix(in srgb, var(--finished-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--finished-accent) 15%, transparent);
+}
+
+.shortcut-edit-btn--active {
+  opacity: 1;
+  color: var(--finished-accent);
+  border-color: var(--finished-accent);
+}
+
+@keyframes rebind-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 @media (min-width: 769px) {
-  .drag-hint {
+  .shortcut-bar {
     bottom: 40px;
-    font-size: 0.8rem;
-    opacity: 0.4;
+  }
+
+  .shortcut-items {
+    gap: 16px;
+  }
+
+  .shortcut-item kbd {
+    font-size: 0.65rem;
+    min-width: 22px;
+    height: 22px;
+  }
+
+  .shortcut-item span {
+    font-size: 0.65rem;
   }
 }
 </style>

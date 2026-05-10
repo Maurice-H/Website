@@ -1,8 +1,13 @@
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useLightingStore } from '../../../stores/lighting';
 import { useViewportStore } from '../../../stores/viewport';
 import BentoCard from '../BentoCard.vue';
+
+type BentoCardInstance = {
+  isHovered: boolean;
+};
 
 describe('BentoCard.vue', () => {
   beforeEach(() => {
@@ -72,5 +77,53 @@ describe('BentoCard.vue', () => {
 
     wrapper.unmount();
     expect(unregisterMock).toHaveBeenCalled();
+  });
+
+  it('updates lighting store on mouse enter and clear on leave', async () => {
+    const lightingStore = useLightingStore();
+    const wrapper = mount(BentoCard, {
+      props: { id: 'hover-test' },
+    });
+
+    // Mock getBoundingClientRect
+    const cardEl = wrapper.element as HTMLElement;
+    vi.spyOn(cardEl, 'getBoundingClientRect').mockReturnValue({
+      left: 100,
+      top: 100,
+      width: 200,
+      height: 200,
+      bottom: 300,
+      right: 300,
+      x: 100,
+      y: 100,
+      toJSON: () => {},
+    });
+
+    vi.stubGlobal('innerWidth', 1000);
+    vi.stubGlobal('innerHeight', 1000);
+
+    await wrapper.trigger('mouseenter');
+    expect((wrapper.vm as unknown as BentoCardInstance).isHovered).toBe(true);
+
+    // centerX = 100 + 100 = 200. (200 / 1000) * 2 - 1 = 0.4 - 1 = -0.6
+    // centerY = 100 + 100 = 200. (200 / 1000) * 2 - 1 = -0.6. Negated = 0.6
+    expect(lightingStore.focusedElementPos).toEqual({ x: -0.6, y: 0.6 });
+
+    await wrapper.trigger('mouseleave');
+    expect((wrapper.vm as unknown as BentoCardInstance).isHovered).toBe(false);
+    expect(lightingStore.focusedElementPos).toBeNull();
+
+    vi.unstubAllGlobals();
+  });
+
+  it('respects isLowEnd prop by removing expensive layers', () => {
+    let wrapper = mount(BentoCard, { props: { isLowEnd: false } });
+    expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(true);
+    expect(wrapper.find('.noise-overlay').exists()).toBe(true);
+
+    wrapper = mount(BentoCard, { props: { isLowEnd: true } });
+    expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(false);
+    expect(wrapper.find('.noise-overlay').exists()).toBe(false);
+    expect(wrapper.classes()).toContain('is-low-end');
   });
 });

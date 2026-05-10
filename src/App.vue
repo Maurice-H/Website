@@ -1,32 +1,36 @@
 <template>
-  <div class="app-root" :class="{ 
-    'hide-system-cursor': isCustomCursorActive,
-    'is-ci-mode': performance.isCiMode
-  }">
+  <div
+    class="app-root"
+    :class="{
+      'hide-system-cursor': isCustomCursorActive,
+      'is-ci-mode': performance.isCiMode,
+    }"
+    :data-drone-focused="lighting.focusedElementPos ? 'true' : 'false'"
+  >
     <!-- WebGL Canvas Background (replaces SpotlightMask, PerspectiveGrid, VolumetricBeam) -->
-    <WebGLBackground v-if="performance.isWebGLSupported" />
+    <WebGLBackground />
     <ResilienceLayer />
 
-    <!-- Scrolling Content Layer -->
+    <!-- Lighting Flash Effect (Unified) -->
     <div
-      v-if="performance.isReady"
-      class="content-stage"
-      :style="rootCssVars"
-    >
-      <Transition name="fade-overlay" mode="out-in" @after-enter="handleAfterEnter">
+      class="flash-overlay"
+      :class="{ 'flash-active': lighting.isFlashActive }"
+    />
+
+    <!-- Scrolling Content Layer -->
+    <div v-if="performance.isReady" class="content-stage" :style="rootCssVars">
+      <Transition
+        name="fade-overlay"
+        mode="out-in"
+        @after-enter="handleAfterEnter"
+      >
         <!-- Navigation Phase -->
         <div
           v-if="lighting.phase === 'NAV'"
           key="nav"
           class="h-screen w-full relative"
         >
-          <!-- Floating Controls (NAV Phase — Responsive Layout) -->
-          <div
-            class="fixed top-2 right-2 md:top-8 md:right-8 z-[100] flex flex-col md:flex-row items-end md:items-center gap-1.5 md:gap-4 pointer-events-auto"
-          >
-            <LightingToggle />
-            <ThemeToggle />
-          </div>
+          <!-- Floating Controls removed — lighting via 3D model click, theme via shortcut -->
           <!-- Fused Background Text (Landing Page Parity) -->
           <div
             class="absolute inset-0 flex items-end justify-center pointer-events-none pb-[10vh]"
@@ -54,8 +58,6 @@
           <div
             class="fixed top-2 right-2 md:top-8 md:right-8 z-[100] flex flex-col md:flex-row items-end md:items-center gap-1.5 md:gap-4 pointer-events-auto"
           >
-            <LightingToggle />
-            <ThemeToggle />
             <button
               type="button"
               @click="handleBackToNav"
@@ -82,12 +84,6 @@
         </div>
       </Transition>
     </div>
-
-    <!-- Flash Overlay for Transitions -->
-    <div
-      class="flash-overlay"
-      :class="{ 'flash-active': lighting.isFlashActive }"
-    ></div>
   </div>
 </template>
 
@@ -107,9 +103,8 @@ const WebGLBackground = defineAsyncComponent(
 
 import ResilienceLayer from './components/layout/ResilienceLayer.vue';
 import BackToTop from './components/navigation/BackToTop.vue';
-import LightingToggle from './components/navigation/LightingToggle.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
-import ThemeToggle from './components/navigation/ThemeToggle.vue';
+import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts';
 import { initGlobalViewportService } from './composables/useViewportStore';
 import { useLightingStore } from './stores/lighting';
 import { usePerformanceStore } from './stores/usePerformanceStore';
@@ -120,6 +115,9 @@ import { LightingPhase } from './types';
 const lighting = useLightingStore();
 const themeStore = useThemeStore();
 const performance = usePerformanceStore();
+
+// Register global keyboard shortcuts (L = lighting, T = theme)
+useKeyboardShortcuts();
 
 // Check if we use the WebGL scanner (only on Content page + light on)
 const isCustomCursorActive = computed(() => {
@@ -226,16 +224,16 @@ onUnmounted(() => {
 }
 
 .flash-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: white;
   opacity: 0;
   pointer-events: none;
-  z-index: 999;
+  z-index: 1000;
   transition: opacity 0.3s ease-out;
 }
 .flash-active {
-  opacity: 0.1;
+  opacity: 0.15;
   transition: opacity 0.05s ease-in;
 }
 
