@@ -195,7 +195,10 @@ describe('usePerformanceStore', () => {
       await promise;
 
       expect(detectGpu.getGPUTier).toHaveBeenCalled();
-      expect(consoleWarnSpy).toHaveBeenCalledWith('GPU detection failed, falling back to Tier 2 (Optimized):', testError);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'GPU detection failed, falling back to Tier 2 (Optimized):',
+        testError
+      );
       expect(store.gpuTier).toBe(2);
       expect(store.isWebGLSupported).toBe(true);
       expect(store.isReady).toBe(true);
