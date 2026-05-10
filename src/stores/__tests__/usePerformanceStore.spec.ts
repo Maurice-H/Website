@@ -177,12 +177,28 @@ describe('usePerformanceStore', () => {
 
     it('handles detectGpu error by falling back to Tier 2', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      vi.mocked(detectGpu.getGPUTier).mockRejectedValue(new Error('WebGL disabled'));
+      const testError = new Error('WebGL disabled');
+      vi.mocked(detectGpu.getGPUTier).mockRejectedValue(testError);
+
       const store = usePerformanceStore();
-      await store.checkPerformance();
+
+      // Force initial state to ensure fallback actually overwrites it
+      store.gpuTier = null;
+      store.isWebGLSupported = false;
+      store.isReady = false;
+
+      const promise = store.checkPerformance();
+
+      // isReady should remain false while checking
+      expect(store.isReady).toBe(false);
+
+      await promise;
 
       expect(detectGpu.getGPUTier).toHaveBeenCalled();
-      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'GPU detection failed, falling back to Tier 2 (Optimized):',
+        testError
+      );
       expect(store.gpuTier).toBe(2);
       expect(store.isWebGLSupported).toBe(true);
       expect(store.isReady).toBe(true);
