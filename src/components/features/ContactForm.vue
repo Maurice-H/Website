@@ -137,11 +137,17 @@
             {{ errorMessage }}
           </p>
 
-          <!-- Cloudflare Turnstile Widget -->
+          <!-- Cloudflare Turnstile Widget (Dynamic Size & Scale) -->
           <div
+            :key="isMobile ? 'mobile' : 'desktop'"
             class="cf-turnstile mb-2"
             :data-sitekey="turnstileSiteKey"
             data-theme="dark"
+            :data-size="isMobile ? 'compact' : 'normal'"
+            :style="{ 
+              transform: `scale(${captchaScale})`,
+              display: widgetId ? 'block' : 'none' 
+            }"
           ></div>
 
           <button
@@ -236,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import { envConfig } from '../../utils/env';
@@ -261,6 +267,7 @@ const emailError = ref('');
 const copyState = ref<'idle' | 'copied' | 'error'>('idle');
 const honeypot = ref('');
 const lastSubmitTime = ref<number>(0);
+const isMobile = ref(false);
 
 const formData = reactive({
   name: '',
@@ -306,22 +313,51 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // --- Methods ---
 interface TurnstileWindow extends Window {
   turnstile?: {
-    render: (selector: string, options: { sitekey: string; theme: string }) => void;
+    render: (
+      selector: string,
+      options: { sitekey: string; theme: string; size?: string }
+    ) => string;
+    reset: (id?: string) => void;
+    remove: (id: string) => void;
   };
 }
+
+const widgetId = ref<string | null>(null);
+const captchaScale = ref(1);
 
 const renderTurnstile = () => {
   const win = window as TurnstileWindow;
   if (win.turnstile) {
     nextTick(() => {
       const container = document.querySelector('.cf-turnstile');
+      // We don't need to manually remove if we use a :key on the element,
+      // as Vue replaces the element for us.
       if (container && !container.querySelector('iframe')) {
-        win.turnstile?.render('.cf-turnstile', {
-          sitekey: turnstileSiteKey,
-          theme: 'dark',
-        });
+        widgetId.value =
+          win.turnstile?.render('.cf-turnstile', {
+            sitekey: turnstileSiteKey,
+            theme: 'dark',
+            size: isMobile.value ? 'compact' : 'normal',
+          }) || null;
+
+        updateCaptchaScale();
       }
     });
+  }
+};
+
+const updateCaptchaScale = () => {
+  const container = document.querySelector('.cf-turnstile');
+  if (!container?.parentElement) return;
+
+  const parentWidth = container.parentElement.clientWidth;
+  const targetWidth = isMobile.value ? 130 : 300;
+
+  if (parentWidth < targetWidth && parentWidth > 0) {
+    // Math.max(0.3, ...) ensures it never scales to 0 and becomes invisible
+    captchaScale.value = Math.max(0.3, Math.min(1, (parentWidth - 10) / targetWidth));
+  } else {
+    captchaScale.value = 1;
   }
 };
 
@@ -555,7 +591,37 @@ const copyToClipboard = async (text: string) => {
 };
 
 // --- Lifecycle & Watchers ---
+let resizeObserver: ResizeObserver | null = null;
+
 onMounted(() => {
+  isMobile.value = window.innerWidth < 480;
+  renderTurnstile();
+
+  // Dynamic scaling observer
+  nextTick(() => {
+    const container = document.querySelector('.cf-turnstile');
+    if (container?.parentElement) {
+      resizeObserver = new ResizeObserver(() => {
+        updateCaptchaScale();
+
+        const mobile = window.innerWidth < 480;
+        if (mobile !== isMobile.value) {
+          isMobile.value = mobile;
+          // Re-render handled by watch(isMobile) below
+        }
+      });
+      resizeObserver.observe(container.parentElement);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
+
+watch(isMobile, () => {
   renderTurnstile();
 });
 
@@ -644,5 +710,12 @@ watch(activeChannel, (newChannel) => {
 
 .social-link-btn:active {
   transform: scale(0.98);
+}
+
+.cf-turnstile {
+  transform-origin: left top;
+  transition: transform 0.2s ease-out;
+  /* Ensure the container doesn't collapse its height when scaled */
+  min-height: v-bind('isMobile ? "120px" : "65px"');
 }
 </style>

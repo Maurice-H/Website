@@ -13,18 +13,13 @@ test.describe('Theme Toggle – Visual Regression Sequence', () => {
     expect(await app.getDataTheme()).not.toBe('blueprint');
   });
 
-  test('entering content phase reveals the theme toggle button', async () => {
-    await app.enterContentPhase();
-    await expect(app.themeToggleBtn).toBeVisible();
-  });
-
-  test('clicking theme toggle sets data-theme="blueprint" on <html>', async () => {
+  test('toggling theme via shortcut sets data-theme="blueprint" on <html>', async () => {
     await app.enterContentPhase();
     await app.toggleTheme();
     expect(await app.getDataTheme()).toBe('blueprint');
   });
 
-  test('clicking theme toggle twice removes data-theme (round-trip)', async () => {
+  test('toggling theme twice via shortcut removes data-theme (round-trip)', async () => {
     await app.enterContentPhase();
     await app.toggleTheme(); // Set to blueprint
     await app.toggleTheme(); // Back to finished

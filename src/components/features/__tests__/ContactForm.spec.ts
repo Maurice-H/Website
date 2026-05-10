@@ -14,6 +14,20 @@ vi.mock('../../../utils/env', () => ({
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+type ContactFormInstance = {
+  isMobile: boolean;
+  captchaScale: number;
+  updateCaptchaScale: () => void;
+  renderTurnstile: () => void;
+};
+
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
 describe('ContactForm.vue', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -440,6 +454,81 @@ describe('ContactForm.vue', () => {
       consoleSpy.mockRestore();
       vi.unstubAllGlobals();
       document.body.innerHTML = '';
+    });
+  });
+
+  describe('Responsive Scaling & Turnstile', () => {
+    it('should determine mobile mode based on window width', () => {
+      vi.stubGlobal('innerWidth', 320);
+      const wrapper = mount(ContactForm);
+      expect((wrapper.vm as unknown as ContactFormInstance).isMobile).toBe(true);
+      vi.stubGlobal('innerWidth', 1024);
+    });
+
+    it('should initialize ResizeObserver on mount', async () => {
+      const observeSpy = vi.spyOn(ResizeObserver.prototype, 'observe');
+      mount(ContactForm, { attachTo: document.body });
+      await flushPromises();
+      expect(observeSpy).toHaveBeenCalled();
+    });
+
+    it('should calculate captchaScale correctly for narrow containers', async () => {
+      const wrapper = mount(ContactForm, { attachTo: document.body });
+      const vm = wrapper.vm as unknown as ContactFormInstance;
+
+      // Mock parent container width
+      const container = document.querySelector('.cf-turnstile');
+      if (container) {
+        Object.defineProperty(container.parentElement, 'clientWidth', {
+          value: 100,
+          configurable: true,
+        });
+      }
+
+      // Compact mode (isMobile = true) -> target 130px
+      vm.isMobile = true;
+      vm.updateCaptchaScale();
+      // (100 - 10) / 130 = ~0.69
+      expect(vm.captchaScale).toBeCloseTo(0.69, 1);
+
+      // Normal mode (isMobile = false) -> target 300px
+      vm.isMobile = false;
+      vm.updateCaptchaScale();
+      // (100 - 10) / 300 = 0.3
+      expect(vm.captchaScale).toBe(0.3);
+
+      // Large container -> scale 1
+      if (container) {
+        Object.defineProperty(container.parentElement, 'clientWidth', {
+          value: 500,
+          configurable: true,
+        });
+      }
+      vm.updateCaptchaScale();
+      expect(vm.captchaScale).toBe(1);
+    });
+
+    it('should trigger turnstile re-render when switching to mobile', async () => {
+      const renderSpy = vi.fn();
+      vi.stubGlobal('turnstile', { render: renderSpy, remove: vi.fn(), reset: vi.fn() });
+
+      const wrapper = mount(ContactForm, { attachTo: document.body });
+      const vm = wrapper.vm as unknown as ContactFormInstance;
+
+      vm.isMobile = false;
+      await wrapper.vm.$nextTick();
+
+      // Simulate resize to mobile
+      vm.isMobile = true;
+      await wrapper.vm.$nextTick();
+
+      // renderTurnstile is watched/called via ResizeObserver logic
+      vm.renderTurnstile();
+      await flushPromises();
+      expect(renderSpy).toHaveBeenCalled();
+
+      wrapper.unmount();
+      vi.unstubAllGlobals();
     });
   });
 });

@@ -12,9 +12,6 @@ export class AppPage {
   /** The root <html> element — used for theme assertions. */
   readonly htmlRoot: Locator;
 
-  /** The "Toggle Theme" button (ThemeToggle.vue — matched by aria-label). */
-  readonly themeToggleBtn: Locator;
-
   /** Navigation windows rendered by the conveyor on the NAV phase. */
   readonly navWindows: Locator;
 
@@ -24,7 +21,6 @@ export class AppPage {
   constructor(page: Page) {
     this.page = page;
     this.htmlRoot = page.locator('html');
-    this.themeToggleBtn = page.getByTestId('theme-toggle');
     this.navWindows = page.locator('.nav-window');
     this.backToNavBtn = page.locator('button').filter({ hasText: /Back/i });
   }
@@ -50,7 +46,6 @@ export class AppPage {
     await activeWindow.scrollIntoViewIfNeeded();
 
     // Strategy: Click, wait briefly, then click again if no transition detected.
-    // We use force:true because the Vue transition or flash might still be technically "covering" it.
     await activeWindow.click({ force: true, delay: 100 });
 
     try {
@@ -69,9 +64,16 @@ export class AppPage {
     await this.page.waitForTimeout(1000);
   }
 
-  /** Click the theme toggle button. */
+  /** Toggle the theme via keyboard shortcut ('T'). */
   async toggleTheme() {
-    await this.themeToggleBtn.click();
+    await this.page.keyboard.press('t');
+    await this.page.waitForTimeout(300);
+  }
+
+  /** Toggle the lighting via keyboard shortcut ('L'). */
+  async toggleLighting() {
+    await this.page.keyboard.press('l');
+    await this.page.waitForTimeout(300);
   }
 
   /** Read the current value of <html data-theme="...">. */
