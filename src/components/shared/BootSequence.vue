@@ -12,7 +12,7 @@
       <div
         v-for="(line, index) in activeLines"
         :key="index"
-        v-memo="[line.text, line.timestamp]"
+        v-memo="[line.text, line.timestamp, index === activeLines.length - 1]"
         class="mb-1.5 flex items-start"
       >
         <span class="mr-3 opacity-30 shrink-0">[{{ line.timestamp }}]</span>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import bootData from '../../data/boot-sequence.json';
 
 interface BootLine {
@@ -82,7 +82,7 @@ onMounted(() => {
     const timer = setTimeout(() => {
       activeLines.value.push({
         ...line,
-        timestamp: getTimestamp()
+        timestamp: getTimestamp(),
       });
       progress.value = ((index + 1) / total) * 100;
     }, cumulativeDelay);
