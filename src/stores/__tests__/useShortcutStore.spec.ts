@@ -178,7 +178,7 @@ describe('useShortcutStore', () => {
       );
 
       const store = useShortcutStore();
-      expect((Object.prototype as any).polluted).toBeUndefined();
+      expect((Object.prototype as Record<string, string>).polluted).toBeUndefined();
       expect(store.getKey('theme')).toBe('p');
     });
 
