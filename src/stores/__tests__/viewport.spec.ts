@@ -10,10 +10,7 @@ class MockIntersectionObserver {
   disconnect = vi.fn();
   callback: IntersectionObserverCallback;
   options?: IntersectionObserverInit;
-  constructor(
-    callback: IntersectionObserverCallback,
-    options?: IntersectionObserverInit
-  ) {
+  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
     this.callback = callback;
     this.options = options;
     mockObserverInstance = this;
