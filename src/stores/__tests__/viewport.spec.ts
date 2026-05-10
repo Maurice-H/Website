@@ -8,10 +8,14 @@ class MockIntersectionObserver {
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
+  callback: IntersectionObserverCallback;
+  options?: IntersectionObserverInit;
   constructor(
-    public callback: IntersectionObserverCallback,
-    public options?: IntersectionObserverInit
+    callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit
   ) {
+    this.callback = callback;
+    this.options = options;
     mockObserverInstance = this;
   }
 }
@@ -57,6 +61,7 @@ describe('useViewportStore', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.clearAllTimers();
   });
 
   it('should initialize with default state', () => {
