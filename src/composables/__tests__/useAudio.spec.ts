@@ -13,10 +13,13 @@ class MockAudio {
   preload = 'auto';
   paused = true;
   ended = false;
-  constructor(public src: string) {}
+  src: string;
+  constructor(src: string) {
+    this.src = src;
+  }
 }
 
-global.Audio = MockAudio as unknown as typeof Audio;
+vi.stubGlobal('Audio', MockAudio);
 
 describe('useAudio', () => {
   beforeEach(() => {
@@ -115,7 +118,7 @@ describe('useAudio', () => {
     // Reset modules to ensure pool is empty
     vi.resetModules();
 
-    const audioConstructorSpy = vi.spyOn(global, 'Audio');
+    const audioConstructorSpy = vi.spyOn(globalThis, 'Audio');
 
     const { useAudio } = await import('../useAudio');
     const { playClick } = useAudio();
