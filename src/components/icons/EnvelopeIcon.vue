@@ -1,5 +1,6 @@
 <template>
   <svg
+    aria-hidden="true"
     class="icon-envelope text-finished-accent/30"
     fill="none"
     viewBox="0 0 24 24"

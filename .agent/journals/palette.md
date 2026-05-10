@@ -17,3 +17,7 @@
 ## 2024-05-07 - Form Error State ARIA Binding
  Learning: Form inputs in Vue templates must dynamically link to their corresponding error messages for screen readers using `aria-invalid` and `aria-describedby` pointing to the error message ID. Furthermore, error message elements should use `aria-live="polite"` so screen readers announce them when they conditionally render into the DOM.
  Action: Ensure that conditional error messages have an `id` and `aria-live="polite"`, and pair the related inputs with `:aria-invalid="!!error"` and `:aria-describedby="error ? 'id' : undefined"`.
+
+## 2024-05-08 - SVG Icons Missing aria-hidden Attribute
+ Learning: Purely decorative SVGs packaged as Vue components often miss the `aria-hidden="true"` attribute, which can lead to screen readers announcing unnecessary elements, particularly when these components are nested inside buttons or links that already have sufficient accessible names (e.g. `aria-label`).
+ Action: Ensure that all newly created standalone SVG icon components include `aria-hidden="true"` on their root `<svg>` element unless they specifically serve a unique semantic purpose and provide their own accessible title.

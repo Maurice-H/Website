@@ -1,8 +1,12 @@
 <template>
   <div class="stacked-card-wrapper perspective-1000">
+    <!-- ⚡ Bolt: Added will-change-transform for hardware acceleration. -->
+    <!-- Impact: Promotes the container to a dedicated compositor layer, -->
+    <!-- preventing CPU layout repaints during high-frequency pointermove 3D rotations, -->
+    <!-- ensuring a locked 60 FPS during interaction. -->
     <div 
       ref="containerEl"
-      class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d hover:rotate-y-12"
+      class="stacked-card-container relative w-full h-64 transition-transform duration-500 transform-style-3d will-change-transform hover:rotate-y-12"
       @pointermove="handlePointerMove"
       @mouseleave="resetRotation"
     >
