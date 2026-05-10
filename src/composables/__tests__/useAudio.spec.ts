@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock Audio class
 const mockPlay = vi.fn().mockResolvedValue(undefined);
@@ -101,7 +101,7 @@ describe('useAudio', () => {
 
     expect(mockPlay).toHaveBeenCalled();
     // Wait for the promise rejection to be handled
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     expect(consoleSpy).toHaveBeenCalledWith('Audio play failed:', expect.any(Error));
 
     consoleSpy.mockRestore();
