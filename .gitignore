@@ -47,7 +47,6 @@ scratch/
 # Reports & Screenshots
 lighthouse-report.json
 screenshot.png
-*.png
 *.jpeg
 *.jpg
 LIGHTHOUSE.md

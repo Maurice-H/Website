@@ -47,3 +47,22 @@ The "Blueprint" phase SHALL include a visual representation of all functional UI
 #### Scenario: Mask reveal over header
 - **WHEN** the spotlight mask passes over the navigation header area in Blueprint mode
 - **THEN** the functional "Back to Navigation" button SHALL appear exactly over its blueprint-sketched counterpart without shifting.
+
+### Requirement: Model Theme-Reactive Colors
+The UFO and Drone models' accent-colored emissive meshes shall change color when the theme toggles.
+
+#### Scenario: UFO Theme Toggle to Blueprint
+- **WHEN** `themeStore.isBlueprintMode` becomes `true`.
+- **THEN** all UFO meshes with green-hue emissive color (HSL h ≈ 100-180°) shall shift their emissive to match `#38bdf8` (blue).
+
+#### Scenario: UFO Theme Toggle to Default
+- **WHEN** `themeStore.isBlueprintMode` becomes `false`.
+- **THEN** the UFO accent meshes shall revert to their original green emissive colors.
+
+#### Scenario: Drone Theme Toggle to Blueprint
+- **WHEN** `themeStore.isBlueprintMode` becomes `true`.
+- **THEN** all Drone meshes with green-hue emissive color shall shift their emissive to match `#38bdf8` (blue).
+
+#### Scenario: Drone Theme Toggle to Default
+- **WHEN** `themeStore.isBlueprintMode` becomes `false`.
+- **THEN** the Drone accent meshes shall revert to their original emissive colors.
