@@ -51,7 +51,10 @@ export function useAudio() {
   };
 
   const playGlitch = () => {
-    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-theme-glitch-click.ogg`, 0.05);
+    const audio = getAudioFromPool(
+      `${import.meta.env.BASE_URL}audio/sci-fi-theme-glitch-click.ogg`,
+      0.05
+    );
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));
