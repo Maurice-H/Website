@@ -35,7 +35,7 @@ describe('useAudioFeedback', () => {
       expect(MockAudioClass).toHaveBeenCalledWith('/test.mp3');
 
       // Get the instance created to verify properties
-      const instance = MockAudioClass.mock.instances[0];
+      const instance = MockAudioClass.mock.instances[0] as { volume: number; preload: string };
       expect(instance.volume).toBe(0.5);
       expect(instance.preload).toBe('auto');
     });
@@ -58,7 +58,7 @@ describe('useAudioFeedback', () => {
 
       useAudioFeedback({ src: '/test.mp3' });
 
-      const instance = MockAudioClass.mock.instances[0];
+      const instance = MockAudioClass.mock.instances[0] as { volume: number };
       expect(instance.volume).toBe(0.3);
     });
 
@@ -97,7 +97,7 @@ describe('useAudioFeedback', () => {
 
       play();
 
-      const instance = MockAudioClass.mock.instances[0];
+      const instance = MockAudioClass.mock.instances[0] as { currentTime: number };
       expect(instance.currentTime).toBe(0);
       expect(mockPlay).toHaveBeenCalled();
     });
