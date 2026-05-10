@@ -19,30 +19,29 @@ import ChevronUpIcon from '../icons/ChevronUpIcon.vue';
 const SCROLL_THRESHOLD = 300;
 const isVisible = ref(false);
 let rafId: number | null = null;
+let cachedScrollContainer: Element | null = null;
 
 const handleScroll = () => {
   if (rafId !== null) return;
   rafId = requestAnimationFrame(() => {
-    const scrollContainer = document.querySelector('.content-stage');
-    isVisible.value = (scrollContainer?.scrollTop ?? 0) > SCROLL_THRESHOLD;
+    isVisible.value = (cachedScrollContainer?.scrollTop ?? 0) > SCROLL_THRESHOLD;
     rafId = null;
   });
 };
 
 const scrollToTop = () => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
+  cachedScrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 onMounted(() => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
+  cachedScrollContainer = document.querySelector('.content-stage');
+  cachedScrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
 });
 
 onUnmounted(() => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.removeEventListener('scroll', handleScroll);
+  cachedScrollContainer?.removeEventListener('scroll', handleScroll);
   if (rafId !== null) cancelAnimationFrame(rafId);
+  cachedScrollContainer = null;
 });
 </script>
 

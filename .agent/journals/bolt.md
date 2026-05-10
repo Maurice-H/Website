@@ -20,3 +20,6 @@
 ## 2024-05-07 - IntersectionObserver Callback Performance
  **Learning:** Iterating over maps/arrays (O(N)) inside a high-frequency `IntersectionObserver` callback blocks the main thread.
  **Action:** For performance-critical observers in stores like `useViewportStore`, cache registered Vue component proxies in a `WeakMap<HTMLElement, ComponentRegistration>` during registration. This enables O(1) lookups inside the observer callback, avoiding performance degradation as the number of registered elements grows.
+## 2024-05-08 - Layout Thrashing & O(N) Traversal in High-Frequency Loops
+ **Learning:** Calling `document.querySelector` inside a high-frequency `requestAnimationFrame` loop (like a scroll handler) causes severe performance degradation due to unnecessary O(N) DOM traversal 60 times a second. Similarly, reading layout properties like `offsetLeft` inside a `pointermove` handler forces synchronous layout recalculation (layout thrashing).
+ **Action:** Always cache DOM element references (e.g., via `document.querySelector`) during component initialization (`onMounted`) and use the cached references in high-frequency event handlers. For drag/scroll interactions, calculate movement purely based on pointer coordinate deltas (`e.pageX - startX`) rather than reading layout properties continuously.

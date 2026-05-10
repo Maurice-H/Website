@@ -131,7 +131,6 @@ let isDragging = false;
 let hasMoved = false;
 let isProgrammaticScroll = false;
 let scrollTimeout: number | null = null;
-let startX = 0;
 let mouseDownX = 0; // Added for distance-based click detection
 let scrollLeft = 0;
 
@@ -139,7 +138,6 @@ const startDrag = (e: PointerEvent) => {
   if (!trackEl.value) return;
   isDragging = true;
   hasMoved = false;
-  startX = e.pageX - trackEl.value.offsetLeft;
   mouseDownX = e.pageX; // Capture start X
   scrollLeft = trackEl.value.scrollLeft;
   trackEl.value.style.cursor = 'grabbing';
@@ -147,8 +145,9 @@ const startDrag = (e: PointerEvent) => {
 
 const onDrag = (e: PointerEvent) => {
   if (!isDragging || !trackEl.value) return;
-  const x = e.pageX - trackEl.value.offsetLeft;
-  const walk = (x - startX) * 2;
+  // Calculate walk purely based on pointer movement since drag start,
+  // avoiding trackEl.value.offsetLeft read which can cause layout thrashing
+  const walk = (e.pageX - mouseDownX) * 2;
 
   if (Math.abs(walk) > 5) {
     hasMoved = true;
