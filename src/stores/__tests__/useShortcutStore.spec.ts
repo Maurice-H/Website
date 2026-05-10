@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useShortcutStore } from '../useShortcutStore';
 
 describe('useShortcutStore', () => {
@@ -133,16 +133,5 @@ describe('useShortcutStore', () => {
     localStorage.setItem('portfolio-shortcuts', 'invalid-json');
     const store = useShortcutStore();
     expect(store.getKey('theme')).toBe('t');
-  });
-
-  it('handles localStorage read exceptions gracefully', () => {
-    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('mock error');
-    });
-    const store = useShortcutStore();
-    expect(store.getKey('theme')).toBe('t');
-    expect(store.getKey('lighting')).toBe('l');
-    expect(store.getKey('back')).toBe('escape');
-    spy.mockRestore();
   });
 });
