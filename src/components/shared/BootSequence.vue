@@ -4,9 +4,18 @@
     <div class="scanlines"></div>
     <div class="crt-glow"></div>
 
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-      <div v-for="(line, index) in activeLines" :key="index" class="mb-1.5 flex items-start">
-        <span class="mr-3 opacity-30 shrink-0">[{{ getTimestamp() }}]</span>
+    <div
+      class="flex-1 overflow-y-auto custom-scrollbar"
+      role="log"
+      aria-live="polite"
+    >
+      <div
+        v-for="(line, index) in activeLines"
+        :key="index"
+        v-memo="[line.text, line.timestamp]"
+        class="mb-1.5 flex items-start"
+      >
+        <span class="mr-3 opacity-30 shrink-0">[{{ line.timestamp }}]</span>
         <span :class="getTypeClass(line.type)" class="leading-relaxed">{{ line.text }}</span>
         <span v-if="index === activeLines.length - 1" class="ml-1 animate-pulse inline-block w-1.5 h-3 bg-emerald-400/50"></span>
       </div>
@@ -29,17 +38,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onBeforeUnmount } from 'vue';
 import bootData from '../../data/boot-sequence.json';
 
 interface BootLine {
   text: string;
   delay: number;
   type: string;
+  timestamp?: string;
 }
 
 const activeLines = ref<BootLine[]>([]);
 const progress = ref(0);
+const timers: ReturnType<typeof setTimeout>[] = [];
 
 const getTimestamp = () => {
   return new Date().toLocaleTimeString('en-US', {
@@ -61,15 +72,27 @@ const getTypeClass = (type: string) => {
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   const total = bootData.length;
-  let count = 0;
-  for (const line of bootData) {
-    await new Promise((resolve) => setTimeout(resolve, line.delay));
-    activeLines.value.push(line);
-    count++;
-    progress.value = (count / total) * 100;
-  }
+  let cumulativeDelay = 0;
+
+  bootData.forEach((line, index) => {
+    cumulativeDelay += line.delay;
+
+    const timer = setTimeout(() => {
+      activeLines.value.push({
+        ...line,
+        timestamp: getTimestamp()
+      });
+      progress.value = ((index + 1) / total) * 100;
+    }, cumulativeDelay);
+
+    timers.push(timer);
+  });
+});
+
+onBeforeUnmount(() => {
+  timers.forEach(clearTimeout);
 });
 </script>
 
