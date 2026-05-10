@@ -69,8 +69,9 @@
                 type="text"
                 required
                 v-model="formData.name"
+                :disabled="formState === 'submitting' || formState === 'success'"
                 placeholder="Enter your designation"
-                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -89,10 +90,11 @@
                 type="email"
                 required
                 v-model="formData.email"
+                :disabled="formState === 'submitting' || formState === 'success'"
                 placeholder="Enter comm-link"
                 :aria-invalid="!!emailError"
                 :aria-describedby="emailError ? 'email-error' : undefined"
-                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors"
+                class="contact-input w-full px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <p v-if="emailError" id="email-error" aria-live="polite" class="text-red-400 text-xs mt-1 ml-1">
@@ -113,10 +115,11 @@
                 id="contact-message"
                 required
                 v-model="formData.message"
+                :disabled="formState === 'submitting' || formState === 'success'"
                 placeholder="Transmit payload..."
                 :aria-invalid="formState === 'error'"
                 :aria-describedby="formState === 'error' ? 'message-error' : undefined"
-                class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none"
+                class="contact-input w-full h-full min-h-[100px] px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               ></textarea>
             </div>
           </div>
