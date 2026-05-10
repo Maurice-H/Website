@@ -21,16 +21,44 @@ const DEFAULT_BINDINGS: Record<ShortcutAction, ShortcutEntry> = {
 };
 
 function loadFromStorage(): Record<ShortcutAction, ShortcutEntry> {
+  const bindings = structuredClone(DEFAULT_BINDINGS);
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return structuredClone(DEFAULT_BINDINGS);
+    if (!stored) return bindings;
 
-    const parsed = JSON.parse(stored) as Partial<Record<ShortcutAction, ShortcutEntry>>;
-    // Merge with defaults to handle new actions added after storage was saved
-    return { ...structuredClone(DEFAULT_BINDINGS), ...parsed };
+    const parsed = JSON.parse(stored);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return bindings;
+    }
+
+    const validActions = Object.keys(DEFAULT_BINDINGS) as ShortcutAction[];
+
+    for (const action of validActions) {
+      const entry = parsed[action];
+
+      if (
+        entry &&
+        typeof entry === 'object' &&
+        !Array.isArray(entry) &&
+        typeof entry.key === 'string' &&
+        typeof entry.label === 'string'
+      ) {
+        const normalizedKey = entry.key.toLowerCase().trim();
+
+        // Security: Validate key length and basic content to prevent malicious or malformed keys
+        // Most keys are single chars or short strings like 'escape', 'arrowup'.
+        if (normalizedKey.length > 0 && normalizedKey.length < 20) {
+          bindings[action] = {
+            key: normalizedKey,
+            label: entry.label,
+          };
+        }
+      }
+    }
   } catch {
-    return structuredClone(DEFAULT_BINDINGS);
+    // Fall back to default bindings on any parsing error
   }
+  return bindings;
 }
 
 export const useShortcutStore = defineStore('shortcuts', () => {

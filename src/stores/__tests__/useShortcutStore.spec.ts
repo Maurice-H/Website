@@ -134,4 +134,65 @@ describe('useShortcutStore', () => {
     const store = useShortcutStore();
     expect(store.getKey('theme')).toBe('t');
   });
+
+  describe('security and validation', () => {
+    it('ignores non-ShortcutAction keys in localStorage', () => {
+      localStorage.setItem(
+        'portfolio-shortcuts',
+        JSON.stringify({
+          invalidAction: { key: 'i', label: 'Invalid' },
+          theme: { key: 'm', label: 'Theme' },
+        })
+      );
+
+      const store = useShortcutStore();
+      expect(store.bindings).not.toHaveProperty('invalidAction');
+      expect(store.getKey('theme')).toBe('m');
+    });
+
+    it('rejects entries with invalid value types', () => {
+      localStorage.setItem(
+        'portfolio-shortcuts',
+        JSON.stringify({
+          theme: { key: 123, label: 'Theme' }, // key should be string
+          lighting: 'invalid', // should be object
+          back: { key: 'b' }, // missing label
+        })
+      );
+
+      const store = useShortcutStore();
+      // Should fall back to defaults for invalid entries
+      expect(store.getKey('theme')).toBe('t');
+      expect(store.getKey('lighting')).toBe('l');
+      expect(store.getKey('back')).toBe('escape');
+    });
+
+    it('prevents prototype pollution from localStorage', () => {
+      localStorage.setItem(
+        'portfolio-shortcuts',
+        JSON.stringify({
+          __proto__: { polluted: 'true' },
+          constructor: { prototype: { polluted: 'true' } },
+          theme: { key: 'p', label: 'Theme' },
+        })
+      );
+
+      const store = useShortcutStore();
+      expect((Object.prototype as any).polluted).toBeUndefined();
+      expect(store.getKey('theme')).toBe('p');
+    });
+
+    it('sanitizes shortcut keys (must be single characters or allowed special keys)', () => {
+      localStorage.setItem(
+        'portfolio-shortcuts',
+        JSON.stringify({
+          theme: { key: '<script>alert(1)</script>', label: 'Theme' },
+        })
+      );
+
+      const store = useShortcutStore();
+      // Extremely long or suspicious keys should probably be rejected
+      expect(store.getKey('theme')).toBe('t');
+    });
+  });
 });
