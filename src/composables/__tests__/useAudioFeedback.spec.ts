@@ -2,129 +2,108 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAudioFeedback } from '../useAudioFeedback';
 
 describe('useAudioFeedback', () => {
-  let OriginalAudio: typeof Audio;
+  let originalAudio: typeof window.Audio;
 
   beforeEach(() => {
-    OriginalAudio = globalThis.Audio;
+    originalAudio = window.Audio;
   });
 
   afterEach(() => {
-    globalThis.Audio = OriginalAudio;
+    window.Audio = originalAudio;
     vi.restoreAllMocks();
   });
 
-  describe('initialization', () => {
-    it('initializes Audio with correct src, volume and preload', () => {
-      const mockPlay = vi.fn().mockResolvedValue(undefined);
+  it('initializes audio with default volume', () => {
+    let capturedSrc: string | undefined;
+    const mockAudioInstance = {
+      play: vi.fn().mockResolvedValue(undefined),
+      volume: 1,
+      preload: '',
+      currentTime: 10,
+    };
 
-      const MockAudioClass = vi.fn().mockImplementation(function (this: {
-        volume: number;
-        preload: string;
-        currentTime: number;
-        play: unknown;
-      }) {
-        this.volume = 1;
-        this.preload = '';
-        this.currentTime = 0;
-        this.play = mockPlay;
-      });
-      globalThis.Audio = MockAudioClass as unknown as typeof Audio;
+    // Create a mock Audio class
+    window.Audio = vi.fn().mockImplementation(function (this: unknown, _src?: string) {
+      capturedSrc = _src;
+      return mockAudioInstance;
+    }) as unknown as typeof window.Audio;
 
-      useAudioFeedback({ src: '/test.mp3', volume: 0.5 });
+    const { play } = useAudioFeedback({ src: 'test.mp3' });
 
-      expect(MockAudioClass).toHaveBeenCalledWith('/test.mp3');
-
-      // Get the instance created to verify properties
-      const instance = MockAudioClass.mock.instances[0] as { volume: number; preload: string };
-      expect(instance.volume).toBe(0.5);
-      expect(instance.preload).toBe('auto');
-    });
-
-    it('uses default volume of 0.3 if not provided', () => {
-      const mockPlay = vi.fn().mockResolvedValue(undefined);
-
-      const MockAudioClass = vi.fn().mockImplementation(function (this: {
-        volume: number;
-        preload: string;
-        currentTime: number;
-        play: unknown;
-      }) {
-        this.volume = 1;
-        this.preload = '';
-        this.currentTime = 0;
-        this.play = mockPlay;
-      });
-      globalThis.Audio = MockAudioClass as unknown as typeof Audio;
-
-      useAudioFeedback({ src: '/test.mp3' });
-
-      const instance = MockAudioClass.mock.instances[0] as { volume: number };
-      expect(instance.volume).toBe(0.3);
-    });
-
-    it('handles Audio constructor failure gracefully', () => {
-      // Simulate SSR or unsupported environment where Audio throws
-      const MockAudioClass = vi.fn().mockImplementation(() => {
-        throw new Error('Audio is not defined');
-      });
-      globalThis.Audio = MockAudioClass as unknown as typeof Audio;
-
-      const { play } = useAudioFeedback({ src: '/test.mp3' });
-
-      // Should not throw when calling play
-      expect(() => play()).not.toThrow();
-    });
+    expect(window.Audio).toHaveBeenCalledWith('test.mp3');
+    expect(capturedSrc).toBe('test.mp3');
+    expect(mockAudioInstance.volume).toBe(0.3);
+    expect(mockAudioInstance.preload).toBe('auto');
+    expect(typeof play).toBe('function');
   });
 
-  describe('play()', () => {
-    it('resets currentTime and calls play() on the audio element', () => {
-      const mockPlay = vi.fn().mockResolvedValue(undefined);
+  it('initializes audio with custom volume', () => {
+    const mockAudioInstance = {
+      play: vi.fn().mockResolvedValue(undefined),
+      volume: 1,
+      preload: '',
+      currentTime: 10,
+    };
 
-      const MockAudioClass = vi.fn().mockImplementation(function (this: {
-        volume: number;
-        preload: string;
-        currentTime: number;
-        play: unknown;
-      }) {
-        this.volume = 1;
-        this.preload = '';
-        this.currentTime = 10;
-        this.play = mockPlay;
-      });
-      globalThis.Audio = MockAudioClass as unknown as typeof Audio;
+    window.Audio = vi.fn().mockImplementation(function (this: unknown, _src?: string) {
+      return mockAudioInstance;
+    }) as unknown as typeof window.Audio;
 
-      const { play } = useAudioFeedback({ src: '/test.mp3' });
+    const { play } = useAudioFeedback({ src: 'test.mp3', volume: 0.8 });
 
-      play();
+    expect(mockAudioInstance.volume).toBe(0.8);
+    expect(typeof play).toBe('function');
+  });
 
-      const instance = MockAudioClass.mock.instances[0] as { currentTime: number };
-      expect(instance.currentTime).toBe(0);
-      expect(mockPlay).toHaveBeenCalled();
-    });
+  it('resets currentTime and calls play when play() is invoked', () => {
+    const mockAudioInstance = {
+      play: vi.fn().mockResolvedValue(undefined),
+      volume: 1,
+      preload: '',
+      currentTime: 10,
+    };
 
-    it('silently catches play() promise rejections (e.g. autoplay policy)', async () => {
-      const mockPlay = vi.fn().mockRejectedValue(new Error('NotAllowedError'));
+    window.Audio = vi.fn().mockImplementation(function (this: unknown, _src?: string) {
+      return mockAudioInstance;
+    }) as unknown as typeof window.Audio;
 
-      const MockAudioClass = vi.fn().mockImplementation(function (this: {
-        volume: number;
-        preload: string;
-        currentTime: number;
-        play: unknown;
-      }) {
-        this.volume = 1;
-        this.preload = '';
-        this.currentTime = 10;
-        this.play = mockPlay;
-      });
-      globalThis.Audio = MockAudioClass as unknown as typeof Audio;
+    const { play } = useAudioFeedback({ src: 'test.mp3' });
 
-      const { play } = useAudioFeedback({ src: '/test.mp3' });
+    play();
 
-      // We need to verify that play() does not throw even though the underlying audio.play() rejects
-      expect(() => play()).not.toThrow();
+    expect(mockAudioInstance.currentTime).toBe(0);
+    expect(mockAudioInstance.play).toHaveBeenCalledTimes(1);
+  });
 
-      // We should also wait a tick to make sure the unhandled promise rejection is swallowed
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
+  it('gracefully handles play() promise rejection (e.g. browser autoplay policy)', async () => {
+    const mockAudioInstance = {
+      play: vi.fn().mockRejectedValueOnce(new Error('Autoplay prevented')),
+      volume: 1,
+      preload: '',
+      currentTime: 10,
+    };
+
+    window.Audio = vi.fn().mockImplementation(function (this: unknown, _src?: string) {
+      return mockAudioInstance;
+    }) as unknown as typeof window.Audio;
+
+    const { play } = useAudioFeedback({ src: 'test.mp3' });
+
+    // Should not throw
+    expect(() => play()).not.toThrow();
+
+    // We need to wait a tick for the microtask to process the catch block
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  it('handles Audio constructor failing (e.g. SSR environment)', () => {
+    window.Audio = vi.fn().mockImplementation(function (this: unknown, _src?: string) {
+      throw new Error('Audio is not defined');
+    }) as unknown as typeof window.Audio;
+
+    const { play } = useAudioFeedback({ src: 'test.mp3' });
+
+    // Construction failed, so play should just return early and not throw
+    expect(() => play()).not.toThrow();
   });
 });
