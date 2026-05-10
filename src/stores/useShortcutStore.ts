@@ -77,13 +77,18 @@ export const useShortcutStore = defineStore('shortcuts', () => {
     return bindings.value[action].label;
   };
 
+  /** Reverse map for fast key-to-action lookups */
+  const keyToActionMap = computed(() => {
+    const map = new Map<string, ShortcutAction>();
+    for (const [action, entry] of Object.entries(bindings.value)) {
+      map.set(entry.key, action as ShortcutAction);
+    }
+    return map;
+  });
+
   /** Find which action (if any) is bound to this key */
   const findAction = (key: string): ShortcutAction | null => {
-    const normalized = key.toLowerCase();
-    for (const [action, entry] of Object.entries(bindings.value)) {
-      if (entry.key === normalized) return action as ShortcutAction;
-    }
-    return null;
+    return keyToActionMap.value.get(key.toLowerCase()) ?? null;
   };
 
   /** Start rebinding an action — the next keypress will be captured */
