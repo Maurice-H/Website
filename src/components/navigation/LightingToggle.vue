@@ -3,6 +3,7 @@
     type="button"
     @click="toggleLighting"
     :aria-label="`Lighting ${lightingEnabled ? 'On' : 'Off'}`"
+    data-testid="lighting-toggle"
     class="group relative flex items-center justify-center md:justify-start p-3 md:p-5 w-full md:w-56 rounded-2xl md:rounded-3xl transition-all duration-[var(--theme-transition-duration)] border cursor-pointer active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     :class="[
       isBlueprint
@@ -29,17 +30,14 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useAudioFeedback } from '../../composables/useAudioFeedback';
+import { useAudio } from '../../composables/useAudio';
 import { useThemeStore } from '../../stores/useThemeStore';
 import LampIcon from '../icons/LampIcon.vue';
 
 const themeStore = useThemeStore();
 const { lightingEnabled, isBlueprintMode: isBlueprint } = storeToRefs(themeStore);
 
-const { play: playSwitchSound } = useAudioFeedback({
-  src: 'audio/sci-fi-light-click.ogg',
-  volume: 0.3,
-});
+const { playClick: playSwitchSound } = useAudio();
 
 const toggleLighting = () => {
   themeStore.toggleLighting();

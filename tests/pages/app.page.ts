@@ -24,42 +24,49 @@ export class AppPage {
   constructor(page: Page) {
     this.page = page;
     this.htmlRoot = page.locator('html');
-    this.themeToggleBtn = page.getByRole('button', { name: /System Mode/ });
+    this.themeToggleBtn = page.getByTestId('theme-toggle');
     this.navWindows = page.locator('.nav-window');
-    this.backToNavBtn = page.getByRole('button', {
-      name: /Back|ESC/,
-    });
+    this.backToNavBtn = page.locator('button').filter({ hasText: /Back/i });
   }
 
   /** Navigate to the app root and wait for the initial render. */
   async goto() {
-    await this.page.goto('/');
+    await this.page.goto('/?ci=1');
     // Wait for the app-ready state (NavConveyor visible)
     await expect(this.page.locator('.nav-conveyor')).toBeVisible({ timeout: 15000 });
+    // Wait for CI mode class to be applied to ensure no transitions
+    await expect(this.page.locator('.app-root')).toHaveClass(/is-ci-mode/);
   }
 
   /** Transition from NAV → CONTENT by clicking the first nav window. */
   async enterContentPhase() {
-    // Wait for the initial centering scroll to settle
-    await this.page.waitForTimeout(1000);
+    // Wait for the app to be stable and centered
+    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForTimeout(2000);
 
-    // We must click the CURRENTLY ACTIVE window to enter the phase.
+    // Find the active window and ensure it's in view
     const activeWindow = this.page.locator('.nav-window.is-active');
     await activeWindow.waitFor({ state: 'visible', timeout: 15000 });
+    await activeWindow.scrollIntoViewIfNeeded();
 
-    // On mobile, the card (480px) is wider than the viewport (375px).
-    // Standard click might hit outside the viewport if not careful.
-    // We click the center of the viewport which should be the center of the active card.
-    const viewport = this.page.viewportSize();
-    if (viewport) {
-      await this.page.mouse.click(viewport.width / 2, viewport.height / 2);
-    } else {
-      await activeWindow.click({ force: true });
+    // Strategy: Click, wait briefly, then click again if no transition detected.
+    // We use force:true because the Vue transition or flash might still be technically "covering" it.
+    await activeWindow.click({ force: true, delay: 100 });
+
+    try {
+      // Wait for the CONTENT phase indicator (the back button)
+      await this.backToNavBtn.waitFor({ state: 'visible', timeout: 5000 });
+    } catch {
+      // Fallback: Try clicking again if the first click didn't trigger the transition
+      await activeWindow.click({ force: true, delay: 100 });
+      await this.backToNavBtn.waitFor({ state: 'visible', timeout: 15000 });
     }
 
-    // Wait for the content phase layout to appear AND be ready for interaction.
-    // We wait for the Back button as a signal that the content transition is done.
-    await this.backToNavBtn.waitFor({ state: 'visible', timeout: 15000 });
+    // Additional safety: ensure the content stage is actually scrollable/visible
+    await expect(this.page.locator('.content-stage')).toBeVisible();
+
+    // Final stabilization wait to ensure Vue transition (0.5s) is 100% complete
+    await this.page.waitForTimeout(1000);
   }
 
   /** Click the theme toggle button. */

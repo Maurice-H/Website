@@ -64,7 +64,7 @@ body {
 /* Blueprint mode overrides — applied via ThemeToggle */
 [data-theme="blueprint"] {
   --finished-bg: #0a1628; /* Deeper technical blue */
-  --finished-text: #7dd3fc;
+  --finished-text: #e0f2fe;
   --finished-accent: #38bdf8; /* Blue-teal for blueprint mode */
   --finished-border: rgba(56, 189, 248, 0.2);
   --finished-glow: 0 0 40px rgba(56, 189, 248, 0.15);

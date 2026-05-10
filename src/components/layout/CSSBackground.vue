@@ -46,18 +46,16 @@
 </template>
 
 <script setup lang="ts">
-import { type CSSProperties, computed } from "vue";
-import { useLightingStore } from "@/stores/lighting";
-import { useThemeStore } from "@/stores/useThemeStore";
-import { LightingPhase } from "@/types";
+import { type CSSProperties, computed } from 'vue';
+import { useLightingStore } from '@/stores/lighting';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { LightingPhase } from '@/types';
 
 const lightingStore = useLightingStore();
 const themeStore = useThemeStore();
 
 const isNavPhase = computed(() => lightingStore.phase === LightingPhase.NAV);
-const isContentPhase = computed(
-  () => lightingStore.phase === LightingPhase.CONTENT,
-);
+const isContentPhase = computed(() => lightingStore.phase === LightingPhase.CONTENT);
 const isLightingEnabled = computed(() => themeStore.lightingEnabled);
 const isBlueprintMode = computed(() => themeStore.isBlueprintMode);
 
@@ -73,8 +71,8 @@ const particleStyle = (index: number): CSSProperties => {
   const size = 2 + (index % 3);
 
   return {
-    "--p-delay": `${delay}s`,
-    "--p-duration": `${duration}s`,
+    '--p-delay': `${delay}s`,
+    '--p-duration': `${duration}s`,
     left: `${left}%`,
     top: `${top}%`,
     width: `${size}px`,
@@ -100,14 +98,18 @@ const particleStyle = (index: number): CSSProperties => {
   position: absolute;
   top: 16%;
   left: 50%;
-  transform: translateX(-50%) scale(1.25);
+  transform: translateX(-50%) translateY(-300px) scale(0.6);
   opacity: 0;
-  transition: opacity 0.8s ease;
+  /* EXIT transition: fast beam-up into orbit */
+  transition: opacity 0.3s ease-in, transform 0.5s cubic-bezier(0.55, 0, 1, 0.45);
   perspective: 600px;
 }
 
 .css-ufo.ufo-visible {
   opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1.25);
+  /* ENTRY transition: slow graceful descent */
+  transition: opacity 1.2s ease-out, transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .ufo-body {

@@ -28,7 +28,11 @@
   </TresMesh>
 
   <!-- UFO (GLB model with primitive fallback) -->
-  <TresGroup ref="ufoRef" :position="[0, 1.6, 0]">
+  <TresGroup
+    v-if="lightingStore.phase === 'NAV' || ufoIsTransitioning"
+    ref="ufoRef"
+    :position="[0, 15, 0]"
+  >
     <primitive v-if="ufoScene" :object="ufoScene" />
     <TresMesh v-else :scale="[0.3, 0.3, 0.3]">
       <TresCylinderGeometry :args="[1.2, 1.5, 0.4, 32]" />
@@ -65,7 +69,7 @@
     </TresMesh>
 
     <!-- Beam System (rigidly attached to drone lens) -->
-    <TresGroup :position="[0.5, -0.2, 0.5]">
+    <TresGroup :position="[0.27, 0.26, -0.1]">
       <!-- Drone Spotlight -->
       <TresSpotLight
         ref="droneSpotlightRef"
@@ -98,6 +102,20 @@
     </TresGroup>
   </TresGroup>
 
+  <!-- Abduction Particles -->
+  <TresPoints ref="abductionParticlesRef" :visible="false">
+    <TresBufferGeometry :position="[abductionPositions, 3]" />
+    <TresPointsMaterial
+      :color="accentColorStr"
+      :size="0.04"
+      :transparent="true"
+      :opacity="0.8"
+      :blending="2"
+      :depth-write="false"
+      :size-attenuation="true"
+    />
+  </TresPoints>
+
   <!-- Drone Area Scan (grid sweep shader) -->
   <TresMesh ref="scanRingRef" :visible="false" :rotation="[0, 0, 0]">
     <TresPlaneGeometry :args="[20, 20]" />
@@ -116,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLoop, useTresContext } from "@tresjs/core";
+import { useLoop, useTresContext } from '@tresjs/core';
 import {
   Box3,
   BufferAttribute,
@@ -124,37 +142,35 @@ import {
   Color,
   type Group,
   type Material,
-  type Mesh,
-  type Texture,
+  MathUtils,
+  Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
   Object3D,
-  Quaternion,
+  type PointsMaterial,
   type SpotLight,
+  type Texture,
   Vector2,
   Vector3,
   type WebGLRenderer,
-} from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { GLTFLoader } from "three-stdlib";
-import { onMounted, shallowRef, watch } from "vue";
+} from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { GLTFLoader } from 'three-stdlib';
+import { onMounted, shallowRef, watch } from 'vue';
 
 // --- TRESJS CRASH PREVENTION PATCH ---
 // TresJS memory profiler crashes if it encounters a Mesh without a position attribute
 // (e.g. HighlightMesh from DevTools). We intercept all traverses to guarantee stability.
 const originalTraverse = Object3D.prototype.traverse;
-Object3D.prototype.traverse = function (callback: (object: Object3D) => any) {
-  if ((this as any).isMesh) {
-    const mesh = this as any;
+Object3D.prototype.traverse = function (callback: (object: Object3D) => unknown) {
+  if ((this as unknown as { isMesh: boolean }).isMesh) {
+    const mesh = this as unknown as Mesh;
     if (mesh.geometry && !mesh.geometry.attributes.position) {
-      mesh.geometry.setAttribute(
-        "position",
-        new BufferAttribute(new Float32Array([0, 0, 0]), 3),
-      );
+      mesh.geometry.setAttribute('position', new BufferAttribute(new Float32Array([0, 0, 0]), 3));
     }
   }
   return originalTraverse.call(this, callback);
@@ -162,24 +178,24 @@ Object3D.prototype.traverse = function (callback: (object: Object3D) => any) {
 
 // -------------------------------------
 
-import { computed, watchEffect } from "vue";
-import fragmentShader from "../../shaders/main.frag.glsl?raw";
-import vertexShader from "../../shaders/main.vert.glsl?raw";
-import { useLightingStore } from "../../stores/lighting";
-import { usePerformanceStore } from "../../stores/usePerformanceStore";
-import { useThemeStore } from "../../stores/useThemeStore";
-import { useViewportStore } from "../../stores/viewport";
-import { projectToScreenSpace } from "../../utils/webgl";
+import { computed, ref, watchEffect } from 'vue';
+import fragmentShader from '../../shaders/main.frag.glsl?raw';
+import vertexShader from '../../shaders/main.vert.glsl?raw';
+import { useLightingStore } from '../../stores/lighting';
+import { usePerformanceStore } from '../../stores/usePerformanceStore';
+import { useThemeStore } from '../../stores/useThemeStore';
+import { useViewportStore } from '../../stores/viewport';
+import { projectToScreenSpace } from '../../utils/webgl';
 
 function grayscaleTexture(tex: Texture | null): Texture | null {
-  if (!tex || !tex.image) return tex;
-  const img = tex.image;
+  if (!tex?.image) return tex;
+  const img = tex.image as HTMLImageElement | ImageBitmap;
 
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = img.width || 1024;
   canvas.height = img.height || 1024;
 
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return tex;
 
   try {
@@ -214,7 +230,7 @@ function grayscaleTexture(tex: Texture | null): Texture | null {
     newTex.needsUpdate = true;
     return newTex;
   } catch (e) {
-    console.error("Grayscale texture failed:", e);
+    console.error('Grayscale texture failed:', e);
     return tex;
   }
 }
@@ -228,12 +244,17 @@ function normalizeModel(scene: Group, targetSize: number): void {
     const box = new Box3();
     box.makeEmpty();
     obj.updateWorldMatrix(true, true);
-    obj.traverse((child: any) => {
-      if (child.isMesh && child.visible && child.geometry) {
-        if (!child.geometry.boundingBox) child.geometry.computeBoundingBox();
-        const childBox = child.geometry.boundingBox.clone();
-        childBox.applyMatrix4(child.matrixWorld);
-        box.union(childBox);
+    obj.traverse((child) => {
+      if (child instanceof Mesh) {
+        if (child.visible && child.geometry) {
+          const geometry = child.geometry;
+          if (!geometry.boundingBox) geometry.computeBoundingBox();
+          if (geometry.boundingBox) {
+            const childBox = geometry.boundingBox.clone();
+            childBox.applyMatrix4(child.matrixWorld);
+            box.union(childBox);
+          }
+        }
       }
     });
     return box;
@@ -268,13 +289,13 @@ function prepareForScreenBlend(scene: Group): void {
 
     const mat = mesh.material as Material;
 
-    const meshName = (mesh.name || "").toLowerCase();
-    const matName = (mat.name || "").toLowerCase();
+    const meshName = (mesh.name || '').toLowerCase();
+    const matName = (mat.name || '').toLowerCase();
     if (
-      meshName.includes("shadow") ||
-      matName.includes("shadow") ||
-      meshName.includes("collision") ||
-      meshName.includes("proxy")
+      meshName.includes('shadow') ||
+      matName.includes('shadow') ||
+      meshName.includes('collision') ||
+      meshName.includes('proxy')
     ) {
       mesh.visible = false;
       return;
@@ -289,12 +310,23 @@ function prepareForScreenBlend(scene: Group): void {
         mesh.userData.__originalColor = mat.color.clone();
       }
 
-      const isGlass = mat.transparent && mat.opacity < 0.9;
+      // Any transparent mesh (glass, glow planes, particle emitters) should be excluded
+      // from the solid-emissive override below, otherwise they turn into solid gray boxes.
+      const isGlass = mat.transparent;
 
       if (!isGlass) {
         const hsl = { h: 0, s: 0, l: 0 };
         mat.color.getHSL(hsl);
-        if (hsl.l < 0.15) {
+
+        // Models with no diffuse map and pure-white base colors (l ≈ 1.0) render
+        // as blinding white rectangles through mix-blend-screen. Darken them to a
+        // visible-but-subtle level. This handles the 1K drone.glb which ships with
+        // KHR_materials_pbrSpecularGlossiness and all-white base colors.
+        if (!mat.map && hsl.l > 0.85) {
+          // For pure white meshes, adding saturation turns them red (Hue 0).
+          // Keep the original saturation (0) to get a clean neutral gray.
+          mat.color.setHSL(hsl.h, hsl.s, 0.35);
+        } else if (hsl.l < 0.15) {
           mat.color.setHSL(hsl.h, Math.max(hsl.s, 0.2), 0.35);
         }
 
@@ -305,11 +337,11 @@ function prepareForScreenBlend(scene: Group): void {
         // By replacing the green with grayscale on the canvas, it allows `mat.emissive.set()`
         // in recolorAccentMeshes to work perfectly without complex shader hacks.
         if (mat.userData.isUfoMaterial) {
-           if (mat.emissiveMap && !mat.userData.__grayscaledEmissive) {
-             mat.emissiveMap = grayscaleTexture(mat.emissiveMap);
-             mat.userData.__grayscaledEmissive = true;
-           }
-           mat.needsUpdate = true;
+          if (mat.emissiveMap && !mat.userData.__grayscaledEmissive) {
+            mat.emissiveMap = grayscaleTexture(mat.emissiveMap);
+            mat.userData.__grayscaledEmissive = true;
+          }
+          mat.needsUpdate = true;
         }
       }
 
@@ -361,29 +393,29 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
       return;
     }
 
-    const matName = (mat.name || "").toLowerCase();
-    const meshName = (mesh.name || "").toLowerCase();
+    const matName = (mat.name || '').toLowerCase();
+    const meshName = (mesh.name || '').toLowerCase();
     const isLens =
-      matName.includes("lens") ||
-      matName.includes("glass") ||
-      matName.includes("eye") ||
-      meshName.includes("lens") ||
-      meshName.includes("glass") ||
-      meshName.includes("eye");
+      matName.includes('lens') ||
+      matName.includes('glass') ||
+      matName.includes('eye') ||
+      meshName.includes('lens') ||
+      meshName.includes('glass') ||
+      meshName.includes('eye');
 
     const isAccent =
-      matName.includes("glow") ||
-      matName.includes("accent") ||
-      matName.includes("light") ||
-      matName.includes("neon") ||
-      matName.includes("ring") ||
-      matName.includes("emitter") ||
-      meshName.includes("glow") ||
-      meshName.includes("accent") ||
-      meshName.includes("light") ||
-      meshName.includes("neon") ||
-      meshName.includes("ring") ||
-      meshName.includes("emitter");
+      matName.includes('glow') ||
+      matName.includes('accent') ||
+      matName.includes('light') ||
+      matName.includes('neon') ||
+      matName.includes('ring') ||
+      matName.includes('emitter') ||
+      meshName.includes('glow') ||
+      meshName.includes('accent') ||
+      meshName.includes('light') ||
+      meshName.includes('neon') ||
+      meshName.includes('ring') ||
+      meshName.includes('emitter');
 
     if (isLens || isAccent) {
       mat.emissive.set(newColorHex);
@@ -431,30 +463,80 @@ function logModelDiagnostics(label: string, scene: Group): void {
   box.getSize(size);
 
   console.info(
-    `[WebGLScene] ${label}: ${meshCount} meshes, materials: [${[...materialTypes].join(", ")}], bbox: ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)}`,
+    `[WebGLScene] ${label}: ${meshCount} meshes, materials: [${[...materialTypes].join(', ')}], bbox: ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)}`
   );
 }
 
 // ── Stores & Reactive State ──
 const themeStore = useThemeStore();
-const accentColorStr = computed(() =>
-  themeStore.isBlueprintMode ? "#38bdf8" : "#10b981",
+const lightingStore = useLightingStore();
+const accentColorStr = computed(() => (themeStore.isBlueprintMode ? '#38bdf8' : '#10b981'));
+
+const ufoIsTransitioning = ref(false);
+watch(
+  () => lightingStore.phase,
+  (newPhase, oldPhase) => {
+    if (oldPhase === 'NAV' && newPhase === 'CONTENT') {
+      ufoIsTransitioning.value = true;
+    }
+  }
 );
 
 // ── 3D Model Loading ──
 const ufoScene = shallowRef<Group | null>(null);
 const droneScene = shallowRef<Group | null>(null);
 
+import { onUnmounted } from 'vue';
+
+onUnmounted(() => {
+  ufoScene.value = null;
+  droneScene.value = null;
+});
+
 const UFO_TARGET_SIZE = 0.8;
-const DRONE_TARGET_SIZE = 1.2;
+const DRONE_TARGET_SIZE = 0.3;
+
+const gltfLoader = new GLTFLoader();
+let droneLoadStarted = false;
+
+/** Load the drone model on demand (deferred to CONTENT phase to avoid blocking initial load) */
+function loadDroneModel() {
+  if (droneLoadStarted || droneScene.value) return;
+  droneLoadStarted = true;
+
+  gltfLoader.load(
+    '/models/drone.glb',
+    (gltf) => {
+      logModelDiagnostics('Drone', gltf.scene);
+
+      // Hide rogue artifact meshes included in the downloaded GLB
+      // The model includes a glass display box and a platform made entirely of 'Plane' meshes.
+      // We hide all of them to ensure only the actual drone (Spheres, Cylinders, Toruses) is visible.
+      gltf.scene.traverse((child) => {
+        const mesh = child as Mesh;
+        if (mesh.isMesh && mesh.name.toLowerCase().includes('plane')) {
+          mesh.visible = false;
+        }
+      });
+
+      prepareForScreenBlend(gltf.scene);
+      normalizeModel(gltf.scene, DRONE_TARGET_SIZE);
+      recolorAccentMeshes(gltf.scene, accentColorStr.value);
+      droneScene.value = gltf.scene;
+    },
+    undefined,
+    (error) => {
+      console.error('[WebGLScene] drone.glb not found — using primitive fallback.', error);
+      droneLoadStarted = false;
+    }
+  );
+}
 
 onMounted(() => {
-  const loader = new GLTFLoader();
-
-  loader.load(
-    "/models/ufo.glb",
+  gltfLoader.load(
+    '/models/ufo.glb',
     (gltf) => {
-      logModelDiagnostics("UFO", gltf.scene);
+      logModelDiagnostics('UFO', gltf.scene);
 
       // Tag UFO materials definitively so they can be identified in prepareForScreenBlend
       gltf.scene.traverse((child) => {
@@ -471,31 +553,20 @@ onMounted(() => {
     },
     undefined,
     (error) => {
-      console.error(
-        "[WebGLScene] ufo.glb not found — using primitive fallback.",
-        error,
-      );
-    },
-  );
-
-  loader.load(
-    "/models/drone-v2.glb",
-    (gltf) => {
-      logModelDiagnostics("Drone", gltf.scene);
-      prepareForScreenBlend(gltf.scene);
-      normalizeModel(gltf.scene, DRONE_TARGET_SIZE);
-      recolorAccentMeshes(gltf.scene, accentColorStr.value);
-      droneScene.value = gltf.scene;
-    },
-    undefined,
-    (error) => {
-      console.error(
-        "[WebGLScene] drone-v2.glb not found — using primitive fallback.",
-        error,
-      );
-    },
+      console.error('[WebGLScene] ufo.glb not found — using primitive fallback.', error);
+    }
   );
 });
+
+// Defer drone loading until CONTENT phase to avoid blocking the initial render
+watch(
+  () => lightingStore.phase,
+  (phase) => {
+    if (phase === 'CONTENT') {
+      loadDroneModel();
+    }
+  }
+);
 
 watch(accentColorStr, (newColor) => {
   if (ufoScene.value) recolorAccentMeshes(ufoScene.value, newColor);
@@ -507,9 +578,7 @@ watch(accentColorStr, (newColor) => {
 });
 
 const performanceStore = usePerformanceStore();
-const isHighEnd = computed(
-  () => performanceStore.gpuTier && performanceStore.gpuTier >= 3,
-);
+const isHighEnd = computed(() => performanceStore.gpuTier && performanceStore.gpuTier >= 3);
 
 const shaderMaterialRef = shallowRef();
 const dustRef = shallowRef();
@@ -519,28 +588,113 @@ const droneSpotlightRef = shallowRef<SpotLight | null>(null);
 const droneSpotTargetRef = shallowRef<Object3D | null>(null);
 const scanRingRef = shallowRef();
 const viewportStore = useViewportStore();
-const lightingStore = useLightingStore();
+
+// ── Drone Maneuver System ──
+type Maneuver =
+  | 'IDLE'
+  | 'CLOSE_VISIT'
+  | 'DISTANT_PROBE'
+  | 'LOOPING'
+  | 'FOLLOW_MOUSE'
+  | 'INSPECT_ELEMENT';
+const currentManeuver = ref<Maneuver>('IDLE');
+const maneuverStartTime = ref(0);
+const maneuverDuration = ref(0);
+let nextManeuverCheck = 10;
+
+// ── Physical Inertia State ──
+const droneVelocity = new Vector3();
+const droneSpringStrength = 15.0; // Responsive force
+const droneDamping = 0.82; // Air resistance / friction
+
+function triggerManeuver(time: number) {
+  // If user is interacting with UI or mouse, prioritize those states elsewhere
+  if (lightingStore.focusedElementPos) return;
+
+  const r = Math.random();
+  if (r < 0.3) {
+    currentManeuver.value = 'CLOSE_VISIT';
+    maneuverDuration.value = 6;
+  } else if (r < 0.5) {
+    currentManeuver.value = 'DISTANT_PROBE';
+    maneuverDuration.value = 8;
+  } else if (r < 0.75) {
+    currentManeuver.value = 'LOOPING';
+    maneuverDuration.value = 5;
+  } else {
+    currentManeuver.value = 'FOLLOW_MOUSE';
+    maneuverDuration.value = 10;
+  }
+  maneuverStartTime.value = time;
+  nextManeuverCheck = time + maneuverDuration.value + 12 + Math.random() * 8;
+}
+
+// ── Interaction Timing Logic ──
+let focusWeight = 0;
+let focusStartTime = 0;
+const MAX_FOCUS_DURATION = 3.2; // 3.2s of focused inspection
+let lastFocusedElement: { x: number; y: number } | null = null;
 
 // ── Organic Drone Flight System (§7) ──
 function getOrganicFlightPosition(time: number, target: Vector3): void {
   // Scale X movement based on screen width to keep drone visible on mobile
-  const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const xLimitScale = Math.max(0.35, Math.min(1.0, screenWidth / 1200));
 
-  // X: Wide horizontal sweeps from -6 to +6 (figure-8 patterns), scaled by screen width
-  const x = (Math.sin(time * 0.2) * 4 + Math.sin(time * 0.5) * 2) * xLimitScale;
+  // ── Base Figure-8 Organic Motion ──
+  let x = (Math.sin(time * 0.2) * 4 + Math.sin(time * 0.5) * 2) * xLimitScale;
+  let y = Math.cos(time * 0.3) * 1.0 + Math.sin(time * 0.8) * 0.5;
+  let z = Math.sin(time * 0.25) * 2 - 3;
 
-  // Y: Height variation from -1.5 to 1.5
-  const y = Math.cos(time * 0.3) * 1.0 + Math.sin(time * 0.8) * 0.5;
+  // ── UI / Bento Card Interaction ──
+  if (lightingStore.focusedElementPos && focusWeight > 0.01) {
+    // Interpolate towards the hovered card using the reactive focusWeight
+    const targetX = lightingStore.focusedElementPos.x * 5 * xLimitScale;
+    const targetY = lightingStore.focusedElementPos.y * 3;
+    x = MathUtils.lerp(x, targetX, 0.85 * focusWeight);
+    y = MathUtils.lerp(y, targetY, 0.85 * focusWeight);
+    z = MathUtils.lerp(z, -1.2, 0.85 * focusWeight);
+  }
 
-  // Z: Depth variation from -5 to -1
-  const z = Math.sin(time * 0.25) * 2 - 3;
+  // ── Maneuver Overrides ──
+  const timeInManeuver = time - maneuverStartTime.value;
+  if (timeInManeuver > 0 && timeInManeuver < maneuverDuration.value) {
+    const progress = timeInManeuver / maneuverDuration.value;
+    // Smoother envelope using a cubic easing for entry/exit
+    const easeProgress =
+      progress < 0.5 ? 4 * progress * progress * progress : 1 - (-2 * progress + 2) ** 3 / 2;
+    const envelope = Math.sin(easeProgress * Math.PI);
+
+    if (currentManeuver.value === 'CLOSE_VISIT') {
+      z = MathUtils.lerp(z, 3.8, envelope);
+      x = MathUtils.lerp(x, Math.sin(time * 0.5) * 1.5 * xLimitScale, envelope);
+      y = MathUtils.lerp(y, Math.cos(time * 0.4) * 0.5, envelope);
+    } else if (currentManeuver.value === 'DISTANT_PROBE') {
+      z = MathUtils.lerp(z, -18, envelope);
+      x = MathUtils.lerp(x, x * 1.5, envelope);
+    } else if (currentManeuver.value === 'FOLLOW_MOUSE' && !lightingStore.focusedElementPos) {
+      // Actively orbit/follow the mouse cursor
+      const mouseX = (viewportStore.rawMouse.x / sizes.width.value - 0.5) * 8 * xLimitScale;
+      const mouseY = -(viewportStore.rawMouse.y / sizes.height.value - 0.5) * 5;
+      x = MathUtils.lerp(x, mouseX + Math.sin(time * 2) * 0.5, envelope);
+      y = MathUtils.lerp(y, mouseY + Math.cos(time * 2) * 0.5, envelope);
+      z = MathUtils.lerp(z, -1.5, envelope);
+    } else if (currentManeuver.value === 'LOOPING') {
+      const radius = 2.5 * envelope;
+      const angle = progress * Math.PI * 2;
+      y += Math.sin(angle) * radius;
+      z += (Math.cos(angle) - 1.0) * radius;
+    }
+  }
 
   target.set(x, y, z);
 }
 
 const droneCurrentPos = new Vector3(0, 0, -2);
 const droneDummyObj = new Object3D();
+// Hoisted out of the render loop to avoid per-frame allocations / GC pressure
+const _droneTargetPos = new Vector3();
+const _droneLookAtPos = new Vector3();
 
 // ── Scan Grid State & Shader (§9) ──
 const SCAN_INTERVAL = 20;
@@ -575,45 +729,45 @@ const scanFragShader = `
     // ── Expanding Wave ──
     // Leading edge: sharp cut off ahead of the wave
     float leadingEdge = smoothstep(uProgress + 0.01, uProgress, dist);
-    
+
     // Trailing fade: long soft tail behind the wave
     float tailLength = 0.6; // How far the tail stretches backwards
     float trailingFade = smoothstep(uProgress - tailLength, uProgress, dist);
     // Exponential fade makes it look more explosive/natural
-    trailingFade = pow(trailingFade, 1.5); 
-    
+    trailingFade = pow(trailingFade, 1.5);
+
     float wave = leadingEdge * trailingFade;
 
     // ── Holographic Matrix Grid ──
     float gridScale = 120.0;
     vec2 gridId = floor(p * gridScale);
     vec2 gridUv = fract(p * gridScale);
-    
+
     // Distance from center of current cell
     float dotDist = length(gridUv - vec2(0.5));
-    
+
     // Noise to make dots flicker/vary organically
     float noise = random(gridId);
-    
+
     // Glowing dots
     float dots = smoothstep(0.4, 0.1, dotDist) * (0.3 + 0.7 * noise);
-    
+
     // Concentric radar rings
     float rings = smoothstep(0.01, 0.0, abs(fract(dist * 12.0) - 0.5));
-    
+
     // Combine patterns
     float techPattern = max(dots, rings * 0.4);
 
     // Apply the wave to the pattern
     float alpha = techPattern * wave;
-    
+
     // Add a solid glowing core ring at the exact leading edge
     float coreRing = smoothstep(uProgress - 0.015, uProgress, dist) * smoothstep(uProgress + 0.015, uProgress, dist);
     alpha += coreRing * 0.8;
-    
+
     alpha *= smoothstep(1.0, 0.8, dist);
     alpha *= uOpacity;
-    
+
     gl_FragColor = vec4(uColor, alpha);
   }`;
 
@@ -645,22 +799,22 @@ const beamFragShader = `
   void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(vViewPosition);
-    
+
     // Fresnel-like effect: brightest when looking directly through the center
     float viewDot = abs(dot(normal, viewDir));
-    
+
     // Soft core and subtle aura
     float core = smoothstep(0.7, 1.0, viewDot) * 0.8;
     float aura = smoothstep(0.0, 0.8, viewDot) * 0.2;
     float intensity = core + aura;
-    
+
     // Vertical fade: vUv.y is 1.0 at the narrow tip (lens), 0.0 at the wide base.
     // By squaring vUv.y, it creates a smooth exponential fade that completely
     // dissipates to 0.0 at the end of the beam!
     float verticalFade = pow(vUv.y, 1.5);
-    
+
     float alpha = intensity * verticalFade * 0.6;
-    
+
     gl_FragColor = vec4(uColor, alpha);
   }`;
 
@@ -708,25 +862,39 @@ watchEffect(() => {
     const renderPass = new RenderPass(scene.value, activeCamera);
     composer.addPass(renderPass);
 
-    if (isHighEnd.value && !performanceStore.isCiMode) {
-      const bloomPass = new UnrealBloomPass(
-        new Vector2(sizes.width.value, sizes.height.value),
-        0.15,
-        0.5,
-        0.9,
-      );
-      composer.addPass(bloomPass);
-    }
-
+    // RGBShift is lightweight — add immediately
     rgbShiftPass = new ShaderPass(RGB_SHIFT_SHADER);
     rgbShiftPass.uniforms.amount.value = 0.0;
     composer.addPass(rgbShiftPass);
 
-    if (isHighEnd.value) {
-      glitchPass = new GlitchPass();
-      glitchPass.enabled = false;
-      glitchPass.goWild = false;
-      composer.addPass(glitchPass);
+    // Defer heavy passes (BloomPass compiles shaders + allocates framebuffers)
+    // to avoid blocking the first rendered frames
+    const addDeferredPasses = () => {
+      if (!composer) return;
+
+      if (isHighEnd.value && !performanceStore.isCiMode) {
+        const bloomPass = new UnrealBloomPass(
+          new Vector2(sizes.width.value, sizes.height.value),
+          0.15,
+          0.5,
+          0.9
+        );
+        // Insert bloom before RGB shift (index 1, after RenderPass)
+        composer.insertPass(bloomPass, 1);
+      }
+
+      if (isHighEnd.value) {
+        glitchPass = new GlitchPass();
+        glitchPass.enabled = false;
+        glitchPass.goWild = false;
+        composer.addPass(glitchPass);
+      }
+    };
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(addDeferredPasses, { timeout: 2000 });
+    } else {
+      setTimeout(addDeferredPasses, 500);
     }
   }
 });
@@ -749,18 +917,28 @@ watch(
         if (glitchPass) glitchPass.enabled = false;
       }, 350);
     }
-  },
+  }
 );
 
-const particleCount = performanceStore.isCiMode
-  ? 10
-  : isHighEnd.value
-    ? 200
-    : 50;
+const particleCount = performanceStore.isCiMode ? 10 : isHighEnd.value ? 200 : 50;
 const dustPositions = new Float32Array(particleCount * 3);
 for (let i = 0; i < particleCount * 3; i++) {
   dustPositions[i] = (Math.random() - 0.5) * 6;
 }
+
+const ABDUCTION_PARTICLE_COUNT = 150;
+const abductionPositions = new Float32Array(ABDUCTION_PARTICLE_COUNT * 3);
+const abductionVelocities = new Float32Array(ABDUCTION_PARTICLE_COUNT);
+for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
+  const radius = 0.2 + Math.random() * 0.8;
+  const theta = Math.random() * Math.PI * 2;
+  abductionPositions[i * 3] = Math.cos(theta) * radius;
+  abductionPositions[i * 3 + 1] = -2 + Math.random() * 4;
+  abductionPositions[i * 3 + 2] = Math.sin(theta) * radius;
+  abductionVelocities[i] = 2.0 + Math.random() * 4.0;
+}
+const abductionParticlesRef = shallowRef();
+let abductionOpacity = 0.0;
 
 const uniforms = {
   uMouse: { value: new Vector2(window.innerWidth / 2, window.innerHeight / 2) },
@@ -803,28 +981,31 @@ watchEffect(() => {
 
   scanUniforms.uColor.value = [accentColor.r, accentColor.g, accentColor.b];
 
-  renderState.isNavPhase = lightingStore.phase === "NAV";
-  renderState.isContentPhase = lightingStore.phase === "CONTENT";
+  renderState.isNavPhase = lightingStore.phase === 'NAV';
+  renderState.isContentPhase = lightingStore.phase === 'CONTENT';
   renderState.isBlueprintMode = themeStore.isBlueprintMode ? 1.0 : 0.0;
   renderState.lightingEnabled = themeStore.lightingEnabled;
 });
 
 onBeforeRender(({ elapsed, delta }) => {
   if (ufoRef.value && camera.activeCamera.value) {
-    if (ufoRef.value.visible !== renderState.isNavPhase) {
-      ufoRef.value.visible = renderState.isNavPhase;
+    const ufoTargetY = renderState.isNavPhase ? 1.6 + Math.sin(elapsed * 2) * 0.1 : 15.0;
+    const ufoSmoothing = 1.0 - Math.exp((renderState.isNavPhase ? -2.0 : -3.0) * delta);
+    ufoRef.value.position.y += (ufoTargetY - ufoRef.value.position.y) * ufoSmoothing;
+
+    const isVisible = ufoRef.value.position.y < 10.0;
+    ufoRef.value.visible = isVisible;
+
+    if (!isVisible && !renderState.isNavPhase) {
+      ufoIsTransitioning.value = false;
     }
 
-    if (renderState.isNavPhase) {
-      ufoRef.value.position.y = 1.6 + Math.sin(elapsed * 2) * 0.1;
-
-      if (shaderMaterialRef.value) {
-        projectToScreenSpace(
-          ufoRef.value.position,
-          camera.activeCamera.value,
-          shaderMaterialRef.value.uniforms.uUfoPosition.value,
-        );
-      }
+    if (isVisible && shaderMaterialRef.value) {
+      projectToScreenSpace(
+        ufoRef.value.position,
+        camera.activeCamera.value,
+        shaderMaterialRef.value.uniforms.uUfoPosition.value
+      );
     }
   }
 
@@ -832,31 +1013,105 @@ onBeforeRender(({ elapsed, delta }) => {
     const droneVisible = renderState.isContentPhase;
     if (droneRef.value.visible !== droneVisible) {
       droneRef.value.visible = droneVisible;
+
+      // Reset scan state when leaving content phase mid-scan
+      if (!droneVisible && scanActive) {
+        scanActive = false;
+        if (scanRingRef.value) {
+          scanRingRef.value.visible = false;
+          scanUniforms.uProgress.value = 0;
+          scanUniforms.uOpacity.value = 0;
+        }
+      }
     }
 
     if (droneVisible) {
       // ── Organic Physics-Based Flight (§7) ──
-      const targetPos = new Vector3();
-      getOrganicFlightPosition(elapsed, targetPos);
+      const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+      const xLimitScale = Math.max(0.35, Math.min(1.0, screenWidth / 1200));
 
-      // 1. Smoothly interpolate position (adds weight/inertia)
-      const posSmoothing = 1.0 - Math.exp(-2.0 * delta);
-      droneCurrentPos.lerp(targetPos, posSmoothing);
+      // ── Update Focus Weight (Timed Bento Inspection) ──
+      if (lightingStore.focusedElementPos) {
+        if (lightingStore.focusedElementPos !== lastFocusedElement) {
+          focusStartTime = elapsed;
+          lastFocusedElement = lightingStore.focusedElementPos;
+        }
+        const focusAge = elapsed - focusStartTime;
+        // Drone only stays focused for a few seconds before returning to duty
+        const targetWeight = focusAge < MAX_FOCUS_DURATION ? 1.0 : 0.0;
+        focusWeight = MathUtils.lerp(focusWeight, targetWeight, delta * 3);
+      } else {
+        focusWeight = MathUtils.lerp(focusWeight, 0.0, delta * 4);
+        lastFocusedElement = null;
+      }
 
-      // Add micro-hover bobbing to the physical position
+      // Trigger new maneuvers periodically
+      if (elapsed > nextManeuverCheck) {
+        triggerManeuver(elapsed);
+      }
+
+      // Reset maneuver state when finished
+      if (
+        currentManeuver.value !== 'IDLE' &&
+        elapsed > maneuverStartTime.value + maneuverDuration.value
+      ) {
+        currentManeuver.value = 'IDLE';
+        // Reset color if it was changed by a gimmick
+        if (droneScene.value) recolorAccentMeshes(droneScene.value, accentColorStr.value);
+      }
+
+      getOrganicFlightPosition(elapsed, _droneTargetPos);
+
+      // 1. Physical Position Simulation (Spring-Damper for fluid inertia)
+      const springForce = _droneTargetPos
+        .clone()
+        .sub(droneCurrentPos)
+        .multiplyScalar(droneSpringStrength);
+      droneVelocity.add(springForce.multiplyScalar(delta));
+
+      // Apply damping (exponential decay towards 0 velocity)
+      const dampingFactor = droneDamping ** (delta * 60);
+      droneVelocity.multiplyScalar(dampingFactor);
+
+      // Integrate velocity into position
+      droneCurrentPos.add(droneVelocity.clone().multiplyScalar(delta));
+
+      // Add micro-hover bobbing to the final visual position
       const hoverY = Math.sin(elapsed * 3.5) * 0.1;
       droneRef.value.position.copy(droneCurrentPos);
       droneRef.value.position.y += hoverY;
 
-      // 2. Calculate ideal rotation (look at future point on the curve)
-      const lookAtPos = new Vector3();
-      getOrganicFlightPosition(elapsed + 0.4, lookAtPos);
+      // 2. Calculate ideal rotation
+      getOrganicFlightPosition(elapsed + 0.4, _droneLookAtPos);
+
+      // Bento Card Inspection: Look directly at the card being hovered
+      if (lightingStore.focusedElementPos && focusWeight > 0.1) {
+        const focusX = lightingStore.focusedElementPos.x * 5 * xLimitScale;
+        const focusY = lightingStore.focusedElementPos.y * 3;
+        // Look slightly "behind" the card to ensure the beam hits it flush
+        _droneLookAtPos.set(focusX, focusY, -2.0);
+      }
+
+      // Gimmick: Mouse Curiosity (peek towards mouse when idle)
+      else if (currentManeuver.value === 'IDLE') {
+        const mouseX = (viewportStore.rawMouse.x / sizes.width.value - 0.5) * 5;
+        const mouseY = -(viewportStore.rawMouse.y / sizes.height.value - 0.5) * 3;
+        _droneLookAtPos.x += mouseX * 0.5;
+        _droneLookAtPos.y += mouseY * 0.5;
+      }
+
+      // Gimmick: Face Look (Look at camera when very close)
+      const distToCam = droneCurrentPos.distanceTo(new Vector3(0, 0, 5));
+      const isVeryClose = currentManeuver.value === 'CLOSE_VISIT' && distToCam < 2.5;
+      if (isVeryClose) {
+        _droneLookAtPos.set(0, 0, 8); // Look "through" the camera at the user
+      }
 
       droneDummyObj.position.copy(droneCurrentPos);
-      droneDummyObj.lookAt(lookAtPos);
+      droneDummyObj.lookAt(_droneLookAtPos);
 
       // Dynamic pitch based on vertical climb/dive
-      const vY = targetPos.y - droneCurrentPos.y;
+      const vY = _droneTargetPos.y - droneCurrentPos.y;
       const targetPitch = -vY * 0.8;
 
       // Dynamic bank (roll) based on turning
@@ -871,14 +1126,39 @@ onBeforeRender(({ elapsed, delta }) => {
       const rotSmoothing = 1.0 - Math.exp(-3.5 * delta);
       droneRef.value.quaternion.slerp(droneDummyObj.quaternion, rotSmoothing);
 
+      // ── Gimmick: Face Scan (Glitch + Red Flash) ──
+      if (isVeryClose && distToCam < 1.8) {
+        if (glitchPass && !glitchPass.enabled && Math.random() > 0.95) {
+          glitchPass.enabled = true;
+          if (droneScene.value) recolorAccentMeshes(droneScene.value, '#ef4444'); // Red alert!
+          setTimeout(() => {
+            if (glitchPass) glitchPass.enabled = false;
+            if (droneScene.value) recolorAccentMeshes(droneScene.value, accentColorStr.value);
+          }, 400);
+        }
+      }
+
       // ── Spotlight target rigidly follows drone (§8) ──
       if (droneSpotlightRef.value && droneSpotTargetRef.value) {
         // Bind the spotlight to its local target
         droneSpotlightRef.value.target = droneSpotTargetRef.value;
 
-        // Subtle intensity flicker/breathing
+        // Gimmick: Speed-based intensity (brighter when moving fast or close)
+        const speed = _droneTargetPos.distanceTo(droneCurrentPos) / delta;
+        const speedBoost = Math.min(speed * 0.1, 4.0);
+        const proximityBoost = isVeryClose ? 5.0 : 0.0;
+
+        // Subtle intensity flicker/breathing + boosts
         droneSpotlightRef.value.intensity =
-          3 + Math.sin(elapsed * 8) * 0.5 + Math.sin(elapsed * 13) * 0.3;
+          3 +
+          speedBoost +
+          proximityBoost +
+          Math.sin(elapsed * 8) * 0.5 +
+          Math.sin(elapsed * 13) * 0.3;
+
+        // Update beam color/intensity
+        const intensity = 1.0 + speedBoost * 0.2 + proximityBoost * 0.5;
+        beamUniforms.uColor.value.set(accentColorStr.value).multiplyScalar(intensity);
       }
 
       if (elapsed - lastScanTime >= SCAN_INTERVAL && !scanActive) {
@@ -917,6 +1197,51 @@ onBeforeRender(({ elapsed, delta }) => {
     }
   }
 
+  if (abductionParticlesRef.value) {
+    const posAttr = abductionParticlesRef.value.geometry?.attributes?.position;
+
+    if (posAttr) {
+      const isAbducting =
+        renderState.isContentPhase && ufoRef.value && ufoRef.value.position.y < 8.0;
+
+      if (isAbducting && !abductionParticlesRef.value.visible) {
+        // Reset particle positions below the UFO on first activation
+        // so they visibly stream upward from the start
+        const positions = posAttr.array as Float32Array;
+        for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
+          const radius = 0.2 + Math.random() * 0.8;
+          const theta = Math.random() * Math.PI * 2;
+          positions[i * 3] = Math.cos(theta) * radius;
+          positions[i * 3 + 1] = -2 + Math.random() * 2; // start below
+          positions[i * 3 + 2] = Math.sin(theta) * radius;
+        }
+        posAttr.needsUpdate = true;
+      }
+
+      if (isAbducting) {
+        abductionOpacity = MathUtils.lerp(abductionOpacity, 1.0, delta * 10);
+        abductionParticlesRef.value.visible = true;
+      } else {
+        abductionOpacity = MathUtils.lerp(abductionOpacity, 0.0, delta * 5);
+        if (abductionOpacity < 0.01) {
+          abductionParticlesRef.value.visible = false;
+        }
+      }
+
+      if (abductionParticlesRef.value.visible) {
+        const positions = posAttr.array as Float32Array;
+        for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
+          positions[i * 3 + 1] += abductionVelocities[i] * delta;
+          if (positions[i * 3 + 1] > 4.0) {
+            positions[i * 3 + 1] = -2.0;
+          }
+        }
+        posAttr.needsUpdate = true;
+        (abductionParticlesRef.value.material as PointsMaterial).opacity = abductionOpacity * 0.8;
+      }
+    }
+  }
+
   if (dustRef.value) {
     dustRef.value.rotation.y += 0.05 * delta;
     dustRef.value.rotation.x += 0.02 * delta;
@@ -933,8 +1258,7 @@ onBeforeRender(({ elapsed, delta }) => {
     lastMouse.set(currentMouseX, currentMouseY);
 
     const targetAmount = Math.min(distance * 0.00005, 0.005);
-    rgbShiftPass.uniforms.amount.value +=
-      (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
+    rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
   }
 
   if (!shaderMaterialRef.value) return;
@@ -951,9 +1275,8 @@ onBeforeRender(({ elapsed, delta }) => {
     u.uLightingEnabled.value = renderState.lightingEnabled;
   }
 
-  const currentPhase = renderState.isContentPhase ? 1.0 : 0.0;
-  if (u.uPhase.value !== currentPhase) {
-    u.uPhase.value = currentPhase;
-  }
+  const targetPhase = renderState.isContentPhase ? 1.0 : 0.0;
+  const phaseSmoothing = 1.0 - Math.exp(-4.0 * delta);
+  u.uPhase.value += (targetPhase - u.uPhase.value) * phaseSmoothing;
 });
 </script>
