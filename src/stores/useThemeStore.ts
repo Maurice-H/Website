@@ -39,6 +39,7 @@ export const useThemeStore = defineStore('theme', () => {
 
         // Update mobile system theme-color (affects status bar and nav bar on Android/iOS)
         const updateMetas = () => {
+          if (typeof document === 'undefined') return;
           // Select both standard and media-query theme-color tags
           const metas = document.querySelectorAll(
             'meta[name="theme-color"], meta[name="msapplication-navbutton-color"]'
@@ -47,6 +48,7 @@ export const useThemeStore = defineStore('theme', () => {
             meta.setAttribute('content', themeColor);
           });
         };
+
 
         // Aggressive update sequence to catch OS registration windows
         updateMetas();
