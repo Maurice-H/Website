@@ -144,6 +144,19 @@
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
         </svg>
       </button>
+      <button
+        v-if="!isMobile"
+        type="button"
+        class="shortcut-reset-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        title="Reset all shortcuts"
+        aria-label="Reset all shortcuts"
+        @click.stop="shortcutStore.resetAll()"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+      </button>
     </div>
   </div>
 </template>
@@ -519,7 +532,8 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.45);
 }
 
-.shortcut-edit-btn {
+.shortcut-edit-btn,
+.shortcut-reset-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -534,7 +548,8 @@ onUnmounted(() => {
   opacity: 0.6;
 }
 
-.shortcut-edit-btn:hover {
+.shortcut-edit-btn:hover,
+.shortcut-reset-btn:hover {
   opacity: 1;
   color: var(--finished-accent);
   border-color: color-mix(in srgb, var(--finished-accent) 40%, transparent);

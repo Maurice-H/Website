@@ -91,12 +91,12 @@ describe('useShortcutStore', () => {
     expect(store.rebindingAction).toBe('theme'); // should stay in rebinding mode
   });
 
-  it('resets to defaults', () => {
+  it('resets to defaults (resetAll)', () => {
     const store = useShortcutStore();
     store.startRebind('theme');
     store.tryRebind('k');
 
-    store.resetDefaults();
+    store.resetAll();
     expect(store.getKey('theme')).toBe('t');
   });
 

@@ -153,7 +153,7 @@ export const useShortcutStore = defineStore('shortcuts', () => {
   };
 
   /** Reset all bindings to defaults */
-  const resetDefaults = () => {
+  const resetAll = () => {
     bindings.value = structuredClone(DEFAULT_BINDINGS);
     rebindingAction.value = null;
   };
@@ -183,6 +183,6 @@ export const useShortcutStore = defineStore('shortcuts', () => {
     startRebind,
     cancelRebind,
     tryRebind,
-    resetDefaults,
+    resetAll,
   };
 });

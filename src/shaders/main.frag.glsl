@@ -6,6 +6,7 @@ uniform bool uLightingEnabled;
 uniform float uPhase;
 uniform vec3 uAccentColor;
 uniform vec2 uUfoPosition;
+uniform bool uIsMobile;
 
 varying vec2 vUv;
 
@@ -52,7 +53,7 @@ void main() {
     }
 
     //   CONTENT phase: custom cursor Cyber-Optic HUD Scanner (Micro)
-    if (uPhase > 0.9) {
+    if (uPhase > 0.9 && !uIsMobile) {
       vec2 dir = st - mouse;
       float dist = length(dir);
       float angle = atan(dir.y, dir.x);

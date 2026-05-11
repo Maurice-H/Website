@@ -30,6 +30,7 @@
         <div class="drone-pulse" />
         <div class="drone-core" />
         <div class="drone-ring" />
+        <div v-if="isLightingEnabled" class="drone-status-light" />
       </div>
     </div>
 
@@ -101,7 +102,9 @@ const particleStyle = (index: number): CSSProperties => {
   transform: translateX(-50%) translateY(-300px) scale(0.6);
   opacity: 0;
   /* EXIT transition: fast beam-up into orbit */
-  transition: opacity 0.3s ease-in, transform 0.5s cubic-bezier(0.55, 0, 1, 0.45);
+  transition:
+    opacity 0.3s ease-in,
+    transform 0.5s cubic-bezier(0.55, 0, 1, 0.45);
   perspective: 600px;
 }
 
@@ -109,7 +112,9 @@ const particleStyle = (index: number): CSSProperties => {
   opacity: 1;
   transform: translateX(-50%) translateY(0) scale(1.25);
   /* ENTRY transition: slow graceful descent */
-  transition: opacity 1.2s ease-out, transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition:
+    opacity 1.2s ease-out,
+    transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .ufo-body {
@@ -180,15 +185,26 @@ const particleStyle = (index: number): CSSProperties => {
     var(--ufo-accent-glow, rgba(16, 185, 129, 0.4)) 0%,
     transparent 80%
   );
-  clip-path: polygon(calc(50% - 25px) 0%, calc(50% + 25px) 0%, 100% 100%, 0% 100%);
+  clip-path: polygon(
+    calc(50% - 25px) 0%,
+    calc(50% + 25px) 0%,
+    100% 100%,
+    0% 100%
+  );
   animation: ufo-beam 3s ease-in-out infinite;
+}
+
+.css-ufo {
+  --ufo-accent: #10b981;
+  --ufo-accent-glow: rgba(16, 185, 129, 0.6);
 }
 
 /* Blueprint mode overrides */
 .css-ufo.ufo-blueprint {
   --ufo-accent: #38bdf8;
-  --ufo-accent-glow: rgba(56, 189, 248, 0.35);
+  --ufo-accent-glow: rgba(56, 189, 248, 0.6);
 }
+
 
 @keyframes ufo-hover {
   0%,
@@ -278,6 +294,24 @@ const particleStyle = (index: number): CSSProperties => {
   animation: drone-ring-spin 4s linear infinite;
 }
 
+.drone-status-light {
+  position: absolute;
+  top: 15%;
+  right: 20%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--drone-accent, #10b981);
+  box-shadow: 0 0 8px var(--drone-accent, #10b981);
+  animation: drone-status-blink 1s ease-in-out infinite alternate;
+  z-index: 5;
+}
+
+@keyframes drone-status-blink {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
 .drone-pulse {
   position: absolute;
   inset: -4px;
@@ -290,11 +324,17 @@ const particleStyle = (index: number): CSSProperties => {
   animation: drone-pulse-anim 2s ease-in-out infinite;
 }
 
+.css-drone {
+  --drone-accent: #10b981;
+  --drone-accent-glow: rgba(16, 185, 129, 0.6);
+}
+
 /* Blueprint mode overrides */
 .css-drone.drone-blueprint {
   --drone-accent: #38bdf8;
-  --drone-accent-glow: rgba(56, 189, 248, 0.15);
+  --drone-accent-glow: rgba(56, 189, 248, 0.6);
 }
+
 
 @keyframes drone-orbit {
   0% {
@@ -352,6 +392,19 @@ const particleStyle = (index: number): CSSProperties => {
   100% {
     opacity: 0.7;
     transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+@media (min-width: 768px) {
+  @keyframes drone-glow-pulse {
+    0% {
+      opacity: 0.6;
+      transform: translate(-50%, -50%) scale(1.0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.4);
+    }
   }
 }
 

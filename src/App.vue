@@ -63,7 +63,7 @@
               @click="handleBackToNav"
               class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98]"
             >
-              [ ESC ] Back
+              <template v-if="!isMobile">[ {{ shortcutStore.getDisplay('back') }} ] </template>Back
             </button>
           </div>
 
@@ -108,20 +108,24 @@ import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts';
 import { initGlobalViewportService } from './composables/useViewportStore';
 import { useLightingStore } from './stores/lighting';
 import { usePerformanceStore } from './stores/usePerformanceStore';
+import { useShortcutStore } from './stores/useShortcutStore';
 import { useThemeStore } from './stores/useThemeStore';
 import { LightingPhase } from './types';
+
+const isMobile = computed(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
 // Use the stores directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
 const themeStore = useThemeStore();
 const performance = usePerformanceStore();
+const shortcutStore = useShortcutStore();
 
 // Register global keyboard shortcuts (L = lighting, T = theme)
 useKeyboardShortcuts();
 
-// Check if we use the WebGL scanner (only on Content page + light on)
+// Check if we use the WebGL scanner (only on Content page + light on + non-mobile)
 const isCustomCursorActive = computed(() => {
-  return themeStore.lightingEnabled && lighting.phase === 'CONTENT';
+  return themeStore.lightingEnabled && lighting.phase === 'CONTENT' && !isMobile.value;
 });
 
 /**
@@ -133,10 +137,9 @@ const rootCssVars = computed<CSSProperties>(() => {
   if (!themeStore.lightingEnabled) return {};
 
   const isNav = lighting.phase === 'NAV';
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   // Use a wider gradient on mobile to cover more of the smaller screen
-  const maskSize = isMobile ? '80% 120%' : '40% 160%';
+  const maskSize = isMobile.value ? '80% 120%' : '40% 160%';
 
   return {
     '--reveal-mask': isNav

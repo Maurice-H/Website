@@ -15,7 +15,10 @@ interface ComponentRegistration {
 export const useViewportStore = defineStore('viewport', () => {
   const registeredComponents = reactive<Map<string, ComponentRegistration>>(new Map());
   const elementMap = new WeakMap<HTMLElement, ComponentRegistration>();
-  const mousePosition = reactive({ x: 0, y: 0 });
+  const mousePosition = reactive({
+    x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
+    y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
+  });
   const isListening = ref(false);
 
   /**
@@ -25,7 +28,10 @@ export const useViewportStore = defineStore('viewport', () => {
    * triggering Vue dependency tracking.
    * markRaw ensures Pinia doesn't automatically wrap this in a proxy.
    */
-  const rawMouse = markRaw({ x: 0, y: 0 });
+  const rawMouse = markRaw({
+    x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
+    y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
+  });
 
   let observer: IntersectionObserver | null = null;
   let updateRafId: number | null = null;
