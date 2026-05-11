@@ -25,3 +25,7 @@
 ## 2026-05-09 - Dynamic Text State Announcements
  Learning: When a button's text dynamically updates to indicate a state change (e.g., from "Copy" to "✓ Copied") without focusing another element or reloading the page, screen readers will not announce the updated text by default, leaving non-visual users unaware of the successful interaction.
  Action: When dynamically updating UI text to indicate temporary or changed states, ensure the element uses `aria-live="polite"` so screen readers appropriately announce the visual change.
+
+## 2024-05-10 - Shortcut Keys Focus Rings
+ Learning: Floating menu items that function as standalone shortcut triggers or edit buttons (`div` and `button` tags) often omit focus states out-of-the-box, hurting keyboard navigability.
+ Action: Ensure `role="button"`, `tabindex="0"`, explicit `keydown` handlers (`.enter.stop` and `.space.prevent.stop`), and distinct focus outlines (`focus-visible:ring-*`) are applied to all interactive elements, including icon-only shortcut toggles.
