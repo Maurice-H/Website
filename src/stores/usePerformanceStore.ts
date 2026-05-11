@@ -9,16 +9,9 @@ export const usePerformanceStore = defineStore('performance', () => {
   const isReady = ref(false);
   const isLowEnd = computed(() => gpuTier.value !== null && gpuTier.value < 2);
 
-  // Sanitize the URL search string to mitigate Client-Side Injection (XSS) risks.
-  // We only allow alphanumeric characters and basic URL structural characters.
-  const getSanitizedSearch = () => {
-    if (typeof window === 'undefined' || !window.location.search) return '';
-    return window.location.search.replace(/[^a-zA-Z0-9?=&_-]/g, '');
-  };
-
   const isCiMode = computed(() => {
     // Check for explicit environment variable or URL parameter
-    const params = new URLSearchParams(getSanitizedSearch());
+    const params = new URLSearchParams(window.location.search);
     return envConfig.isCiMode || params.get('ciMode') === 'true' || params.get('ci') === '1';
   });
 
@@ -29,7 +22,7 @@ export const usePerformanceStore = defineStore('performance', () => {
   const initTierFromOverrides = () => {
     if (isReady.value) return true;
 
-    const params = new URLSearchParams(getSanitizedSearch());
+    const params = new URLSearchParams(window.location.search);
     const forcedTier = params.get('forceTier');
 
     if (forcedTier) {

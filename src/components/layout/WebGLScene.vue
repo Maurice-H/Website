@@ -104,15 +104,14 @@
 
   <!-- Abduction Particles -->
   <TresPoints ref="abductionParticlesRef" :visible="false">
-    <TresBufferGeometry :position="[abductionPositions, 3]" />
-    <TresPointsMaterial
-      :color="accentColorStr"
-      :size="0.04"
+    <TresBufferGeometry :position="[abductionPositions, 3]" :a-velocity="[abductionVelocities, 1]" />
+    <TresShaderMaterial
+      :vertex-shader="abductionVertShader"
+      :fragment-shader="abductionFragShader"
+      :uniforms="abductionUniforms"
       :transparent="true"
-      :opacity="0.8"
       :blending="2"
       :depth-write="false"
-      :size-attenuation="true"
     />
   </TresPoints>
 
@@ -147,7 +146,6 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   Object3D,
-  type PointsMaterial,
   type SpotLight,
   type Texture,
   Vector2,
@@ -446,6 +444,27 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
   });
 }
 
+function logModelDiagnostics(label: string, scene: Group): void {
+  let meshCount = 0;
+  const materialTypes = new Set<string>();
+
+  scene.traverse((child) => {
+    const mesh = child as Mesh;
+    if (!mesh.isMesh) return;
+    meshCount++;
+    const mat = mesh.material as Material;
+    materialTypes.add(mat.type);
+  });
+
+  const box = new Box3().setFromObject(scene);
+  const size = new Vector3();
+  box.getSize(size);
+
+  console.info(
+    `[WebGLScene] ${label}: ${meshCount} meshes, materials: [${[...materialTypes].join(', ')}], bbox: ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)}`
+  );
+}
+
 // ── Stores & Reactive State ──
 const themeStore = useThemeStore();
 const lightingStore = useLightingStore();
@@ -486,6 +505,8 @@ function loadDroneModel() {
   gltfLoader.load(
     `${import.meta.env.BASE_URL}models/drone.glb`,
     (gltf) => {
+      logModelDiagnostics('Drone', gltf.scene);
+
       // Hide rogue artifact meshes included in the downloaded GLB
       // The model includes a glass display box and a platform made entirely of 'Plane' meshes.
       // We hide all of them to ensure only the actual drone (Spheres, Cylinders, Toruses) is visible.
@@ -513,6 +534,8 @@ onMounted(() => {
   gltfLoader.load(
     `${import.meta.env.BASE_URL}models/ufo.glb`,
     (gltf) => {
+      logModelDiagnostics('UFO', gltf.scene);
+
       // Tag UFO materials definitively so they can be identified in prepareForScreenBlend
       gltf.scene.traverse((child) => {
         const mesh = child as Mesh;
@@ -677,6 +700,51 @@ let lastScanTime = 0;
 let scanActive = false;
 let scanElapsed = 0;
 const SCAN_DURATION = 3;
+
+// ── Abduction Particle Shader ──
+const abductionVertShader = `
+  uniform float uTime;
+  uniform float uActivationTime;
+  uniform float uPixelRatio;
+  attribute float aVelocity;
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    vec3 pos = position;
+
+    // Relative time since activation
+    float localTime = max(0.0, uTime - uActivationTime);
+
+    // Apply velocity over time and wrap around (simulate modulus operator logic for floats)
+    float currentY = pos.y + aVelocity * localTime;
+
+    // wrap logic: starting from -2.0, going up to 4.0, length of 6.0
+    float wrappedY = mod(currentY + 2.0, 6.0) - 2.0;
+    pos.y = wrappedY;
+
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+
+    // Proper size attenuation logic replicating TresPointsMaterial :size="0.04"
+    gl_PointSize = 0.04 * uPixelRatio * (1000.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const abductionFragShader = `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying vec2 vUv;
+  void main() {
+    // Circle shape for points
+    float r = distance(gl_PointCoord, vec2(0.5));
+    if (r > 0.5) discard;
+
+    // Soft edge
+    float alpha = (0.5 - r) * 2.0;
+
+    gl_FragColor = vec4(uColor, alpha * uOpacity);
+  }
+`;
 
 const scanVertShader = `
   varying vec2 vUv;
@@ -915,6 +983,14 @@ for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
 const abductionParticlesRef = shallowRef();
 let abductionOpacity = 0.0;
 
+const abductionUniforms = {
+  uTime: { value: 0 },
+  uActivationTime: { value: 0 },
+  uPixelRatio: { value: window.devicePixelRatio || 1.0 },
+  uColor: { value: new Color(accentColorStr.value) },
+  uOpacity: { value: 0.0 },
+};
+
 const uniforms = {
   uMouse: { value: new Vector2(window.innerWidth / 2, window.innerHeight / 2) },
   uResolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
@@ -953,6 +1029,8 @@ watchEffect(() => {
       accentColor.b,
     ];
   }
+
+  abductionUniforms.uColor.value.set(accentColorStr.value);
 
   scanUniforms.uColor.value = [accentColor.r, accentColor.g, accentColor.b];
 
@@ -1180,17 +1258,8 @@ onBeforeRender(({ elapsed, delta }) => {
         renderState.isContentPhase && ufoRef.value && ufoRef.value.position.y < 8.0;
 
       if (isAbducting && !abductionParticlesRef.value.visible) {
-        // Reset particle positions below the UFO on first activation
-        // so they visibly stream upward from the start
-        const positions = posAttr.array as Float32Array;
-        for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
-          const radius = 0.2 + Math.random() * 0.8;
-          const theta = Math.random() * Math.PI * 2;
-          positions[i * 3] = Math.cos(theta) * radius;
-          positions[i * 3 + 1] = -2 + Math.random() * 2; // start below
-          positions[i * 3 + 2] = Math.sin(theta) * radius;
-        }
-        posAttr.needsUpdate = true;
+        // Record activation time to trigger bottom-up streaming effect
+        abductionUniforms.uActivationTime.value = elapsed;
       }
 
       if (isAbducting) {
@@ -1204,15 +1273,8 @@ onBeforeRender(({ elapsed, delta }) => {
       }
 
       if (abductionParticlesRef.value.visible) {
-        const positions = posAttr.array as Float32Array;
-        for (let i = 0; i < ABDUCTION_PARTICLE_COUNT; i++) {
-          positions[i * 3 + 1] += abductionVelocities[i] * delta;
-          if (positions[i * 3 + 1] > 4.0) {
-            positions[i * 3 + 1] = -2.0;
-          }
-        }
-        posAttr.needsUpdate = true;
-        (abductionParticlesRef.value.material as PointsMaterial).opacity = abductionOpacity * 0.8;
+        // Update uniforms instead of modifying positions on CPU
+        abductionUniforms.uOpacity.value = abductionOpacity * 0.8;
       }
     }
   }
@@ -1235,6 +1297,8 @@ onBeforeRender(({ elapsed, delta }) => {
     const targetAmount = Math.min(distance * 0.00005, 0.005);
     rgbShiftPass.uniforms.amount.value += (targetAmount - rgbShiftPass.uniforms.amount.value) * 0.1;
   }
+
+  abductionUniforms.uTime.value = elapsed;
 
   if (!shaderMaterialRef.value) return;
 

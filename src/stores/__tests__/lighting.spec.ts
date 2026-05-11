@@ -1,5 +1,10 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('detect-gpu', () => ({
+  getGPUTier: vi.fn().mockResolvedValue({ tier: 3 }),
+}));
+
 import { LightingPhase } from '../../types';
 import { useLightingStore } from '../lighting';
 
@@ -14,7 +19,6 @@ describe('useLightingStore', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
-    vi.clearAllTimers();
   });
 
   it('should initialize with default state', () => {
