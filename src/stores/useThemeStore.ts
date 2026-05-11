@@ -49,7 +49,6 @@ export const useThemeStore = defineStore('theme', () => {
           });
         };
 
-
         // Aggressive update sequence to catch OS registration windows
         updateMetas();
         setTimeout(updateMetas, 100);
