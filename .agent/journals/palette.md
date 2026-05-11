@@ -25,3 +25,7 @@
 ## 2026-05-09 - Dynamic Text State Announcements
  Learning: When a button's text dynamically updates to indicate a state change (e.g., from "Copy" to "✓ Copied") without focusing another element or reloading the page, screen readers will not announce the updated text by default, leaving non-visual users unaware of the successful interaction.
  Action: When dynamically updating UI text to indicate temporary or changed states, ensure the element uses `aria-live="polite"` so screen readers appropriately announce the visual change.
+
+## 2026-05-11 - Keyboard Accessibility on Clickable Divs
+ Learning: Custom clickable components (like `<div @click="...">` with `cursor-pointer`) must implement complete keyboard interactivity to be fully accessible. They need `role="button"`, `tabindex="0"`, explicit keyboard event listeners (like `@keydown.enter.prevent` and `@keydown.space.prevent`), and clear focus states (e.g., `focus-visible:ring-*`).
+ Action: When adding `@click` and `cursor-pointer` to non-button elements, always ensure they are paired with complete keyboard accessibility properties and focus indicators.
