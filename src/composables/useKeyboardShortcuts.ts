@@ -39,8 +39,8 @@ export function useKeyboardShortcuts(): void {
     if (shortcutStore.rebindingAction) {
       e.preventDefault();
 
-      // Escape cancels rebind
-      if (key === 'escape') {
+      // Escape cancels rebind UNLESS we are specifically rebinding the 'back' action
+      if (key === 'escape' && shortcutStore.rebindingAction !== 'back') {
         shortcutStore.cancelRebind();
         return;
       }

@@ -548,23 +548,23 @@ onMounted(() => {
       normalizeModel(gltf.scene, UFO_TARGET_SIZE);
       recolorAccentMeshes(gltf.scene, accentColorStr.value);
       ufoScene.value = gltf.scene;
+
+      // Defer drone loading slightly to avoid blocking the main thread during initial render,
+      // but start it immediately so it's ready before the user transitions to the CONTENT phase.
+      setTimeout(() => {
+        loadDroneModel();
+      }, 500);
     },
     undefined,
     (error) => {
       console.error('[WebGLScene] ufo.glb not found — using primitive fallback.', error);
+      // Still attempt to load drone if UFO fails
+      setTimeout(() => {
+        loadDroneModel();
+      }, 500);
     }
   );
 });
-
-// Defer drone loading until CONTENT phase to avoid blocking the initial render
-watch(
-  () => lightingStore.phase,
-  (phase) => {
-    if (phase === 'CONTENT') {
-      loadDroneModel();
-    }
-  }
-);
 
 watch(accentColorStr, (newColor) => {
   if (ufoScene.value) recolorAccentMeshes(ufoScene.value, newColor);
@@ -609,6 +609,9 @@ function triggerManeuver(time: number) {
   // If user is interacting with UI or mouse, prioritize those states elsewhere
   if (lightingStore.focusedElementPos) return;
 
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+  const isMobile = screenWidth < 768;
+
   const r = Math.random();
   if (r < 0.3) {
     currentManeuver.value = 'CLOSE_VISIT';
@@ -620,7 +623,8 @@ function triggerManeuver(time: number) {
     currentManeuver.value = 'LOOPING';
     maneuverDuration.value = 5;
   } else {
-    currentManeuver.value = 'FOLLOW_MOUSE';
+    // Avoid mouse-following on mobile as there's no persistent cursor
+    currentManeuver.value = isMobile ? 'CLOSE_VISIT' : 'FOLLOW_MOUSE';
     maneuverDuration.value = 10;
   }
   maneuverStartTime.value = time;
@@ -645,7 +649,8 @@ function getOrganicFlightPosition(time: number, target: Vector3): void {
   let z = Math.sin(time * 0.25) * 2 - 3;
 
   // ── UI / Bento Card Interaction ──
-  if (lightingStore.focusedElementPos && focusWeight > 0.01) {
+  const isMobile = screenWidth < 768;
+  if (!isMobile && lightingStore.focusedElementPos && focusWeight > 0.01) {
     // Interpolate towards the hovered card using the reactive focusWeight
     const targetX = lightingStore.focusedElementPos.x * 5 * xLimitScale;
     const targetY = lightingStore.focusedElementPos.y * 3;
@@ -670,7 +675,11 @@ function getOrganicFlightPosition(time: number, target: Vector3): void {
     } else if (currentManeuver.value === 'DISTANT_PROBE') {
       z = MathUtils.lerp(z, -18, envelope);
       x = MathUtils.lerp(x, x * 1.5, envelope);
-    } else if (currentManeuver.value === 'FOLLOW_MOUSE' && !lightingStore.focusedElementPos) {
+    } else if (
+      !isMobile &&
+      currentManeuver.value === 'FOLLOW_MOUSE' &&
+      !lightingStore.focusedElementPos
+    ) {
       // Actively orbit/follow the mouse cursor
       const mouseX = (viewportStore.rawMouse.x / sizes.width.value - 0.5) * 8 * xLimitScale;
       const mouseY = -(viewportStore.rawMouse.y / sizes.height.value - 0.5) * 5;
@@ -998,6 +1007,7 @@ const uniforms = {
   uThemeState: { value: 0.0 },
   uLightingEnabled: { value: true },
   uPhase: { value: 0.0 },
+  uIsMobile: { value: false },
   uAccentColor: { value: [0.063, 0.725, 0.506] },
   uUfoPosition: { value: new Vector2(0.5, 0.85) },
 };
@@ -1313,6 +1323,10 @@ onBeforeRender(({ elapsed, delta }) => {
   if (u.uLightingEnabled.value !== renderState.lightingEnabled) {
     u.uLightingEnabled.value = renderState.lightingEnabled;
   }
+
+  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+  const isMobile = screenWidth < 768;
+  u.uIsMobile.value = isMobile;
 
   const targetPhase = renderState.isContentPhase ? 1.0 : 0.0;
   const phaseSmoothing = 1.0 - Math.exp(-4.0 * delta);

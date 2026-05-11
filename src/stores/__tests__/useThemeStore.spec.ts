@@ -12,6 +12,14 @@ describe('useThemeStore', () => {
         setAttribute: vi.fn(),
         removeAttribute: vi.fn(),
       },
+      querySelectorAll: vi.fn(() => []),
+      querySelector: vi.fn(() => null),
+      createElement: vi.fn(() => ({
+        setAttribute: vi.fn(),
+      })),
+      head: {
+        appendChild: vi.fn(),
+      },
     });
   });
 

@@ -13,7 +13,7 @@
 
     <!-- CONTENT Custom Cursor: Small div moved via transform (compositor-optimized) -->
     <div 
-      v-else 
+      v-else-if="!isMobile" 
       ref="cursorEl"
       class="cursor-glow" 
       :style="baseCursorStyle"
@@ -22,27 +22,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { useThemeStore } from '@/stores/useThemeStore';
+import { useViewportStore } from '@/stores/viewport';
 import { LightingPhase } from '@/types';
+
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
 const lighting = useLightingStore();
 const performance = usePerformanceStore();
 const themeStore = useThemeStore();
+const viewportStore = useViewportStore();
 
 const cursorEl = ref<HTMLElement | null>(null);
 
 // Plain JS variables to avoid Vue reactivity overhead on high-frequency events
-let rawMouseX = -100;
-let rawMouseY = -100;
+let rawMouseX = viewportStore.rawMouse.x;
+let rawMouseY = viewportStore.rawMouse.y;
 let rafId: number | null = null;
 
-const onPointerMove = (e: PointerEvent) => {
-  rawMouseX = e.clientX;
-  rawMouseY = e.clientY;
-
+const updatePosition = () => {
   if (rafId === null) {
     rafId = requestAnimationFrame(() => {
       if (cursorEl.value) {
@@ -53,7 +54,17 @@ const onPointerMove = (e: PointerEvent) => {
   }
 };
 
+const onPointerMove = (e: PointerEvent) => {
+  rawMouseX = e.clientX;
+  rawMouseY = e.clientY;
+  updatePosition();
+};
+
 onMounted(() => {
+  // Sync with current mouse position if available
+  rawMouseX = viewportStore.rawMouse.x;
+  rawMouseY = viewportStore.rawMouse.y;
+  updatePosition();
   window.addEventListener('pointermove', onPointerMove, { passive: true });
 });
 
@@ -61,15 +72,42 @@ onUnmounted(() => {
   window.removeEventListener('pointermove', onPointerMove);
 });
 
+const isVisible = computed(() => {
+  return !performance.isWebGLSupported && themeStore.lightingEnabled;
+});
+
+// Watch for visibility changes to sync position when the layer becomes active
+// (e.g., when the user toggles lighting while the mouse is stationary)
+watch(isVisible, (visible) => {
+  if (visible) {
+    rawMouseX = viewportStore.rawMouse.x;
+    rawMouseY = viewportStore.rawMouse.y;
+    // Wait for next tick to ensure cursorEl is in the DOM
+    nextTick(() => {
+      updatePosition();
+    });
+  }
+});
+
+// Watch for phase transitions to sync cursor when switching to CONTENT
+watch(
+  () => lighting.phase,
+  (newPhase) => {
+    if (newPhase === LightingPhase.CONTENT && isVisible.value) {
+      rawMouseX = viewportStore.rawMouse.x;
+      rawMouseY = viewportStore.rawMouse.y;
+      nextTick(() => {
+        updatePosition();
+      });
+    }
+  }
+);
+
 const getAccentColor = (opacity: number) => {
   return themeStore.isBlueprintMode
     ? `rgba(56, 189, 248, ${opacity})`
     : `rgba(16, 185, 129, ${opacity})`;
 };
-
-const isVisible = computed(() => {
-  return !performance.isWebGLSupported && themeStore.lightingEnabled;
-});
 
 const navStyle = computed(() => {
   const color = getAccentColor(0.3);
@@ -83,8 +121,6 @@ const baseCursorStyle = computed(() => {
   const color = getAccentColor(0.8);
   const transparent = getAccentColor(0);
   return {
-    // Initial off-screen positioning until the first mouse move
-    transform: 'translate(-100px, -100px)',
     background: `radial-gradient(circle 40px at center, ${color} 0%, ${transparent} 100%)`,
   };
 });
