@@ -104,7 +104,7 @@
                 <span
                   v-for="tag in project.tags"
                   :key="tag"
-                  class="px-2 py-0.5 text-[0.65rem] uppercase tracking-widest rounded border border-finished-text/8 bg-transparent text-finished-text/25 group-hover:border-finished-accent/15 group-hover:text-finished-text/50 transition-colors duration-[var(--theme-transition-duration)]"
+                  class="px-2 py-0.5 text-xs uppercase tracking-widest rounded border border-finished-text/8 bg-transparent text-finished-text/25 group-hover:border-finished-accent/15 group-hover:text-finished-text/50 transition-colors duration-[var(--theme-transition-duration)]"
                 >
                   {{ tag }}
                 </span>

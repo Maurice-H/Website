@@ -40,7 +40,7 @@
             </div>
             <div class="code-line justify-center md:justify-start opacity-50">{{ $t("nav.career.stack") }}</div>
             <div
-              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
               {{ $t("nav.career.cta") }}
             </div>
@@ -63,7 +63,7 @@
               {{ $t("nav.about.location") }}
             </div>
             <div
-              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
               {{ $t("nav.about.cta") }}
             </div>
@@ -95,7 +95,7 @@
               {{ $t("nav.projectsCard.stack") }}
             </div>
             <div
-              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
               {{ $t("nav.projectsCard.cta") }}
             </div>
@@ -110,7 +110,7 @@
           <div class="flex flex-col items-center gap-3">
             <EnvelopeIcon />
             <div
-              class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line text-finished-text/20 text-xs tracking-widest uppercase"
             >
               {{ $t("nav.contactCard.channels") }}
             </div>
@@ -581,7 +581,7 @@ onUnmounted(() => {
   height: 20px;
   padding: 0 5px;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--finished-accent);
@@ -593,7 +593,7 @@ onUnmounted(() => {
 }
 
 .shortcut-item span {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -650,13 +650,13 @@ onUnmounted(() => {
   }
 
   .shortcut-item kbd {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     min-width: 22px;
     height: 22px;
   }
 
   .shortcut-item span {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
   }
 }
 </style>

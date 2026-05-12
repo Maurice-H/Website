@@ -124,6 +124,7 @@ onUnmounted(() => {
 .nav-window {
   flex-shrink: 0;
   width: min(480px, 80vw);
+  height: fit-content;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -202,21 +203,29 @@ onUnmounted(() => {
 
 .window-label-wrapper {
   position: relative;
-  margin-top: 16px;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.25em;
   font-weight: 400;
-  height: 1.4em;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .window-label-wrapper {
+    font-size: 12px; /* Slightly smaller but still legible */
+    letter-spacing: 0.1em;
+  }
 }
 
 .window-label-base,
 .window-label-active {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
+  grid-area: 1 / 1;
+  text-align: center;
+  word-break: break-all;
+  white-space: normal;
   transition: opacity 0.4s var(--lighting-transition);
 }
 

@@ -59,7 +59,7 @@ watch(
 
 .locale-option {
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.05em;
   color: rgba(255, 255, 255, 0.3);
@@ -73,7 +73,7 @@ watch(
 
 .locale-divider {
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.15);
 }
 </style>

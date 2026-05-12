@@ -44,7 +44,7 @@
                 <span 
                   v-for="skill in category.skills" 
                   :key="skill"
-                  class="px-2 py-0.5 md:px-2.5 md:py-1 border border-finished-text/5 bg-finished-text/[0.03] rounded-full text-[0.65rem] md:text-xs uppercase tracking-widest text-finished-text/40 hover:border-finished-accent/30 hover:text-finished-text/80 transition-colors duration-[var(--theme-transition-duration)]"
+                  class="px-2 py-0.5 md:px-2.5 md:py-1 border border-finished-text/5 bg-finished-text/[0.03] rounded-full text-xs md:text-xs uppercase tracking-widest text-finished-text/40 hover:border-finished-accent/30 hover:text-finished-text/80 transition-colors duration-[var(--theme-transition-duration)]"
                 >
                   {{ skill }}
                 </span>

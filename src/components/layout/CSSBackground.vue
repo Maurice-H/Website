@@ -397,26 +397,25 @@ const particleStyle = (index: number): CSSProperties => {
   );
   box-shadow:
     0 0 6px rgba(0, 0, 0, 0.2),
-    0 0 12px var(--drone-accent-glow, rgba(16, 185, 129, 0.15)),
     inset 0 3px 6px rgba(255, 255, 255, 0.6),
     inset 0 -1px 3px rgba(255, 255, 255, 0.15);
+}
+
+.drone-core::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 18px var(--drone-accent-glow, rgba(16, 185, 129, 0.3));
   animation: drone-core-glow 4s ease-in-out infinite alternate;
 }
 
 @keyframes drone-core-glow {
   0% {
-    box-shadow:
-      0 0 6px rgba(0, 0, 0, 0.2),
-      0 0 8px var(--drone-accent-glow, rgba(16, 185, 129, 0.1)),
-      inset 0 3px 6px rgba(255, 255, 255, 0.6),
-      inset 0 -1px 3px rgba(255, 255, 255, 0.15);
+    opacity: 0.3;
   }
   100% {
-    box-shadow:
-      0 0 6px rgba(0, 0, 0, 0.2),
-      0 0 18px var(--drone-accent-glow, rgba(16, 185, 129, 0.3)),
-      inset 0 3px 6px rgba(255, 255, 255, 0.6),
-      inset 0 -1px 3px rgba(255, 255, 255, 0.15);
+    opacity: 1;
   }
 }
 
@@ -499,11 +498,11 @@ const particleStyle = (index: number): CSSProperties => {
   0%,
   100% {
     opacity: 0.3;
-    scale: 1;
+    transform: scale(1);
   }
   50% {
     opacity: 0.7;
-    scale: 1.15;
+    transform: scale(1.15);
   }
 }
 

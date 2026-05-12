@@ -40,7 +40,8 @@
             "
           >
             <div
-              class="text-[10vw] md:text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
+              class="text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
+              style="font-family: sans-serif; letter-spacing: -0.05em;"
               data-testid="bg-name"
             >
               Maurice Hanl
@@ -182,6 +183,12 @@ onMounted(async () => {
 
   console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
+
+  // Remove the static LCP skeleton once Vue has taken over rendering
+  const skeleton = document.getElementById('lcp-skeleton');
+  if (skeleton) {
+    skeleton.remove();
+  }
 
   // Run GPU performance benchmark early to determine rendering tier
   await performance.checkPerformance();
