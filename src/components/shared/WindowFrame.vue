@@ -50,5 +50,6 @@ const isBracketed = computed(() => {
 
 .window-title {
   text-shadow: 0 0 20px var(--finished-glow);
+  margin-top: 0.5rem;
 }
 </style>

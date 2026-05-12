@@ -4,6 +4,7 @@
     :id="id"
     class="bento-card relative rounded-2xl p-4 md:p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass, { 'is-low-end': isLowEnd }]"
+    :data-testid="dataTestid"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     :data-drone-target="isHovered ? 'true' : 'false'"
@@ -53,6 +54,7 @@ interface Props {
   withWindow?: boolean;
   title?: string;
   isLowEnd?: boolean;
+  dataTestid?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -62,6 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
   withWindow: false,
   title: '',
   isLowEnd: false,
+  dataTestid: '',
 });
 
 const cardRef = ref<HTMLElement | null>(null);

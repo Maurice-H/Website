@@ -14,6 +14,7 @@
       v-if="isVisible"
       type="button"
       class="back-to-top-btn"
+      data-testid="back-to-top"
       aria-label="Scroll to top"
       @click="scrollToTop"
     >

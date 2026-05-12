@@ -6,7 +6,10 @@ import ProjectsSection from '../ProjectsSection.vue';
 describe('ProjectsSection.vue', () => {
   it('mounts successfully', () => {
     const wrapper = shallowMount(ProjectsSection, {
-      global: { plugins: [createTestingPinia()], stubs: { BentoCard: true } },
+      global: {
+        plugins: [createTestingPinia()],
+        stubs: { BentoCard: true, SkeletonLoader: true },
+      },
     });
     expect(wrapper.exists()).toBe(true);
   });
