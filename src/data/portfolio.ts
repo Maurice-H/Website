@@ -1,48 +1,33 @@
-import type { NavTab, PortfolioProject, SkillSection } from '../types';
+import type { NavTab, SkillSection } from '../types';
 
 export const NAV_TABS: NavTab[] = [
   {
     id: 'about',
     label: 'About Me',
+    labelKey: 'nav.aboutMe',
     theme: 'about',
     targetSection: 'hero-section',
   },
   {
     id: 'projects',
     label: 'Projects',
+    labelKey: 'nav.projects',
     theme: 'projects',
     targetSection: 'projects-section',
   },
   {
     id: 'skills',
     label: 'Experience',
+    labelKey: 'nav.experience',
     theme: 'career',
     targetSection: 'about-discovery',
   },
   {
     id: 'contact',
     label: 'Get in Touch',
+    labelKey: 'nav.contact',
     theme: 'contact',
     targetSection: 'contact-form',
-  },
-];
-
-export const PROJECTS: PortfolioProject[] = [
-  {
-    id: '1',
-    title: 'Neon E-Commerce',
-    description:
-      'A blazing fast headless storefront built with Nuxt 3 and Shopify Storefront API. Designed for high conversion rates with sub-second page loads.',
-    tags: ['Vue 3', 'Nuxt', 'GraphQL', 'Tailwind CSS'],
-    imageUrl: '',
-  },
-  {
-    id: '2',
-    title: 'FlowState Dashboard',
-    description:
-      'Real-time analytics dashboard featuring WebSockets integration and D3.js interactive data visualizations for enterprise clients.',
-    tags: ['TypeScript', 'WebSocket', 'D3.js', 'Vitest'],
-    imageUrl: '',
   },
 ];
 
@@ -50,27 +35,68 @@ export const SKILL_SECTIONS: SkillSection[] = [
   {
     id: 'bio',
     title: 'Discovery Path',
-    content:
-      'I bridge the gap between creative design and robust engineering. My journey is defined by a relentless pursuit of performance and pixel perfection.',
+    content: '', // Content sourced from i18n locale files (skills.bio)
     skills: [],
   },
   {
     id: 'stack',
     title: 'STACK',
     content: '',
-    skills: [
-      'Vue 3',
-      'TypeScript',
-      'Node.js',
-      'Tailwind',
-      'PostgreSQL',
-      'Three.js',
-      'Vite',
-      'GraphQL',
-      'PostgreSQL',
+    skills: [],
+    categories: [
+      {
+        name: 'skills.categories.languages',
+        skills: ['C#', 'JavaScript', 'TypeScript', 'Python', 'SQL', 'HTML', 'CSS', 'SCSS'],
+      },
+      {
+        name: 'skills.categories.frameworks',
+        skills: ['Vue.js', 'Node.js', 'Pinia', 'Tailwind CSS', 'WebGL', 'Three.js', 'Vite'],
+      },
+      {
+        name: 'skills.categories.cloud',
+        skills: [
+          'AWS',
+          'Serverless Architecture',
+          'Terraform',
+          'Docker Compose',
+          'Docker',
+          'CI/CD',
+          'GitHub Actions',
+          'Git',
+        ],
+      },
+      {
+        name: 'skills.categories.architecture',
+        skills: [
+          'AI-Assisted Software Engineering',
+          'Spec-Driven Development (SDD)',
+          'Softwarearchitektur',
+          'Frontend Architecture',
+          'Microservices',
+          'REST APIs',
+          'MVVM',
+        ],
+      },
+      {
+        name: 'skills.categories.testing',
+        skills: [
+          'Qualitätssicherung',
+          'End-To-End-Tests',
+          'Cypress',
+          'Playwright',
+          'Vitest',
+          'Lighthouse',
+        ],
+      },
+      {
+        name: 'skills.categories.design',
+        skills: ['UX/UI Design', 'User Experience (UX)', 'UI', 'Frontend-Design', 'Figma'],
+      },
     ],
   },
 ];
+
+export const SKILLS_DEFAULT_VISIBLE = 10;
 
 export interface SocialLink {
   id: string;

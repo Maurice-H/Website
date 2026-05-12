@@ -1,0 +1,129 @@
+{
+  "hero": {
+    "greeting": "Hi. I'm",
+    "name": "Maurice",
+    "tagline": "Frontend Engineer focused on Vue.js/TS architectures and clean UI/UX. Strong foundation in Backend (Node.js/Python) and Cloud DevOps (AWS, Terraform, CI/CD).",
+    "roles": {
+      "developer": "DEVELOPER",
+      "architect": "ARCHITECT",
+      "creator": "CREATOR"
+    },
+    "subtitle": "[ IDENTITY_PROTOCOL_LOADED ]"
+  },
+  "nav": {
+    "aboutMe": "About Me",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Get in Touch",
+    "back": "Back",
+    "career": {
+      "title": "EXPERIENCE",
+      "command": "$ career --summary",
+      "role": "Frontend Engineer & System Architect",
+      "stack": "Vue 3 · TypeScript · WebGL",
+      "cta": "Click to explore →"
+    },
+    "about": {
+      "title": "ABOUT ME",
+      "command": "$ whoami",
+      "role": "Maurice — Frontend Engineer",
+      "location": "Hamburg · Performance Obsessed",
+      "cta": "Click to explore →"
+    },
+    "projectsCard": {
+      "title": "PROJECTS",
+      "command": "$ ls ~/works --count",
+      "count": "{count} repositories indexed",
+      "stack": "Vue 3 · Node.js · Three.js",
+      "cta": "Click to explore →"
+    },
+    "contactCard": {
+      "title": "GET IN TOUCH",
+      "channels": "Email · Discord · LinkedIn"
+    }
+  },
+  "skills": {
+    "discoveryPath": "Discovery Path",
+    "bio": "Frontend Engineer with deep architectural understanding (MVVM) and a clear specialization in complex, high-performance frontend applications (Vue.js, TypeScript).\n\nMy core competency lies at the intersection of thoughtful UI/UX design and robust state management logic. What sets me apart is my holistic T-shaped approach: I don't just build frontends — I seamlessly integrate them with backend services (Node.js, Python).\n\nThrough solid DevOps and cloud practice (Docker Compose, GitHub Actions, AWS, Terraform), I build, test, and deploy applications independently across the entire software lifecycle.",
+    "stackTitle": "Technology Stack",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "categories": {
+      "languages": "Programming Languages",
+      "frameworks": "Frameworks & Libraries",
+      "cloud": "Cloud, DevOps & Infrastructure",
+      "architecture": "Software Architecture & Methodologies",
+      "testing": "Testing & Quality Assurance",
+      "design": "Design & UI/UX"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "seeMore": "See all projects on GitHub →",
+    "loading": "Loading projects...",
+    "errorFallback": "GitHub API unreachable — showing fallback projects.",
+    "errorTitle": "GitHub projects could not be loaded.",
+    "errorLink": "View projects directly on GitHub →",
+    "noDescription": "No description available."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Establish direct channel for collaboration.",
+    "copied": "Copied to clipboard!",
+    "copyFailed": "Copy failed — please copy manually.",
+    "discord": "Discord",
+    "email": "Email",
+    "linkedin": "LinkedIn",
+    "xing": "Xing",
+    "github": "GitHub",
+    "tabs": {
+      "emailTab": "Email",
+      "discordTab": "Discord",
+      "xingTab": "Xing",
+      "linkedinTab": "LinkedIn"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter your designation",
+      "email": "Email",
+      "emailPlaceholder": "Enter comm-link",
+      "message": "Message",
+      "messagePlaceholder": "Transmit payload...",
+      "submit": "Send Transmission",
+      "submitting": "Transmitting...",
+      "success": "Transmission Sent ✓",
+      "retry": "Retry Transmission",
+      "errors": {
+        "tooShort": "Transmission too short. Minimum 15 characters required.",
+        "incomplete": "Transmission rejected. Please use complete sentences.",
+        "invalidLength": "Transmission rejected. Invalid word length detected.",
+        "unsupportedSet": "Transmission rejected. Unsupported character set detected.",
+        "tooManyLinks": "Transmission rejected. Too many links detected.",
+        "spamPattern": "Transmission rejected. Anomalous pattern detected.",
+        "repeatingSequence": "Transmission rejected. Repeating sequence detected.",
+        "lowVariance": "Transmission rejected. Low character variance detected.",
+        "emailFormat": "Invalid email format",
+        "domainInvalid": "The email address is not publicly available. Please use a non-internal email.",
+        "cooldown": "Please wait 15 seconds before sending another transmission.",
+        "securityCheck": "Please complete the security check.",
+        "configMissing": "Form configuration missing. Please check VITE_FORMSPREE_ID."
+      }
+    },
+    "discordConnect": "Connect with me on Discord",
+    "xingProfile": "View my professional profile on Xing",
+    "linkedinConnect": "Connect with me on LinkedIn",
+    "openXing": "Open Xing Profile →",
+    "openLinkedin": "Open LinkedIn Profile →",
+    "copy": "Copy",
+    "copySuccess": "✓ Copied",
+    "copyError": "Failed to copy"
+  },
+  "meta": {
+    "title": "Maurice H. — Portfolio | Frontend Engineer",
+    "description": "Maurice H. — Frontend Engineer focused on Vue.js, TypeScript, and high-performance web applications."
+  },
+  "locale": {
+    "de": "DE",
+    "en": "EN"
+  }
+}
