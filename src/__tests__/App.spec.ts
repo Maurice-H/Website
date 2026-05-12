@@ -15,7 +15,7 @@ describe('App.vue', () => {
   let pinia: ReturnType<typeof createTestingPinia>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     pinia = createTestingPinia({
       createSpy: vi.fn,
       initialState: {
@@ -174,13 +174,22 @@ describe('App.vue', () => {
 
   it('tests handleAfterEnter scrolling logic with element found', async () => {
     vi.useFakeTimers();
+    // Mock getElementById and scrollIntoView
+    const scrollIntoViewMock = vi.fn();
+    const elementMock = {
+      scrollIntoView: scrollIntoViewMock,
+      remove: vi.fn(),
+    };
+    const getElSpy = vi
+      .spyOn(document, 'getElementById')
+      .mockReturnValue(elementMock as unknown as HTMLElement);
+
     const wrapper = createWrapper();
     const lightingStore = useLightingStore();
 
-    // Mock getElementById and scrollIntoView
-    const scrollIntoViewMock = vi.fn();
-    const elementMock = { scrollIntoView: scrollIntoViewMock };
-    vi.spyOn(document, 'getElementById').mockReturnValue(elementMock as unknown as HTMLElement);
+    // Verify initial skeleton removal
+    expect(getElSpy).toHaveBeenCalledWith('lcp-skeleton');
+    getElSpy.mockClear();
 
     // Setup state for transition
 
@@ -198,7 +207,7 @@ describe('App.vue', () => {
     // Fast forward setTimeout
     vi.runAllTimers();
 
-    expect(document.getElementById).toHaveBeenCalledWith('test-target');
+    expect(getElSpy).toHaveBeenCalledWith('test-target');
     expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
 
     vi.useRealTimers();
@@ -206,11 +215,10 @@ describe('App.vue', () => {
 
   it('tests handleAfterEnter logic with element not found or no target', async () => {
     vi.useFakeTimers();
+    const getElSpy = vi.spyOn(document, 'getElementById').mockReturnValue(null);
+
     const wrapper = createWrapper();
     const lightingStore = useLightingStore();
-
-    // Mock getElementById returning null
-    vi.spyOn(document, 'getElementById').mockReturnValue(null);
 
     // Test with no target
 
@@ -220,7 +228,9 @@ describe('App.vue', () => {
     handleAfterEnter();
     // setTimeout shouldn't even be called, but we run timers to be sure
     vi.runAllTimers();
-    expect(document.getElementById).not.toHaveBeenCalled();
+    // 1st call is 'lcp-skeleton' from onMounted, no other calls expected
+    expect(getElSpy).toHaveBeenCalledTimes(1);
+    expect(getElSpy).toHaveBeenCalledWith('lcp-skeleton');
 
     // Test with target but element not found
 
@@ -229,7 +239,8 @@ describe('App.vue', () => {
     handleAfterEnter();
     expect(lightingStore.pendingScrollTarget).toBeNull();
     vi.runAllTimers();
-    expect(document.getElementById).toHaveBeenCalledWith('test-target-not-found');
+    expect(getElSpy).toHaveBeenCalledWith('test-target-not-found');
+    expect(getElSpy).toHaveBeenCalledWith('lcp-skeleton');
 
     vi.useRealTimers();
   });

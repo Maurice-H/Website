@@ -186,7 +186,7 @@ onMounted(async () => {
 
   // Remove the static LCP skeleton once Vue has taken over rendering
   const skeleton = document.getElementById('lcp-skeleton');
-  if (skeleton) {
+  if (skeleton && typeof skeleton.remove === 'function') {
     skeleton.remove();
   }
 
