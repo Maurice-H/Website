@@ -3,14 +3,14 @@
     id="contact-form"
     class="md:col-span-4 md:row-span-1 flex flex-col"
     with-window
-    title="Get In Touch"
+    :title="$t('contact.title')"
     :is-low-end="performance.isLowEnd"
   >
     <div class="p-4 md:p-10 flex flex-col h-full">
       <p
         class="text-finished-text/50 text-xs md:text-sm mb-4 md:mb-6 font-mono tracking-wide transition-colors duration-[var(--theme-transition-duration)]"
       >
-        Establish direct channel for collaboration.
+        {{ $t('contact.subtitle') }}
       </p>
 
       <!-- Channel Tab Switcher -->
@@ -24,6 +24,7 @@
           :key="channel.id"
           type="button"
           role="tab"
+          :data-testid="`channel-tab-${channel.id}`"
           :aria-selected="activeChannel === channel.id"
           :class="[
             'channel-tab flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black',
@@ -60,7 +61,7 @@
               for="contact-name"
               class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
-              Name
+              {{ $t('contact.form.name') }}
               <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper">
@@ -69,7 +70,8 @@
                 type="text"
                 required
                 v-model="formData.name"
-                placeholder="Enter your designation"
+                data-testid="contact-name"
+                :placeholder="$t('contact.form.namePlaceholder')"
                 class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors duration-[var(--theme-transition-duration)]"
               />
             </div>
@@ -80,7 +82,7 @@
               for="contact-email"
               class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
-              Email
+              {{ $t('contact.form.email') }}
               <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper">
@@ -89,7 +91,8 @@
                 type="email"
                 required
                 v-model="formData.email"
-                placeholder="Enter comm-link"
+                data-testid="contact-email"
+                :placeholder="$t('contact.form.emailPlaceholder')"
                 :aria-invalid="!!emailError"
                 :aria-describedby="emailError ? 'email-error' : undefined"
                 class="contact-input w-full px-4 py-3 text-sm text-finished-text placeholder-finished-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent/50 transition-colors duration-[var(--theme-transition-duration)]"
@@ -98,10 +101,12 @@
             <p
               v-if="emailError"
               id="email-error"
+              data-testid="contact-email-error"
+              :data-error-key="emailError"
               aria-live="polite"
               class="text-red-400 text-xs mt-1 ml-1"
             >
-              {{ emailError }}
+              {{ $t(emailError) }}
             </p>
           </div>
 
@@ -110,7 +115,7 @@
               for="contact-message"
               class="text-xs text-finished-text/50 uppercase tracking-widest font-bold ml-1 transition-colors duration-[var(--theme-transition-duration)]"
             >
-              Message
+              {{ $t('contact.form.message') }}
               <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]" aria-hidden="true">*</span>
             </label>
             <div class="input-wrapper h-full">
@@ -118,7 +123,8 @@
                 id="contact-message"
                 required
                 v-model="formData.message"
-                placeholder="Transmit payload..."
+                data-testid="contact-message"
+                :placeholder="$t('contact.form.messagePlaceholder')"
                 :aria-invalid="formState === 'error'"
                 :aria-describedby="
                   formState === 'error' ? 'message-error' : undefined
@@ -131,10 +137,12 @@
           <p
             v-if="formState === 'error'"
             id="message-error"
+            data-testid="contact-error-message"
+            :data-error-key="errorMessage"
             aria-live="polite"
             class="text-red-400 text-xs ml-1"
           >
-            {{ errorMessage }}
+            {{ $t(errorMessage) }}
           </p>
 
           <!-- Cloudflare Turnstile Widget (Dynamic Size & Scale) -->
@@ -152,6 +160,8 @@
 
           <button
             type="submit"
+            data-testid="contact-submit"
+            :data-success="formState === 'success'"
             :disabled="formState === 'submitting'"
             aria-live="polite"
             class="relative w-full py-3 md:py-4 px-6 overflow-hidden rounded border border-finished-accent/40 bg-black/40 text-finished-text font-bold text-xs uppercase tracking-[0.3em] hover:bg-finished-accent/15 hover:text-finished-accent hover:border-finished-accent/70 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-[var(--theme-transition-duration)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed group"
@@ -175,7 +185,7 @@
       >
         <div class="text-finished-accent w-12 h-12"><DiscordIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
-          Connect with me on Discord
+          {{ $t('contact.discordConnect') }}
         </p>
         <div
           class="flex items-center gap-3 px-4 py-3 rounded border border-finished-border bg-finished-text/[0.03]"
@@ -185,16 +195,17 @@
           }}</span>
           <button
             type="button"
+            data-testid="copy-discord"
             aria-live="polite"
             class="px-3 py-1 text-xs uppercase tracking-widest border border-finished-accent/40 rounded bg-black/40 text-finished-accent hover:bg-finished-accent/15 hover:border-finished-accent/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-all duration-200 active:scale-95"
             @click="copyToClipboard(discordUser)"
           >
             {{
               copyState === "copied"
-                ? "✓ Copied"
+                ? $t('contact.copySuccess')
                 : copyState === "error"
-                  ? "Failed to copy"
-                  : "Copy"
+                  ? $t('contact.copyError')
+                  : $t('contact.copy')
             }}
           </button>
         </div>
@@ -207,7 +218,7 @@
       >
         <div class="text-finished-accent w-12 h-12"><XingIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
-          View my professional profile on Xing
+          {{ $t('contact.xingProfile') }}
         </p>
         <a
           :href="xingUrl"
@@ -215,7 +226,7 @@
           rel="noopener noreferrer"
           class="social-link-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
-          Open Xing Profile →
+          {{ $t('contact.openXing') }}
         </a>
       </div>
 
@@ -226,7 +237,7 @@
       >
         <div class="text-finished-accent w-12 h-12"><LinkedinIcon /></div>
         <p class="text-finished-text/50 text-sm text-center">
-          Connect with me on LinkedIn
+          {{ $t('contact.linkedinConnect') }}
         </p>
         <a
           :href="linkedinUrl"
@@ -234,7 +245,7 @@
           rel="noopener noreferrer"
           class="social-link-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
-          Open LinkedIn Profile →
+          {{ $t('contact.openLinkedin') }}
         </a>
       </div>
     </div>
@@ -243,6 +254,8 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useToast } from '@/composables/useToast';
 import { SOCIAL_LINKS } from '../../data/portfolio';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import { envConfig } from '../../utils/env';
@@ -258,6 +271,8 @@ type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 // --- State ---
 const performance = usePerformanceStore();
+const { show: showToast } = useToast();
+const { t } = useI18n();
 const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
 const activeChannel = ref<ChannelId>('email');
@@ -298,13 +313,13 @@ const linkedinUrl = linkedinLink?.url ?? '#';
 const submitLabel = computed(() => {
   switch (formState.value) {
     case 'submitting':
-      return 'Transmitting...';
+      return t('contact.form.submitting');
     case 'success':
-      return 'Transmission Sent ✓';
+      return t('contact.form.success');
     case 'error':
-      return 'Retry Transmission';
+      return t('contact.form.retry');
     default:
-      return 'Send Transmission';
+      return t('contact.form.submit');
   }
 });
 
@@ -363,7 +378,7 @@ const updateCaptchaScale = () => {
 
 const validateEmail = (email: string): boolean => {
   if (!EMAIL_REGEX.test(email)) {
-    emailError.value = 'Invalid email format';
+    emailError.value = 'contact.form.errors.emailFormat';
     return false;
   }
   emailError.value = '';
@@ -429,7 +444,7 @@ const validateMessage = (msg: string): boolean => {
   const trimmed = msg.trim();
 
   if (trimmed.length < 15) {
-    errorMessage.value = 'Transmission too short. Minimum 15 characters required.';
+    errorMessage.value = 'contact.form.errors.tooShort';
     formState.value = 'error';
     return false;
   }
@@ -438,7 +453,7 @@ const validateMessage = (msg: string): boolean => {
   // We require at least 3 words (2 spaces) to prevent single-string gibberish like "earvwscarevcaevcrw".
   const words = trimmed.split(/\s+/);
   if (words.length < 3) {
-    errorMessage.value = 'Transmission rejected. Please use complete sentences.';
+    errorMessage.value = 'contact.form.errors.incomplete';
     formState.value = 'error';
     return false;
   }
@@ -447,14 +462,14 @@ const validateMessage = (msg: string): boolean => {
   // This catches things like "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd".
   const hasAbsurdlyLongWord = words.some((w) => w.length > 40 && !w.startsWith('http'));
   if (hasAbsurdlyLongWord) {
-    errorMessage.value = 'Transmission rejected. Invalid word length detected.';
+    errorMessage.value = 'contact.form.errors.invalidLength';
     formState.value = 'error';
     return false;
   }
 
   // Check for Cyrillic characters (common in spam bots, irrelevant for this portfolio)
   if (/[А-Яа-яЁё]/.test(trimmed)) {
-    errorMessage.value = 'Transmission rejected. Unsupported character set detected.';
+    errorMessage.value = 'contact.form.errors.unsupportedSet';
     formState.value = 'error';
     return false;
   }
@@ -462,14 +477,14 @@ const validateMessage = (msg: string): boolean => {
   // Check for SEO spam (multiple URLs)
   const urlCount = (trimmed.match(/https?:\/\//g) || []).length;
   if (urlCount > 1) {
-    errorMessage.value = 'Transmission rejected. Too many links detected.';
+    errorMessage.value = 'contact.form.errors.tooManyLinks';
     formState.value = 'error';
     return false;
   }
 
   // Basic keyboard mashing (e.g., "aaaaaa")
   if (/(.)\1{5,}/.test(trimmed)) {
-    errorMessage.value = 'Transmission rejected. Anomalous pattern detected.';
+    errorMessage.value = 'contact.form.errors.spamPattern';
     formState.value = 'error';
     return false;
   }
@@ -478,7 +493,7 @@ const validateMessage = (msg: string): boolean => {
   // We check if ANY sequence of 2 to 5 characters repeats 4 or more times in a row anywhere in the string.
   const noSpaces = trimmed.replace(/\s+/g, '');
   if (/(.{2,5})\1{3,}/.test(noSpaces)) {
-    errorMessage.value = 'Transmission rejected. Repeating sequence detected.';
+    errorMessage.value = 'contact.form.errors.repeatingSequence';
     formState.value = 'error';
     return false;
   }
@@ -487,7 +502,7 @@ const validateMessage = (msg: string): boolean => {
   // If the string is mostly composed of 4-5 unique characters, it's probably spam.
   const uniqueChars = new Set(noSpaces.split('')).size;
   if (noSpaces.length >= 15 && uniqueChars < 6) {
-    errorMessage.value = 'Transmission rejected. Low character variance detected.';
+    errorMessage.value = 'contact.form.errors.lowVariance';
     formState.value = 'error';
     return false;
   }
@@ -502,7 +517,7 @@ const handleSubmit = async () => {
   // Enforce 15-second cooldown
   const now = Date.now();
   if (now - lastSubmitTime.value < 15000) {
-    errorMessage.value = 'Please wait 15 seconds before sending another transmission.';
+    errorMessage.value = 'contact.form.errors.cooldown';
     formState.value = 'error';
     return;
   }
@@ -514,12 +529,14 @@ const handleSubmit = async () => {
   errorMessage.value = '';
 
   // Advanced verification: Check if domain actually exists/receives mail
-  const isDomainValid = await checkEmailExistence(formData.email);
-  if (!isDomainValid) {
-    errorMessage.value =
-      'The email address is not publicly available. Please use a non-internal email that is publicly available or contact via the other platforms.';
-    formState.value = 'error';
-    return;
+  // Bypass in CI mode to avoid network dependency and flakiness
+  if (!envConfig.isCiMode) {
+    const isDomainValid = await checkEmailExistence(formData.email);
+    if (!isDomainValid) {
+      errorMessage.value = 'contact.form.errors.domainInvalid';
+      formState.value = 'error';
+      return;
+    }
   }
 
   try {
@@ -528,12 +545,12 @@ const handleSubmit = async () => {
     )?.value;
 
     if (!turnstileResponse) {
-      throw new Error('Please complete the security check.');
+      throw new Error('contact.form.errors.securityCheck');
     }
 
-    const formspreeId = envConfig.VITE_FORMSPREE_ID;
+    const formspreeId = envConfig.VITE_FORMSPREE_ID || (envConfig.isCiMode ? 'ci-test-id' : '');
     if (!formspreeId) {
-      throw new Error('Form configuration missing. Please check VITE_FORMSPREE_ID.');
+      throw new Error('contact.form.errors.configMissing');
     }
 
     const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
@@ -578,12 +595,14 @@ const copyToClipboard = async (text: string) => {
   try {
     await navigator.clipboard.writeText(text);
     copyState.value = 'copied';
+    showToast('contact.copied', 'success');
     setTimeout(() => {
       copyState.value = 'idle';
     }, 2000);
   } catch (error) {
     console.error('Failed to copy text to clipboard:', error);
     copyState.value = 'error';
+    showToast('contact.copyFailed', 'error');
     setTimeout(() => {
       copyState.value = 'idle';
     }, 2000);

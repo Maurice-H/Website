@@ -54,12 +54,12 @@ describe('CSSBackground.vue', () => {
     const wrapper = mount(CSSBackground);
 
     expect(wrapper.find('.ufo-glow').exists()).toBe(false);
-    expect(wrapper.find('.drone-scanner').exists()).toBe(false);
+    expect(wrapper.find('.drone-pulse').exists()).toBe(false);
 
     themeStore.lightingEnabled = true;
     const wrapper2 = mount(CSSBackground);
     expect(wrapper2.find('.ufo-glow').exists()).toBe(true);
-    expect(wrapper2.find('.drone-scanner').exists()).toBe(true);
+    expect(wrapper2.find('.drone-pulse').exists()).toBe(true);
   });
 
   it('generates deterministic particle styles', () => {

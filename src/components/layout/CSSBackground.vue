@@ -24,13 +24,26 @@
         'drone-blueprint': isBlueprintMode,
       }"
     >
-      <div class="drone-body">
-        <div v-if="isLightingEnabled" class="drone-scanner" />
-        <div class="drone-base" />
-        <div class="drone-pulse" />
-        <div class="drone-core" />
-        <div class="drone-ring" />
-        <div v-if="isLightingEnabled" class="drone-status-light" />
+      <div class="drone-x">
+        <div class="drone-y">
+          <div class="drone-scale">
+            <div class="drone-rotate">
+              <div class="drone-body">
+                <div v-if="isLightingEnabled" class="drone-pulse" />
+                <div class="drone-base" />
+                <div class="drone-core" />
+                <div class="drone-ring" />
+                <div
+                  v-for="n in 8"
+                  v-if="isLightingEnabled"
+                  :key="n"
+                  class="drone-light"
+                  :style="{ '--dot-angle': n * 45 + 'deg', animationDelay: n * 0.2 + 's' }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -205,7 +218,6 @@ const particleStyle = (index: number): CSSProperties => {
   --ufo-accent-glow: rgba(56, 189, 248, 0.6);
 }
 
-
 @keyframes ufo-hover {
   0%,
   100% {
@@ -231,10 +243,10 @@ const particleStyle = (index: number): CSSProperties => {
 @keyframes ufo-beam {
   0%,
   100% {
-    opacity: 0.6;
+    opacity: 0.4;
   }
   50% {
-    opacity: 1;
+    opacity: 0.7;
   }
 }
 
@@ -252,11 +264,110 @@ const particleStyle = (index: number): CSSProperties => {
   opacity: 1;
 }
 
+.drone-x {
+  animation: drone-move-x 29s ease-in-out infinite;
+}
+
+.drone-y {
+  animation: drone-move-y 37s ease-in-out infinite;
+}
+
+.drone-scale {
+  animation: drone-scale-anim 19s ease-in-out infinite;
+}
+
+.drone-rotate {
+  /* Using a much slower rotation so it feels like it's drifting/scanning */
+  animation: drone-spin 43s ease-in-out infinite;
+}
+
 .drone-body {
   position: relative;
   width: 40px;
   height: 40px;
-  animation: drone-orbit 12s linear infinite;
+  animation: drone-hover 5s ease-in-out infinite alternate;
+}
+
+@keyframes drone-move-x {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(35vw);
+  }
+  40% {
+    transform: translateX(-25vw);
+  }
+  60% {
+    transform: translateX(15vw);
+  }
+  80% {
+    transform: translateX(-30vw);
+  }
+}
+
+@keyframes drone-move-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-30vh);
+  }
+  50% {
+    transform: translateY(25vh);
+  }
+  75% {
+    transform: translateY(-20vh);
+  }
+}
+
+@keyframes drone-scale-anim {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  33% {
+    transform: scale(1.15);
+  }
+  66% {
+    transform: scale(0.85);
+  }
+}
+
+@keyframes drone-spin {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(120deg);
+  }
+  35% {
+    transform: rotate(-45deg);
+  }
+  55% {
+    transform: rotate(210deg);
+  }
+  75% {
+    transform: rotate(-135deg);
+  }
+  85% {
+    transform: rotate(45deg);
+  }
+}
+
+@keyframes drone-hover {
+  0% {
+    transform: translate(0, -6px);
+  }
+  50% {
+    transform: translate(3px, 0);
+  }
+  100% {
+    transform: translate(-2px, 6px);
+  }
 }
 
 .drone-base {
@@ -268,21 +379,44 @@ const particleStyle = (index: number): CSSProperties => {
     rgba(30, 30, 30, 0.95) 0%,
     rgba(10, 10, 10, 0.98) 100%
   );
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .drone-core {
   position: absolute;
-  inset: 8px;
+  inset: 6px;
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    rgba(80, 80, 80, 0.9) 0%,
-    rgba(50, 50, 50, 0.95) 100%
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(200, 230, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.08) 100%
   );
   box-shadow:
-    0 0 10px rgba(0, 0, 0, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    0 0 6px rgba(0, 0, 0, 0.2),
+    inset 0 3px 6px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 3px rgba(255, 255, 255, 0.15);
+}
+
+.drone-core::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 18px var(--drone-accent-glow, rgba(16, 185, 129, 0.3));
+  animation: drone-core-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes drone-core-glow {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .drone-ring {
@@ -294,34 +428,50 @@ const particleStyle = (index: number): CSSProperties => {
   animation: drone-ring-spin 4s linear infinite;
 }
 
-.drone-status-light {
+.drone-light {
   position: absolute;
-  top: 15%;
-  right: 20%;
+  top: 50%;
+  left: 50%;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--drone-accent, #10b981);
-  box-shadow: 0 0 8px var(--drone-accent, #10b981);
-  animation: drone-status-blink 1s ease-in-out infinite alternate;
+  margin: -2px 0 0 -2px;
+  transform: rotate(var(--dot-angle, 0deg)) translateX(18px);
+  background: radial-gradient(
+    circle at 30% 30%,
+    #fff 0%,
+    var(--drone-accent, #10b981) 50%,
+    rgba(10, 50, 30, 0.8) 100%
+  );
+  box-shadow:
+    0 0 6px var(--drone-accent, #10b981),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  animation: drone-status-blink 1.5s ease-in-out infinite alternate;
   z-index: 5;
 }
 
 @keyframes drone-status-blink {
-  0% { opacity: 0.4; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .drone-pulse {
   position: absolute;
-  inset: -4px;
+  inset: -60px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    var(--drone-accent-glow, rgba(16, 185, 129, 0.2)) 0%,
+    var(--drone-accent-glow, rgba(16, 185, 129, 0.3)) 0%,
+    rgba(16, 185, 129, 0.08) 40%,
     transparent 70%
   );
-  animation: drone-pulse-anim 2s ease-in-out infinite;
+  animation: drone-pulse-anim 3s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .css-drone {
@@ -333,17 +483,6 @@ const particleStyle = (index: number): CSSProperties => {
 .css-drone.drone-blueprint {
   --drone-accent: #38bdf8;
   --drone-accent-glow: rgba(56, 189, 248, 0.6);
-}
-
-
-@keyframes drone-orbit {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg) translateX(180px)
-      rotate(-360deg);
-  }
 }
 
 @keyframes drone-ring-spin {
@@ -364,47 +503,6 @@ const particleStyle = (index: number): CSSProperties => {
   50% {
     opacity: 0.7;
     transform: scale(1.15);
-  }
-}
-
-.drone-scanner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80px;
-  height: 80px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    var(--drone-accent, #10b981) 0%,
-    var(--drone-accent-glow, rgba(16, 185, 129, 0.3)) 30%,
-    transparent 70%
-  );
-  animation: drone-glow-pulse 4s ease-in-out infinite alternate;
-}
-
-@keyframes drone-glow-pulse {
-  0% {
-    opacity: 0.4;
-    transform: translate(-50%, -50%) scale(0.85);
-  }
-  100% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-}
-
-@media (min-width: 768px) {
-  @keyframes drone-glow-pulse {
-    0% {
-      opacity: 0.6;
-      transform: translate(-50%, -50%) scale(1.0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.4);
-    }
   }
 }
 

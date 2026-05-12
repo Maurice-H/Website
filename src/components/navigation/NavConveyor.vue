@@ -11,16 +11,17 @@
       aria-label="Navigation Conveyor"
       @pointerdown="startDrag"
       @wheel.prevent="onWheel"
-      @scroll="handleScroll"
+      @scroll="handleScroll()"
     >
       <!-- ⚡ Bolt: Use v-memo to skip virtual DOM diffing for inactive tabs during scroll events -->
       <NavWindow
         v-for="tab in tabs"
         :key="tab.id"
-        v-memo="[activeId === tab.id]"
+        v-memo="[activeId === tab.id, locale, isLoading, error, projectCount]"
         :theme="tab.theme"
-        :label="tab.label"
+        :label="tab.labelKey ? $t(tab.labelKey) : tab.label"
         :active="activeId === tab.id"
+        :data-testid="`nav-window-${tab.id}`"
         @click="selectTab(tab.id, $event)"
         @keydown.enter="selectTab(tab.id, $event)"
         @keydown.space.prevent="selectTab(tab.id, $event)"
@@ -30,19 +31,18 @@
           v-if="tab.theme === 'career'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
-          <h2 class="window-title">EXPERIENCE</h2>
-          <div class="flex flex-col items-start gap-1">
-            <div class="code-line">
-              <span class="opacity-30">$</span> career --summary
+          <div class="flex flex-col items-center md:items-start text-center md:text-left gap-1 w-full px-4 md:px-0 md:w-auto">
+            <div class="code-line justify-center md:justify-start">
+              <span class="opacity-30">$</span> {{ $t("nav.career.command") }}
             </div>
-            <div class="code-line text-finished-accent/60">
-              Frontend Developer &amp; System Architect
+            <div class="code-line justify-center md:justify-start text-finished-accent/60">
+              {{ $t("nav.career.role") }}
             </div>
-            <div class="code-line opacity-50">Vue 3 · TypeScript · WebGL</div>
+            <div class="code-line justify-center md:justify-start opacity-50">{{ $t("nav.career.stack") }}</div>
             <div
-              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
-              Click to explore →
+              {{ $t("nav.career.cta") }}
             </div>
           </div>
         </div>
@@ -52,21 +52,20 @@
           v-else-if="tab.theme === 'about'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
-          <h2 class="window-title">ABOUT ME</h2>
-          <div class="flex flex-col items-start gap-1">
-            <div class="code-line">
-              <span class="opacity-30">$</span> whoami
+          <div class="flex flex-col items-center md:items-start text-center md:text-left gap-1 w-full px-4 md:px-0 md:w-auto">
+            <div class="code-line justify-center md:justify-start">
+              <span class="opacity-30">$</span> {{ $t("nav.about.command") }}
             </div>
-            <div class="code-line text-finished-accent/60">
-              Maurice — Junior Developer
+            <div class="code-line justify-center md:justify-start text-finished-accent/60">
+              {{ $t("nav.about.role") }}
             </div>
-            <div class="code-line opacity-50">
-              Germany · Performance Obsessed
+            <div class="code-line justify-center md:justify-start opacity-50">
+              {{ $t("nav.about.location") }}
             </div>
             <div
-              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
-              Click to explore →
+              {{ $t("nav.about.cta") }}
             </div>
           </div>
         </div>
@@ -76,19 +75,29 @@
           v-else-if="tab.theme === 'projects'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
-          <h2 class="window-title">PROJECTS</h2>
-          <div class="flex flex-col items-start gap-1">
-            <div class="code-line">
-              <span class="opacity-30">$</span> ls ~/works --count
+          <div class="flex flex-col items-center md:items-start text-center md:text-left gap-1 w-full px-4 md:px-0 md:w-auto">
+            <div class="code-line justify-center md:justify-start">
+              <span class="opacity-30">$</span>
+              {{ $t("nav.projectsCard.command") }}
             </div>
-            <div class="code-line text-finished-accent/60">
-              {{ projectCount }} repositories indexed
+            <div class="code-line justify-center md:justify-start text-finished-accent/60">
+              <template v-if="isLoading">
+                <span class="animate-pulse">{{ $t("nav.projectsCard.count", { count: "..." }) }}</span>
+              </template>
+              <template v-else-if="error">
+                {{ $t("nav.projectsCard.count", { count: "?" }) }}
+              </template>
+              <template v-else>
+                {{ $t("nav.projectsCard.count", { count: projectCount }) }}
+              </template>
             </div>
-            <div class="code-line opacity-50">Vue 3 · Node.js · Three.js</div>
+            <div class="code-line justify-center md:justify-start opacity-50">
+              {{ $t("nav.projectsCard.stack") }}
+            </div>
             <div
-              class="code-line mt-1 text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line justify-center md:justify-start mt-1 text-finished-text/20 text-xs tracking-widest uppercase"
             >
-              Click to explore →
+              {{ $t("nav.projectsCard.cta") }}
             </div>
           </div>
         </div>
@@ -98,13 +107,12 @@
           v-else-if="tab.theme === 'contact'"
           class="content-terminal flex flex-col items-center justify-center h-full"
         >
-          <h2 class="window-title">GET IN TOUCH</h2>
           <div class="flex flex-col items-center gap-3">
             <EnvelopeIcon />
             <div
-              class="code-line text-finished-text/20 text-[0.65rem] tracking-widest uppercase"
+              class="code-line text-finished-text/20 text-xs tracking-widest uppercase"
             >
-              Email · Discord · LinkedIn
+              {{ $t("nav.contactCard.channels") }}
             </div>
           </div>
         </div>
@@ -120,12 +128,19 @@
           role="button"
           tabindex="0"
           class="shortcut-item focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          :class="{ 'shortcut-item--rebinding': shortcutStore.rebindingAction === action }"
+          :class="{
+            'shortcut-item--rebinding':
+              shortcutStore.rebindingAction === action,
+          }"
           @click.stop="handleShortcutClick(action)"
           @keydown.enter.stop="handleShortcutClick(action)"
           @keydown.space.prevent.stop="handleShortcutClick(action)"
         >
-          <kbd>{{ shortcutStore.rebindingAction === action ? '...' : shortcutStore.getDisplay(action) }}</kbd>
+          <kbd>{{
+            shortcutStore.rebindingAction === action
+              ? "..."
+              : shortcutStore.getDisplay(action)
+          }}</kbd>
           <span>{{ shortcutStore.getLabel(action) }}</span>
         </div>
       </div>
@@ -133,14 +148,34 @@
         v-if="!isMobile"
         type="button"
         class="shortcut-edit-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-        :title="shortcutStore.rebindingAction ? 'Cancel rebind' : 'Edit shortcuts'"
-        :aria-label="shortcutStore.rebindingAction ? 'Cancel rebind' : 'Edit shortcuts'"
+        :title="
+          shortcutStore.rebindingAction ? 'Cancel rebind' : 'Edit shortcuts'
+        "
+        :aria-label="
+          shortcutStore.rebindingAction ? 'Cancel rebind' : 'Edit shortcuts'
+        "
         :aria-pressed="!!shortcutStore.rebindingAction"
         :class="{ 'shortcut-edit-btn--active': shortcutStore.rebindingAction }"
-        @click.stop="shortcutStore.rebindingAction ? shortcutStore.cancelRebind() : shortcutStore.startRebind('lighting')"
+        @click.stop="
+          shortcutStore.rebindingAction
+            ? shortcutStore.cancelRebind()
+            : shortcutStore.startRebind('lighting')
+        "
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+          />
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
         </svg>
       </button>
@@ -152,30 +187,45 @@
         aria-label="Reset all shortcuts"
         @click.stop="shortcutStore.resetAll()"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
           <path d="M3 3v5h5" />
         </svg>
       </button>
+      <LocaleSwitcher />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAudio } from '../../composables/useAudio';
-import { PROJECTS, NAV_TABS as tabs } from '../../data/portfolio';
+import { useGitHubProjects } from '../../composables/useGitHubProjects';
+import { NAV_TABS as tabs } from '../../data/portfolio';
 import { useLightingStore } from '../../stores/lighting';
 import { type ShortcutAction, useShortcutStore } from '../../stores/useShortcutStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { LightingPhase } from '../../types/index';
 import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
+import LocaleSwitcher from '../shared/LocaleSwitcher.vue';
 import NavWindow from './NavWindow.vue';
 
 const lightingStore = useLightingStore();
 const shortcutStore = useShortcutStore();
 const themeStore = useThemeStore();
 const { playClick, playGlitch } = useAudio();
+const { locale } = useI18n();
 
 const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 768);
 const updateMobileState = () => {
@@ -202,7 +252,9 @@ const handleShortcutClick = (action: ShortcutAction) => {
 const trackEl = ref<HTMLElement | null>(null);
 
 const activeId = ref('skills'); // Start at EXPERIENCE to match mockup
-const projectCount = PROJECTS.length;
+
+const { projects, isLoading, error } = useGitHubProjects();
+const projectCount = computed(() => projects.value.length);
 
 // ---------- Drag-to-scroll ----------
 let isDragging = false;
@@ -245,16 +297,32 @@ const stopDrag = (_e: PointerEvent) => {
   }
 };
 
-const handleScroll = () => {
-  if (isProgrammaticScroll || !trackEl.value?.children[0]) return;
-  const firstChild = trackEl.value.children[0] as HTMLElement;
-  const gap = window.innerWidth < 768 ? 40 : 120;
-  const step = firstChild.offsetWidth + gap;
+const handleScroll = (force = false) => {
+  if (!force && (isProgrammaticScroll || !trackEl.value?.children[0])) return;
 
-  // Pure math calculation to find active tab index based on scrollLeft
-  const rawIndex = Math.round(Math.max(0, trackEl.value.scrollLeft) / step);
-  const clampedIndex = Math.max(0, Math.min(rawIndex, tabs.length - 1));
+  const track = trackEl.value;
+  if (!track) return;
 
+  const children = Array.from(track.children) as HTMLElement[];
+  if (children.length === 0) return;
+
+  const trackRect = track.getBoundingClientRect();
+  const trackCenter = trackRect.left + trackRect.width / 2;
+
+  let closestIndex = 0;
+  let minDistance = Infinity;
+
+  children.forEach((child, i) => {
+    const rect = child.getBoundingClientRect();
+    const childCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(childCenter - trackCenter);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestIndex = i;
+    }
+  });
+
+  const clampedIndex = Math.max(0, Math.min(closestIndex, tabs.length - 1));
   activeId.value = tabs[clampedIndex].id;
 };
 
@@ -343,21 +411,21 @@ onMounted(() => {
   window.addEventListener('pointermove', onDrag);
   window.addEventListener('pointerup', stopDrag);
   window.addEventListener('keydown', handleGlobalKeydown);
-  // Initial scroll to EXPERIENCE
+  // Initial scroll to EXPERIENCE (Skills)
   if (trackEl.value) {
-    // Find the skills tab
     const index = tabs.findIndex((t) => t.id === 'skills');
     if (index >= 0) {
+      isProgrammaticScroll = true;
       setTimeout(() => {
-        if (!trackEl.value?.children[0]) return;
-        const firstChild = trackEl.value.children[0] as HTMLElement;
-        const gap = window.innerWidth < 768 ? 40 : 120;
-        const step = firstChild.offsetWidth + gap;
-
-        const targetScroll = index * step - window.innerWidth / 2 + firstChild.offsetWidth / 2;
-        trackEl.value.scrollLeft = Math.max(0, targetScroll);
-        handleScroll();
-      }, 100);
+        const targetEl = trackEl.value?.children[index] as HTMLElement;
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+          handleScroll(true);
+        }
+        setTimeout(() => {
+          isProgrammaticScroll = false;
+        }, 150);
+      }, 150);
     }
   }
 });
@@ -401,8 +469,8 @@ onUnmounted(() => {
 .conveyor-track {
   --track-px: max(2rem, calc(50vw - 240px));
   display: flex;
-  gap: 120px;
-  padding: 60px var(--track-px);
+  gap: 140px;
+  padding: 100px var(--track-px);
   width: 100%;
   height: min-content;
   align-self: flex-start;
@@ -513,7 +581,7 @@ onUnmounted(() => {
   height: 20px;
   padding: 0 5px;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--finished-accent);
@@ -525,7 +593,7 @@ onUnmounted(() => {
 }
 
 .shortcut-item span {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -563,8 +631,13 @@ onUnmounted(() => {
 }
 
 @keyframes rebind-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 @media (min-width: 769px) {
@@ -577,13 +650,13 @@ onUnmounted(() => {
   }
 
   .shortcut-item kbd {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     min-width: 22px;
     height: 22px;
   }
 
   .shortcut-item span {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
   }
 }
 </style>

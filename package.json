@@ -1,6 +1,6 @@
 {
   "name": "website",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "description": "Personal website",
   "author": "Maurice-H",
   "private": true,
@@ -24,7 +24,8 @@
     "pinia": "^3.0.4",
     "three": "^0.184.0",
     "three-stdlib": "^2.36.1",
-    "vue": "^3.5.32"
+    "vue": "^3.5.32",
+    "vue-i18n": "^11.4.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",

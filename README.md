@@ -167,7 +167,7 @@ $env:VITE_CI_MODE="true"; npx @lhci/cli autorun --collect.settings.preset=deskto
 
 ## 🔮 What's Next?
 
-I am currently working on completing the remaining items in the [TODO.md](https://github.com/Maurice-H/Website/blob/main/TODO.md) (if not already finished) and reclaiming the keyboard for the final touches. After that, I'll be moving on to have some fun with new projects!
+I will reclaim my keyboard and move on to have some fun with new projects!
 
 If you have ideas, feedback, or found a bug, I'd love to hear from you!
 

@@ -35,7 +35,7 @@ test.describe('WebGL Background Canvas', () => {
     await expect(canvas).toBeAttached({ timeout: 10000 });
 
     // UI should remain interactive
-    const backBtn = page.locator('button').filter({ hasText: /Back/i });
+    const backBtn = page.getByTestId('back-to-nav');
     await expect(backBtn).toBeVisible({ timeout: 10000 });
   });
 });

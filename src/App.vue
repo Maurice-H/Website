@@ -40,9 +40,11 @@
             "
           >
             <div
-              class="text-[10vw] md:text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
+              class="text-[12vw] font-black uppercase tracking-tighter select-none text-white/[0.03] leading-none"
+              style="font-family: sans-serif; letter-spacing: -0.05em;"
+              data-testid="bg-name"
             >
-              Technical DNA
+              Maurice Hanl
             </div>
           </div>
           <NavConveyor />
@@ -60,10 +62,11 @@
           >
             <button
               type="button"
+              data-testid="back-to-nav"
               @click="handleBackToNav"
               class="px-2 md:px-4 py-2 border whitespace-nowrap border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:bg-white/10 transition-all duration-200 text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.98]"
             >
-              <template v-if="!isMobile">[ {{ shortcutStore.getDisplay('back') }} ] </template>Back
+              <template v-if="!isMobile">[ {{ shortcutStore.getDisplay('back') }} ] </template>{{ $t('nav.back') }}
             </button>
           </div>
 
@@ -80,10 +83,12 @@
             </BentoLayout>
           </div>
 
-          <BackToTop />
+          <backToTop />
         </div>
       </Transition>
     </div>
+
+    <ToastNotification />
   </div>
 </template>
 
@@ -104,6 +109,7 @@ const WebGLBackground = defineAsyncComponent(
 import ResilienceLayer from './components/layout/ResilienceLayer.vue';
 import BackToTop from './components/navigation/BackToTop.vue';
 import NavConveyor from './components/navigation/NavConveyor.vue';
+import ToastNotification from './components/shared/ToastNotification.vue';
 import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts';
 import { initGlobalViewportService } from './composables/useViewportStore';
 import { useLightingStore } from './stores/lighting';
@@ -178,6 +184,12 @@ onMounted(async () => {
   console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
 
+  // Remove the static LCP skeleton once Vue has taken over rendering
+  const skeleton = document.getElementById('lcp-skeleton');
+  if (skeleton && typeof skeleton.remove === 'function') {
+    skeleton.remove();
+  }
+
   // Run GPU performance benchmark early to determine rendering tier
   await performance.checkPerformance();
 });
@@ -249,8 +261,8 @@ onUnmounted(() => {
 /* CI Mode Overrides: Eliminate transitions for stable Lighthouse scores */
 .is-ci-mode,
 .is-ci-mode * {
-  transition-duration: 0s !important;
-  animation-duration: 0s !important;
+  transition-duration: 0.05s !important;
+  animation-duration: 0.05s !important;
   animation-delay: 0s !important;
   transition-delay: 0s !important;
 }

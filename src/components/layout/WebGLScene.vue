@@ -104,7 +104,10 @@
 
   <!-- Abduction Particles -->
   <TresPoints ref="abductionParticlesRef" :visible="false">
-    <TresBufferGeometry :position="[abductionPositions, 3]" :a-velocity="[abductionVelocities, 1]" />
+    <TresBufferGeometry
+      :position="[abductionPositions, 3]"
+      :a-velocity="[abductionVelocities, 1]"
+    />
     <TresShaderMaterial
       :vertex-shader="abductionVertShader"
       :fragment-shader="abductionFragShader"

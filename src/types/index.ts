@@ -17,6 +17,14 @@ export interface PortfolioProject {
   imageUrl: string;
   link?: string;
   repoUrl?: string;
+  language?: string;
+  stars?: number;
+  updatedAt?: string;
+}
+
+export interface SkillCategory {
+  name: string;
+  skills: string[];
 }
 
 export interface SkillSection {
@@ -24,6 +32,7 @@ export interface SkillSection {
   title: string;
   content: string;
   skills: string[];
+  categories?: SkillCategory[];
 }
 
 export const LightingPhase = {
@@ -48,6 +57,7 @@ export type NavWindowTheme = 'career' | 'about' | 'projects' | 'contact';
 export interface NavTab {
   id: string;
   label: string;
+  labelKey?: string;
   theme: NavWindowTheme;
   description?: string;
   targetSection?: string;
@@ -57,6 +67,21 @@ export interface HeroData {
   name: string;
   roles: string[];
   tagline: string;
+}
+
+export interface ContactMethod {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+  action: 'link' | 'copy';
+  url?: string;
+}
+
+export interface ToastOptions {
+  message: string;
+  type: 'success' | 'error' | 'info';
+  duration?: number;
 }
 
 export * from './webgl';
