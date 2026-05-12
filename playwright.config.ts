@@ -12,6 +12,7 @@ export default defineConfig({
     baseURL: 'http://localhost:4173',
     trace: 'retain-on-failure',
     video: 'on-first-retry',
+    locale: 'en-US',
   },
   projects: [
     {

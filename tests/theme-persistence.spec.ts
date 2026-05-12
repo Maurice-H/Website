@@ -13,14 +13,14 @@ test.describe('Theme Persistence and Navigation', () => {
     // Verify initial theme is "finished" (no data-theme="blueprint")
     expect(await app.getDataTheme()).not.toBe('blueprint');
 
-    // In NAV phase, Technical DNA should be visible
-    await expect(app.page.getByText('Technical DNA').first()).toBeVisible();
+    // In NAV phase, Maurice Hanl should be visible
+    await expect(app.page.getByTestId('bg-name')).toBeVisible({ timeout: 15000 });
 
     // Navigate to content phase
     await app.enterContentPhase();
 
     // Discovery Path should appear in the Bento Grid
-    await expect(app.page.getByText('Discovery Path').first()).toBeVisible({ timeout: 15000 });
+    await expect(app.page.getByTestId('discovery-card')).toBeVisible({ timeout: 15000 });
 
     // Now in content phase, Toggle theme to Blueprint
     await app.toggleTheme();
@@ -30,7 +30,7 @@ test.describe('Theme Persistence and Navigation', () => {
     await app.backToNavBtn.click();
 
     // Verify back to NAV phase and theme is STILL blueprint
-    await expect(app.page.getByText('Technical DNA').first()).toBeVisible();
+    await expect(app.page.getByTestId('bg-name')).toBeVisible({ timeout: 15000 });
     expect(await app.getDataTheme()).toBe('blueprint');
   });
 });

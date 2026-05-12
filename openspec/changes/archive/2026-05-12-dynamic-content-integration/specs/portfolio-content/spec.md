@@ -1,9 +1,6 @@
-# Capability: Portfolio Content
+# Capability: Portfolio Content (Delta)
 
-## Purpose
-This capability handles the rendering of real profile data, including GitHub-integrated project lists, CV-sourced bio and skills, and functional contact actions within the bento grid and navigation system.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Render Case Studies
 The system MUST render portfolio projects from an async data source (GitHub API via `useGitHubProjects` composable) with loading, error, and success states. The system SHALL display a maximum of 5 project cards. When the display limit is reached, a themed "See More" link pointing to `https://github.com/Maurice-H` SHALL be rendered below the project grid. Each project card SHALL include a repository link button/icon that opens `repoUrl` in a new tab.
@@ -18,7 +15,7 @@ The system MUST render portfolio projects from an async data source (GitHub API 
 
 #### Scenario: Display Projects (error/fallback)
 - **WHEN** the GitHub API request fails
-- **THEN** an informative error message with a direct link to the GitHub profile SHALL be rendered.
+- **THEN** the static fallback `PROJECTS` from `src/data/portfolio.ts` SHALL be rendered without skeleton loaders.
 
 #### Scenario: "See More" link
 - **WHEN** the fetched repo count equals the display limit (5)

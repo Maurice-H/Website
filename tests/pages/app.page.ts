@@ -22,7 +22,7 @@ export class AppPage {
     this.page = page;
     this.htmlRoot = page.locator('html');
     this.navWindows = page.locator('.nav-window');
-    this.backToNavBtn = page.locator('button').filter({ hasText: /Back/i });
+    this.backToNavBtn = page.getByTestId('back-to-nav');
   }
 
   /** Navigate to the app root and wait for the initial render. */
@@ -38,30 +38,63 @@ export class AppPage {
   async enterContentPhase() {
     // Wait for the app to be stable and centered
     await this.page.waitForLoadState('networkidle');
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(1000);
 
     // Find the active window and ensure it's in view
     const activeWindow = this.page.locator('.nav-window.is-active');
     await activeWindow.waitFor({ state: 'visible', timeout: 15000 });
-    await activeWindow.scrollIntoViewIfNeeded();
 
-    // Strategy: Click, wait briefly, then click again if no transition detected.
-    await activeWindow.click({ force: true, delay: 100 });
+    // Webkit specific stabilization: ensure the conveyor is not scrolling
+    await this.page.waitForTimeout(500);
 
+    // Click the window to trigger phase change
+    await activeWindow.click({ force: true });
+
+    // If it didn't change phase (still in nav), click again
+    // This handles cases where the first click only triggers a "highlight" or is lost
     try {
-      // Wait for the CONTENT phase indicator (the back button)
-      await this.backToNavBtn.waitFor({ state: 'visible', timeout: 5000 });
+      await expect(this.backToNavBtn).toBeVisible({ timeout: 5000 });
     } catch {
-      // Fallback: Try clicking again if the first click didn't trigger the transition
-      await activeWindow.click({ force: true, delay: 100 });
-      await this.backToNavBtn.waitFor({ state: 'visible', timeout: 15000 });
+      await activeWindow.click({ force: true });
     }
 
-    // Additional safety: ensure the content stage is actually scrollable/visible
-    await expect(this.page.locator('.content-stage')).toBeVisible();
+    // Wait for the CONTENT phase indicator (the back button)
+    await expect(this.backToNavBtn).toBeVisible({ timeout: 20000 });
 
-    // Final stabilization wait to ensure Vue transition (0.5s) is 100% complete
+    // Final stabilization wait to ensure Vue transition and layout settle
     await this.page.waitForTimeout(1000);
+
+    // Ensure the content stage is actually scrollable/visible
+    const contentStage = this.page.locator('.content-stage');
+    await expect(contentStage).toBeVisible();
+  }
+
+  async navigateToSection(id: 'skills' | 'career' | 'projects' | 'contact') {
+    const tab = this.page.getByTestId(`nav-window-${id}`);
+
+    // If already in content phase, we don't need to navigate (or we should go back first)
+    // But usually tests start fresh.
+    await tab.scrollIntoViewIfNeeded();
+
+    const classAttr = await tab.getAttribute('class');
+    const isActive = classAttr?.includes('is-active');
+
+    if (!isActive) {
+      // Step 1: Highlight
+      await tab.click({ force: true });
+      await expect(tab).toHaveClass(/is-active/, { timeout: 15000 });
+      // Wait for Vue state and potential scroll to settle
+      await this.page.waitForTimeout(800);
+    }
+
+    // Step 2: Navigate (Only if we are still in NAV phase)
+    if (await this.page.locator('.nav-conveyor').isVisible()) {
+      await tab.click({ force: true });
+    }
+
+    // Verify transition to CONTENT phase
+    await expect(this.backToNavBtn).toBeVisible({ timeout: 20000 });
+    await this.page.waitForTimeout(500);
   }
 
   /** Toggle the theme via keyboard shortcut ('T'). */
