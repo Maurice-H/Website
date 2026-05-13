@@ -306,15 +306,15 @@ const handleScroll = (force = false) => {
   const children = Array.from(track.children) as HTMLElement[];
   if (children.length === 0) return;
 
-  const trackRect = track.getBoundingClientRect();
-  const trackCenter = trackRect.left + trackRect.width / 2;
+  // ⚡ Bolt: Using scrollLeft + clientWidth / 2 instead of getBoundingClientRect
+  // prevents layout thrashing on high-frequency scroll events
+  const trackCenter = track.scrollLeft + track.clientWidth / 2;
 
   let closestIndex = 0;
   let minDistance = Infinity;
 
   children.forEach((child, i) => {
-    const rect = child.getBoundingClientRect();
-    const childCenter = rect.left + rect.width / 2;
+    const childCenter = child.offsetLeft + child.clientWidth / 2;
     const distance = Math.abs(childCenter - trackCenter);
     if (distance < minDistance) {
       minDistance = distance;
@@ -468,6 +468,7 @@ onUnmounted(() => {
 /* ---- Conveyor Track ---- */
 .conveyor-track {
   --track-px: max(2rem, calc(50vw - 240px));
+  position: relative; /* ⚡ Bolt: Required to make this the offsetParent for children's offsetLeft */
   display: flex;
   gap: 140px;
   padding: 100px var(--track-px);
