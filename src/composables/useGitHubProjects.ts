@@ -17,12 +17,25 @@ function getCachedData(): CachedData | null {
   try {
     const raw = sessionStorage.getItem(CACHE_KEY);
     if (!raw) return null;
-    const parsed: CachedData = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+
+    // Strict runtime validation to prevent prototype pollution and crashes
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      typeof parsed.timestamp !== 'number' ||
+      !Array.isArray(parsed.projects) ||
+      typeof parsed.hasMore !== 'boolean'
+    ) {
+      sessionStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+
     if (Date.now() - parsed.timestamp > CACHE_TTL_MS) {
       sessionStorage.removeItem(CACHE_KEY);
       return null;
     }
-    return parsed;
+    return parsed as CachedData;
   } catch {
     return null;
   }

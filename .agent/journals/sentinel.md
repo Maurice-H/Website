@@ -11,3 +11,7 @@
 ## 2026-05-09 - Strict Type Enforcement for Externally Bound Objects
  **Learning:** Type casting global objects like `window` to interfaces extending it using `as unknown as Type` bypasses TypeScript's natural inheritance checks, potentially hiding upstream type changes. `activeRenderer` from TresJS was also cast as `unknown` before `WebGLRenderer`, masking potential API drifts.
  **Action:** Replaced `as unknown as` with direct `as` casting where types naturally align (e.g., `window as TurnstileWindow`, `activeRenderer as WebGLRenderer`), enforcing standard TypeScript bounds.
+
+## 2026-05-13 - Strict Runtime Type Enforcement for External Payloads
+ **Learning:** TypeScript type casting for `JSON.parse` bypasses type checking at runtime, which can cause unexpected crashes or prototype pollution if external payloads (e.g. `sessionStorage`, `localStorage`) are tampered with or corrupted.
+ **Action:** Implemented strict runtime validation for parsed objects before casting or using them, checking explicitly for required types (e.g., `typeof parsed.timestamp === 'number'`, `Array.isArray(parsed.projects)`) to enforce data integrity.
