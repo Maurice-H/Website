@@ -11,3 +11,6 @@
 ## 2026-05-09 - Strict Type Enforcement for Externally Bound Objects
  **Learning:** Type casting global objects like `window` to interfaces extending it using `as unknown as Type` bypasses TypeScript's natural inheritance checks, potentially hiding upstream type changes. `activeRenderer` from TresJS was also cast as `unknown` before `WebGLRenderer`, masking potential API drifts.
  **Action:** Replaced `as unknown as` with direct `as` casting where types naturally align (e.g., `window as TurnstileWindow`, `activeRenderer as WebGLRenderer`), enforcing standard TypeScript bounds.
+## 2026-05-15 - Strict Runtime Validation for SessionStorage Parsing
+ **Learning:** TypeScript type casting after `JSON.parse()` bypasses runtime type checking. When reading external data from `sessionStorage`, simply casting the parsed value (e.g., `const parsed: CachedData = JSON.parse(raw)`) does not validate the structural integrity or primitive types of the object, opening the door to prototype pollution or crashes.
+ **Action:** Implemented a strict type guard `isCachedData` in `useGitHubProjects.ts` to explicitly check primitive types (`typeof`, `Array.isArray()`) and structure before trusting the parsed data.
