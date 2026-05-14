@@ -12,7 +12,8 @@
   <BentoCard id="skills-stack" class="md:col-span-2 md:row-span-1" with-window :title="$t('skills.stackTitle')" :is-low-end="performance.isLowEnd">
     <div ref="skillsContainerRef" class="p-4 md:p-6 flex flex-col h-full">
       <div 
-        ref="skillsWrapRef" 
+        ref="skillsWrapRef"
+        id="skills-wrapper"
         class="flex flex-col gap-4 overflow-hidden relative transition-[max-height] duration-300"
         :style="[
           wrapStyle,
@@ -22,8 +23,10 @@
         <div v-for="category in categories" :key="category.name" class="flex flex-col gap-2 pb-2 border-b border-finished-text/5 last:border-0 last:pb-0">
           <button 
             type="button"
-            class="flex items-center justify-between w-full text-left group cursor-pointer"
+            class="flex items-center justify-between w-full text-left group cursor-pointer px-1 -mx-1 rounded transition-all duration-300 hover:bg-white/5 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent"
             @click="toggleCategory(category.name)"
+            :aria-expanded="expandedCategories.has(category.name)"
+            :aria-controls="`category-content-${category.name}`"
           >
             <h4 class="text-[0.7rem] md:text-sm text-finished-accent uppercase tracking-widest font-mono font-bold transition-colors duration-[var(--theme-transition-duration)] group-hover:opacity-80">
               {{ $t(category.name) }}
@@ -36,6 +39,7 @@
           </button>
           
           <div 
+            :id="`category-content-${category.name}`"
             class="grid transition-all duration-300 ease-in-out"
             :class="expandedCategories.has(category.name) ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
           >
@@ -57,8 +61,10 @@
       <button
         v-if="showToggle"
         type="button"
-        class="mt-4 self-start text-xs font-mono tracking-widest uppercase text-finished-accent/50 hover:text-finished-accent transition-colors duration-200 cursor-pointer z-10"
+        class="mt-4 self-start text-xs font-mono tracking-widest uppercase text-finished-accent/50 hover:text-finished-accent transition-all duration-300 cursor-pointer z-10 px-2 py-1 -mx-2 -my-1 rounded hover:bg-white/5 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent"
         @click="showAll = !showAll"
+        :aria-expanded="showAll"
+        aria-controls="skills-wrapper"
       >
         {{ showAll ? $t('skills.showLess') : $t('skills.showMore') }}
       </button>
