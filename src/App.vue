@@ -30,7 +30,6 @@
           key="nav"
           class="h-screen w-full relative"
         >
-          <!-- Floating Controls removed — lighting via 3D model click, theme via shortcut -->
           <!-- Fused Background Text (Landing Page Parity) -->
           <div
             class="absolute inset-0 flex items-end justify-center pointer-events-none pb-[10vh]"
@@ -181,7 +180,6 @@ const handleAfterEnter = () => {
 onMounted(async () => {
   window.addEventListener('keydown', handleGlobalKeydown);
 
-  console.log('App Mounted in Fused Single-Layer Mode');
   initGlobalViewportService();
 
   // Remove the static LCP skeleton once Vue has taken over rendering

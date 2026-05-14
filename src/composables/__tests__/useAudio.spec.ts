@@ -1,6 +1,9 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Array to keep track of created mock instances
+let mockAudioInstances: MockAudio[] = [];
+
 // Mock Audio globally
 class MockAudio {
   src = '';
@@ -10,7 +13,15 @@ class MockAudio {
   paused = true;
   ended = false;
 
-  play = vi.fn().mockResolvedValue(undefined);
+  constructor() {
+    mockAudioInstances.push(this);
+  }
+
+  play = vi.fn().mockImplementation(() => {
+    this.paused = false;
+    this.currentTime = 1;
+    return Promise.resolve(undefined);
+  });
   pause = vi.fn().mockImplementation(() => {
     this.paused = true;
   });
@@ -22,6 +33,7 @@ describe('useAudio', () => {
   beforeEach(async () => {
     vi.resetModules();
     setActivePinia(createPinia());
+    mockAudioInstances = [];
   });
 
   afterEach(() => {
@@ -78,18 +90,40 @@ describe('useAudio', () => {
     // Since it returns null when muted, nothing should crash
   });
 
-  it('reuses audio pool elements', async () => {
+  it('reuses audio pool elements when full and actively playing', async () => {
     const { useAudio } = await import('../useAudio');
     const { playClick } = useAudio();
 
-    // Call multiple times to fill the pool
+    // Call 3 times to fill the pool of size 3
     playClick();
     playClick();
-    playClick();
-    // 4th call should reuse from pool
     playClick();
 
-    // Should not crash, pool management works
-    expect(true).toBe(true);
+    // The pool size is 3, so there should be 3 instances created
+    expect(mockAudioInstances.length).toBe(3);
+
+    // Get the first created audio element
+    const oldestAudio = mockAudioInstances[0];
+
+    // Verify it is currently "playing"
+    expect(oldestAudio.paused).toBe(false);
+
+    // Reset its pause mock to check if it's called during the 4th play
+    oldestAudio.pause.mockClear();
+
+    // 4th call should trigger oldest element reuse because all are "playing"
+    playClick();
+
+    // No new instance should be created, pool is reused
+    expect(mockAudioInstances.length).toBe(3);
+
+    // Oldest element should have been paused and rewound
+    expect(oldestAudio.pause).toHaveBeenCalled();
+    // After `getAudioFromPool` it's rewound to 0, but then `playClick` immediately sets it to 0 and calls `play()`.
+    // Since our mock `play()` sets `currentTime` to `1`, we expect it to be `1` now.
+    expect(oldestAudio.currentTime).toBe(1);
+
+    // Let's check play has been called on it twice.
+    expect(oldestAudio.play).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { usePerformanceStore } from '../stores/usePerformanceStore';
+import { envConfig } from '../utils/env';
 
 const isMuted = ref(false);
 
@@ -43,7 +44,7 @@ export function useAudio() {
   };
 
   const playClick = () => {
-    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-light-click.ogg`, 0.05);
+    const audio = getAudioFromPool(`${envConfig.BASE_URL}audio/sci-fi-light-click.ogg`, 0.05);
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));
@@ -52,7 +53,7 @@ export function useAudio() {
 
   const playGlitch = () => {
     const audio = getAudioFromPool(
-      `${import.meta.env.BASE_URL}audio/sci-fi-theme-glitch-click.ogg`,
+      `${envConfig.BASE_URL}audio/sci-fi-theme-glitch-click.ogg`,
       0.05
     );
     if (audio) {
@@ -62,7 +63,7 @@ export function useAudio() {
   };
 
   const playSwoosh = () => {
-    const audio = getAudioFromPool(`${import.meta.env.BASE_URL}audio/sci-fi-swoosh.ogg`, 0.05);
+    const audio = getAudioFromPool(`${envConfig.BASE_URL}audio/sci-fi-swoosh.ogg`, 0.05);
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch((e) => console.warn('Audio play failed:', e));
