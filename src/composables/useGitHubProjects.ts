@@ -45,7 +45,7 @@ function getCachedData(): CachedData | null {
       sessionStorage.removeItem(CACHE_KEY);
       return null;
     }
-    return parsed;
+    return parsed as CachedData;
   } catch {
     return null;
   }
