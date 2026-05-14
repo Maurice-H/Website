@@ -22,7 +22,9 @@
         <div v-for="category in categories" :key="category.name" class="flex flex-col gap-2 pb-2 border-b border-finished-text/5 last:border-0 last:pb-0">
           <button 
             type="button"
-            class="flex items-center justify-between w-full text-left group cursor-pointer"
+            class="flex items-center justify-between w-full text-left group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-1 -mx-1"
+            :aria-expanded="expandedCategories.has(category.name)"
+            :aria-controls="`category-content-${category.name.replace(/\s+/g, '-')}`"
             @click="toggleCategory(category.name)"
           >
             <h4 class="text-[0.7rem] md:text-sm text-finished-accent uppercase tracking-widest font-mono font-bold transition-colors duration-[var(--theme-transition-duration)] group-hover:opacity-80">
@@ -36,6 +38,7 @@
           </button>
           
           <div 
+            :id="`category-content-${category.name.replace(/\s+/g, '-')}`"
             class="grid transition-all duration-300 ease-in-out"
             :class="expandedCategories.has(category.name) ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
           >
@@ -57,7 +60,9 @@
       <button
         v-if="showToggle"
         type="button"
-        class="mt-4 self-start text-xs font-mono tracking-widest uppercase text-finished-accent/50 hover:text-finished-accent transition-colors duration-200 cursor-pointer z-10"
+        class="mt-4 self-start text-xs font-mono tracking-widest uppercase text-finished-accent/50 hover:text-finished-accent transition-colors duration-200 cursor-pointer z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded px-2 py-1 -ml-2"
+        :aria-expanded="showAll"
+        aria-controls="skills-stack"
         @click="showAll = !showAll"
       >
         {{ showAll ? $t('skills.showLess') : $t('skills.showMore') }}
