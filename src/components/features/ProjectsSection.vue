@@ -63,7 +63,7 @@
           <div
             v-for="project in projects"
             :key="project.id"
-            class="group relative cursor-pointer rounded-xl border border-finished-text/5 bg-finished-text/[0.02] hover:border-finished-accent/20 transition-all duration-300 active:scale-[0.98]"
+            class="group relative cursor-pointer rounded-xl border border-finished-text/5 bg-finished-text/[0.02] hover:bg-finished-text/[0.04] hover:border-finished-accent/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent"
             role="link"
             tabindex="0"
             :aria-label="`Open project: ${project.title}`"
