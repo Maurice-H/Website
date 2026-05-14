@@ -1,10 +1,10 @@
 <template>
-  <div id="hero-section" class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-20 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
+  <section id="hero-section" aria-labelledby="hero-title" class="w-full flex flex-col items-start justify-center px-6 md:px-12 py-20 md:py-64 max-w-7xl mx-auto min-h-[85vh] text-left">
     <div class="mb-6 text-xs tracking-[0.6em] font-mono text-finished-accent transition-colors duration-[var(--theme-transition-duration)] uppercase opacity-60">
       {{ $t('hero.subtitle') }}
     </div>
 
-    <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-finished-text transition-colors duration-[var(--theme-transition-duration)] mb-6 leading-[1.1] select-none">
+    <h1 id="hero-title" class="text-4xl md:text-6xl font-bold tracking-tight text-finished-text transition-colors duration-[var(--theme-transition-duration)] mb-6 leading-[1.1] select-none">
       {{ $t('hero.greeting') }} <span class="text-finished-accent transition-colors duration-[var(--theme-transition-duration)]">{{ $t('hero.name') }}</span>
     </h1>
     
@@ -26,7 +26,7 @@
         {{ $t('hero.roles.creator') }}
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">

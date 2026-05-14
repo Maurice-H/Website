@@ -15,3 +15,6 @@
 ## 2026-05-13 - Strict Runtime Type Enforcement for External Payloads
  **Learning:** TypeScript type casting for `JSON.parse` bypasses type checking at runtime, which can cause unexpected crashes or prototype pollution if external payloads (e.g. `sessionStorage`, `localStorage`) are tampered with or corrupted.
  **Action:** Implemented strict runtime validation for parsed objects before casting or using them, checking explicitly for required types (e.g., `typeof parsed.timestamp === 'number'`, `Array.isArray(parsed.projects)`) to enforce data integrity.
+## 2026-05-15 - Strict Runtime Validation for SessionStorage Parsing
+ **Learning:** TypeScript type casting after `JSON.parse()` bypasses runtime type checking. When reading external data from `sessionStorage`, simply casting the parsed value (e.g., `const parsed: CachedData = JSON.parse(raw)`) does not validate the structural integrity or primitive types of the object, opening the door to prototype pollution or crashes.
+ **Action:** Implemented a strict type guard `isCachedData` in `useGitHubProjects.ts` to explicitly check primitive types (`typeof`, `Array.isArray()`) and structure before trusting the parsed data.
