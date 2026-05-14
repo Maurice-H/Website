@@ -2,10 +2,10 @@
   <div class="floating-actions-wrapper">
     <!-- Mobile Toggles -->
     <div v-if="isMobile" class="mobile-toggles">
-      <button class="mobile-toggle-btn" aria-label="Toggle Theme" @click="handleTheme">
+      <button class="mobile-toggle-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black" aria-label="Toggle Theme" @click="handleTheme">
         <kbd>T</kbd>
       </button>
-      <button class="mobile-toggle-btn" aria-label="Toggle Lighting" @click="handleLighting">
+      <button class="mobile-toggle-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black" aria-label="Toggle Lighting" @click="handleLighting">
         <kbd>L</kbd>
       </button>
     </div>

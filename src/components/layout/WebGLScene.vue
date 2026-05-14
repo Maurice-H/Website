@@ -186,6 +186,7 @@ import { useLightingStore } from '../../stores/lighting';
 import { usePerformanceStore } from '../../stores/usePerformanceStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { useViewportStore } from '../../stores/viewport';
+import { envConfig } from '../../utils/env';
 import { projectToScreenSpace } from '../../utils/webgl';
 
 function grayscaleTexture(tex: Texture | null): Texture | null {
@@ -506,7 +507,7 @@ function loadDroneModel() {
   droneLoadStarted = true;
 
   gltfLoader.load(
-    `${import.meta.env.BASE_URL}models/drone.glb`,
+    `${envConfig.BASE_URL}models/drone.glb`,
     (gltf) => {
       logModelDiagnostics('Drone', gltf.scene);
 
@@ -535,7 +536,7 @@ function loadDroneModel() {
 
 onMounted(() => {
   gltfLoader.load(
-    `${import.meta.env.BASE_URL}models/ufo.glb`,
+    `${envConfig.BASE_URL}models/ufo.glb`,
     (gltf) => {
       logModelDiagnostics('UFO', gltf.scene);
 
