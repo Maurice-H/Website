@@ -47,7 +47,7 @@ describe('useAudio', () => {
     setActivePinia(createPinia());
     mockAudioInstances = [];
     MockAudio.shouldRejectPlay = false;
-    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: false } as Record<string, unknown>);
+    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: false } as any);
   });
 
   afterEach(() => {
@@ -142,7 +142,7 @@ describe('useAudio', () => {
   });
 
   it('does not play audio in CI mode', async () => {
-    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: true } as Record<string, unknown>);
+    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: true } as any);
     const { useAudio } = await import('../useAudio');
     const { playClick } = useAudio();
 
