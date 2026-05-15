@@ -2,7 +2,7 @@
   "hero": {
     "greeting": "Hi. Ich bin",
     "name": "Maurice",
-    "tagline": "Frontend Engineer mit Fokus auf Vue.js/TS Architekturen und sauberem UI/UX. Starkes Fundament in Backend (Node.js/Python) und Cloud DevOps (AWS, Terraform, CI/CD).",
+    "tagline": "Architektur performanter Vue 3 Interfaces und komplexer Systemtopologien. Nahtlose Integration von modernem UI/UX mit resilienter Cloud-Infrastruktur (Node.js/Python, AWS, Terraform).",
     "roles": {
       "developer": "ENTWICKLER",
       "architect": "ARCHITEKT",
