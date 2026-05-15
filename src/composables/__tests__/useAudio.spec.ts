@@ -47,6 +47,7 @@ describe('useAudio', () => {
     setActivePinia(createPinia());
     mockAudioInstances = [];
     MockAudio.shouldRejectPlay = false;
+    // biome-ignore lint/suspicious/noExplicitAny: Pinia store mock type mismatch
     vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: false } as any);
   });
 
@@ -142,6 +143,7 @@ describe('useAudio', () => {
   });
 
   it('does not play audio in CI mode', async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: Pinia store mock type mismatch
     vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: true } as any);
     const { useAudio } = await import('../useAudio');
     const { playClick } = useAudio();
