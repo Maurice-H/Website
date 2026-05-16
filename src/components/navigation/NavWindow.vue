@@ -146,11 +146,17 @@ onUnmounted(() => {
   transform: scale(1.15);
 }
 
-.nav-window:hover:not(.is-active) {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .nav-window:not(.is-active):hover {
+    transform: scale(1.02);
+  }
+
+  .nav-window:not(.is-active):hover .window-active-glow {
+    opacity: 0.3;
+  }
 }
 
-.nav-window:active:not(.is-active) {
+.nav-window:not(.is-active):active {
   transform: scale(0.98);
 }
 
