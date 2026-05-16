@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="locale-switcher"
+    class="locale-switcher focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     data-testid="locale-switcher"
     :title="locale === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'"
     :aria-label="locale === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'"
@@ -51,7 +51,8 @@ watch(
   opacity: 0.6;
 }
 
-.locale-switcher:hover {
+.locale-switcher:hover,
+.locale-switcher:focus-visible {
   opacity: 1;
   border-color: color-mix(in srgb, var(--finished-accent) 40%, transparent);
   background: color-mix(in srgb, var(--finished-accent) 15%, transparent);
