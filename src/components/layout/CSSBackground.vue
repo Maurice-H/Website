@@ -119,6 +119,7 @@ const particleStyle = (index: number): CSSProperties => {
     opacity 0.3s ease-in,
     transform 0.5s cubic-bezier(0.55, 0, 1, 0.45);
   perspective: 600px;
+  will-change: transform, opacity;
 }
 
 .css-ufo.ufo-visible {
@@ -136,6 +137,7 @@ const particleStyle = (index: number): CSSProperties => {
   height: 70px;
   transform-style: preserve-3d;
   animation: ufo-hover 3s ease-in-out infinite;
+  will-change: transform;
 }
 
 .ufo-dome {
@@ -184,6 +186,7 @@ const particleStyle = (index: number): CSSProperties => {
   border: 2px solid var(--ufo-accent, #10b981);
   opacity: 0.7;
   animation: ufo-ring-pulse 2s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .ufo-glow {
@@ -205,6 +208,7 @@ const particleStyle = (index: number): CSSProperties => {
     0% 100%
   );
   animation: ufo-beam 3s ease-in-out infinite;
+  will-change: opacity;
 }
 
 .css-ufo {
@@ -258,6 +262,7 @@ const particleStyle = (index: number): CSSProperties => {
   left: 50%;
   opacity: 0;
   transition: opacity 0.8s ease;
+  will-change: opacity;
 }
 
 .css-drone.drone-visible {
@@ -266,19 +271,23 @@ const particleStyle = (index: number): CSSProperties => {
 
 .drone-x {
   animation: drone-move-x 29s ease-in-out infinite;
+  will-change: transform;
 }
 
 .drone-y {
   animation: drone-move-y 37s ease-in-out infinite;
+  will-change: transform;
 }
 
 .drone-scale {
   animation: drone-scale-anim 19s ease-in-out infinite;
+  will-change: transform;
 }
 
 .drone-rotate {
   /* Using a much slower rotation so it feels like it's drifting/scanning */
   animation: drone-spin 43s ease-in-out infinite;
+  will-change: transform;
 }
 
 .drone-body {
@@ -286,6 +295,7 @@ const particleStyle = (index: number): CSSProperties => {
   width: 40px;
   height: 40px;
   animation: drone-hover 5s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 @keyframes drone-move-x {
@@ -408,6 +418,7 @@ const particleStyle = (index: number): CSSProperties => {
   border-radius: 50%;
   box-shadow: 0 0 18px var(--drone-accent-glow, rgba(16, 185, 129, 0.3));
   animation: drone-core-glow 4s ease-in-out infinite alternate;
+  will-change: opacity;
 }
 
 @keyframes drone-core-glow {
@@ -426,6 +437,7 @@ const particleStyle = (index: number): CSSProperties => {
   border: 2px solid var(--drone-accent, #10b981);
   opacity: 0.6;
   animation: drone-ring-spin 4s linear infinite;
+  will-change: transform;
 }
 
 .drone-light {
@@ -448,6 +460,7 @@ const particleStyle = (index: number): CSSProperties => {
     inset 0 1px 1px rgba(255, 255, 255, 0.8);
   animation: drone-status-blink 1.5s ease-in-out infinite alternate;
   z-index: 5;
+  will-change: opacity;
 }
 
 @keyframes drone-status-blink {
@@ -472,6 +485,7 @@ const particleStyle = (index: number): CSSProperties => {
   animation: drone-pulse-anim 3s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
+  will-change: transform, opacity;
 }
 
 .css-drone {
@@ -519,6 +533,7 @@ const particleStyle = (index: number): CSSProperties => {
   background: rgba(248, 250, 252, 0.15);
   animation: particle-float var(--p-duration) var(--p-delay) ease-in-out
     infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes particle-float {
