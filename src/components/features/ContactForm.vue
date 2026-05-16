@@ -530,7 +530,7 @@ const handleSubmit = async () => {
 
   // Advanced verification: Check if domain actually exists/receives mail
   // Bypass in CI mode to avoid network dependency and flakiness
-  if (!envConfig.isCiMode) {
+  if (!performance.isCiMode) {
     const isDomainValid = await checkEmailExistence(formData.email);
     if (!isDomainValid) {
       errorMessage.value = 'contact.form.errors.domainInvalid';
@@ -548,7 +548,7 @@ const handleSubmit = async () => {
       throw new Error('contact.form.errors.securityCheck');
     }
 
-    const formspreeId = envConfig.VITE_FORMSPREE_ID || (envConfig.isCiMode ? 'ci-test-id' : '');
+    const formspreeId = envConfig.VITE_FORMSPREE_ID || (performance.isCiMode ? 'ci-test-id' : '');
     if (!formspreeId) {
       throw new Error('contact.form.errors.configMissing');
     }
