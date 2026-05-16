@@ -44,7 +44,7 @@
   },
   "skills": {
     "discoveryPath": "Discovery Path",
-    "bio": "Frontend Engineer with deep architectural understanding (MVVM) and a clear specialization in complex, high-performance frontend applications (Vue.js, TypeScript).\n\nMy core competency lies at the intersection of thoughtful UI/UX design and robust state management logic. What sets me apart is my holistic T-shaped approach: I don't just build frontends — I seamlessly integrate them with backend services (Node.js, Python).\n\nThrough solid DevOps and cloud practice (Docker Compose, GitHub Actions, AWS, Terraform), I build, test, and deploy applications independently across the entire software lifecycle.",
+    "bio": "Frontend Architect engineering high-performance systems with a focus on Vue.js and TypeScript ecosystems.\n\nMy core directive lies at the intersection of enigmatic UI aesthetics and robust state management logic. Operating beyond standard frontend paradigms, I seamlessly integrate scalable architectures with resilient backend networks (Node.js, Python).\n\nForged through rigorous DevOps protocols (Docker Compose, GitHub Actions, AWS, Terraform), I construct, test, and deploy resilient applications across the complete software lifecycle.",
     "stackTitle": "Technology Stack",
     "showMore": "Show More",
     "showLess": "Show Less",
