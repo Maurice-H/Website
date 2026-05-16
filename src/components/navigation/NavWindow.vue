@@ -146,6 +146,20 @@ onUnmounted(() => {
   transform: scale(1.15);
 }
 
+@media (hover: hover) {
+  .nav-window:not(.is-active):hover {
+    transform: scale(1.02);
+  }
+
+  .nav-window:not(.is-active):hover .window-active-glow {
+    opacity: 0.3;
+  }
+}
+
+.nav-window:not(.is-active):active {
+  transform: scale(0.98);
+}
+
 .window-container-wrapper {
   position: relative;
   width: 100%;

@@ -25,10 +25,11 @@
         @after-enter="handleAfterEnter"
       >
         <!-- Navigation Phase -->
-        <div
+        <nav
           v-if="lighting.phase === 'NAV'"
           key="nav"
           class="h-screen w-full relative"
+          aria-label="Main Navigation"
         >
           <!-- Fused Background Text (Landing Page Parity) -->
           <div
@@ -47,10 +48,10 @@
             </div>
           </div>
           <NavConveyor />
-        </div>
+        </nav>
 
         <!-- Content Phase (Fused Bento Grid) -->
-        <div
+        <main
           v-else
           key="content"
           class="p-4 md:p-8 lg:p-16 min-h-screen relative"
@@ -83,7 +84,7 @@
           </div>
 
           <backToTop />
-        </div>
+        </main>
       </Transition>
     </div>
 
