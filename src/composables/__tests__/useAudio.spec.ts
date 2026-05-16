@@ -1,11 +1,20 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { usePerformanceStore } from '../../stores/usePerformanceStore';
+
+vi.mock('../../stores/usePerformanceStore', () => ({
+  usePerformanceStore: vi.fn(() => ({
+    isCiMode: false,
+  })),
+}));
+
 // Array to keep track of created mock instances
 let mockAudioInstances: MockAudio[] = [];
 
 // Mock Audio globally
 class MockAudio {
+  static shouldRejectPlay = false;
   src = '';
   preload = '';
   volume = 1;
@@ -18,6 +27,9 @@ class MockAudio {
   }
 
   play = vi.fn().mockImplementation(() => {
+    if (MockAudio.shouldRejectPlay) {
+      return Promise.reject(new Error('Audio playback failed'));
+    }
     this.paused = false;
     this.currentTime = 1;
     return Promise.resolve(undefined);
@@ -34,6 +46,10 @@ describe('useAudio', () => {
     vi.resetModules();
     setActivePinia(createPinia());
     mockAudioInstances = [];
+    MockAudio.shouldRejectPlay = false;
+    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: false } as ReturnType<
+      typeof usePerformanceStore
+    >);
   });
 
   afterEach(() => {
@@ -125,5 +141,42 @@ describe('useAudio', () => {
 
     // Let's check play has been called on it twice.
     expect(oldestAudio.play).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not play audio in CI mode', async () => {
+    vi.mocked(usePerformanceStore).mockReturnValue({ isCiMode: true } as ReturnType<
+      typeof usePerformanceStore
+    >);
+    const { useAudio } = await import('../useAudio');
+    const { playClick } = useAudio();
+
+    playClick();
+    // It should not have created any Audio instances because getAudioFromPool returns early
+    expect(mockAudioInstances.length).toBe(0);
+  });
+
+  it('handles audio play rejection gracefully', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    MockAudio.shouldRejectPlay = true;
+
+    const { useAudio } = await import('../useAudio');
+    const { playClick, playGlitch, playSwoosh } = useAudio();
+
+    playClick();
+    // Wait for the promise rejection to be caught
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(consoleWarnSpy).toHaveBeenCalledWith('Audio play failed:', expect.any(Error));
+    consoleWarnSpy.mockClear();
+
+    playGlitch();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(consoleWarnSpy).toHaveBeenCalledWith('Audio play failed:', expect.any(Error));
+    consoleWarnSpy.mockClear();
+
+    playSwoosh();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(consoleWarnSpy).toHaveBeenCalledWith('Audio play failed:', expect.any(Error));
+
+    consoleWarnSpy.mockRestore();
   });
 });
