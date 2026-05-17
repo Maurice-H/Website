@@ -3,7 +3,7 @@
     <!-- Window Header (Minimalist, no borders/bg) -->
     <div class="window-header flex items-center px-6 pt-6 pb-2">
       <!-- Title in Mockup Style (Large, clean, matching subpage mockups) -->
-      <div
+      <h2
         class="window-title font-bold tracking-wide"
         :style="{ fontSize: 'clamp(1.125rem, 3vw, 1.5rem)' }"
         :class="
@@ -17,7 +17,7 @@
             ? `[ ${title?.replace(/[\[\]]/g, "").trim() || ""} ]`
             : title
         }}
-      </div>
+      </h2>
     </div>
 
     <!-- Window Content -->
