@@ -448,27 +448,6 @@ function recolorAccentMeshes(scene: Group, newColorHex: string): void {
   });
 }
 
-function logModelDiagnostics(label: string, scene: Group): void {
-  let meshCount = 0;
-  const materialTypes = new Set<string>();
-
-  scene.traverse((child) => {
-    const mesh = child as Mesh;
-    if (!mesh.isMesh) return;
-    meshCount++;
-    const mat = mesh.material as Material;
-    materialTypes.add(mat.type);
-  });
-
-  const box = new Box3().setFromObject(scene);
-  const size = new Vector3();
-  box.getSize(size);
-
-  console.info(
-    `[WebGLScene] ${label}: ${meshCount} meshes, materials: [${[...materialTypes].join(', ')}], bbox: ${size.x.toFixed(2)} × ${size.y.toFixed(2)} × ${size.z.toFixed(2)}`
-  );
-}
-
 // ── Stores & Reactive State ──
 const themeStore = useThemeStore();
 const lightingStore = useLightingStore();
@@ -509,8 +488,6 @@ function loadDroneModel() {
   gltfLoader.load(
     `${envConfig.BASE_URL}models/drone.glb`,
     (gltf) => {
-      logModelDiagnostics('Drone', gltf.scene);
-
       // Hide rogue artifact meshes included in the downloaded GLB
       // The model includes a glass display box and a platform made entirely of 'Plane' meshes.
       // We hide all of them to ensure only the actual drone (Spheres, Cylinders, Toruses) is visible.
@@ -538,8 +515,6 @@ onMounted(() => {
   gltfLoader.load(
     `${envConfig.BASE_URL}models/ufo.glb`,
     (gltf) => {
-      logModelDiagnostics('UFO', gltf.scene);
-
       // Tag UFO materials definitively so they can be identified in prepareForScreenBlend
       gltf.scene.traverse((child) => {
         const mesh = child as Mesh;
