@@ -4,15 +4,20 @@ import { nextTick } from 'vue';
 import { useThemeStore } from '../useThemeStore';
 
 describe('useThemeStore', () => {
+  let mockMetaElements: { setAttribute: ReturnType<typeof vi.fn> }[];
+
   beforeEach(() => {
     setActivePinia(createPinia());
+
+    mockMetaElements = [{ setAttribute: vi.fn() }, { setAttribute: vi.fn() }];
+
     // Mock document
     vi.stubGlobal('document', {
       documentElement: {
         setAttribute: vi.fn(),
         removeAttribute: vi.fn(),
       },
-      querySelectorAll: vi.fn(() => []),
+      querySelectorAll: vi.fn(() => mockMetaElements),
       querySelector: vi.fn(() => null),
       createElement: vi.fn(() => ({
         setAttribute: vi.fn(),
@@ -50,6 +55,21 @@ describe('useThemeStore', () => {
     store.toggleTheme();
     await nextTick();
     expect(document.documentElement.removeAttribute).toHaveBeenCalledWith('data-theme');
+  });
+
+  it('updates meta tags for system theme colors when isBlueprintMode changes', async () => {
+    const store = useThemeStore();
+
+    // The watcher runs immediately (immediate: true), so it should be called with the non-blueprint color (#020205)
+    expect(mockMetaElements[0].setAttribute).toHaveBeenCalledWith('content', '#020205');
+    expect(mockMetaElements[1].setAttribute).toHaveBeenCalledWith('content', '#020205');
+
+    // Toggle to blueprint mode
+    store.toggleTheme();
+    await nextTick();
+
+    expect(mockMetaElements[0].setAttribute).toHaveBeenCalledWith('content', '#0a1628');
+    expect(mockMetaElements[1].setAttribute).toHaveBeenCalledWith('content', '#0a1628');
   });
 });
 
