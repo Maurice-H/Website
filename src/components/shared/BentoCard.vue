@@ -200,29 +200,31 @@ onUnmounted(() => {
   opacity: 0.25;
 }
 
-.bento-card:hover .layer-1 {
-  transform: translate(-10px, 10px);
-  border-color: var(--finished-accent);
-}
+@media (hover: hover) {
+  .bento-card:hover .layer-1 {
+    transform: translate(-10px, 10px);
+    border-color: var(--finished-accent);
+  }
 
-.bento-card:hover .layer-2 {
-  transform: translate(-20px, 20px);
-  border-color: var(--finished-accent);
-}
+  .bento-card:hover .layer-2 {
+    transform: translate(-20px, 20px);
+    border-color: var(--finished-accent);
+  }
 
-.bento-card:hover .layer-3 {
-  transform: translate(-30px, 30px);
-  border-color: var(--finished-accent);
-}
+  .bento-card:hover .layer-3 {
+    transform: translate(-30px, 30px);
+    border-color: var(--finished-accent);
+  }
 
-.bento-card:hover {
-  border-color: var(--finished-accent);
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.8),
-    var(--finished-glow);
-}
+  .bento-card:hover {
+    border-color: var(--finished-accent);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.8),
+      var(--finished-glow);
+  }
 
-.bento-card.is-low-end:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  .bento-card.is-low-end:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
 }
 </style>

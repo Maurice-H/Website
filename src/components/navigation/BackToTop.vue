@@ -156,11 +156,13 @@ onUnmounted(() => {
     transform 0.2s ease;
 }
 
-.back-to-top-btn:hover {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: var(--finished-accent, #10b981);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .back-to-top-btn:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--finished-accent, #10b981);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+  }
 }
 
 .back-to-top-btn:active {
