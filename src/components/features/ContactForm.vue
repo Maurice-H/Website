@@ -24,6 +24,8 @@
           :key="channel.id"
           type="button"
           role="tab"
+          :id="`tab-${channel.id}`"
+          :aria-controls="`panel-${channel.id}`"
           :data-testid="`channel-tab-${channel.id}`"
           :aria-selected="activeChannel === channel.id"
           :class="[
@@ -40,7 +42,13 @@
       </div>
 
       <!-- Email Tab -->
-      <div v-if="activeChannel === 'email'" class="flex flex-col flex-1">
+      <div
+        v-if="activeChannel === 'email'"
+        id="panel-email"
+        role="tabpanel"
+        aria-labelledby="tab-email"
+        class="flex flex-col flex-1"
+      >
         <form
           @submit.prevent="handleSubmit"
           class="flex flex-col gap-3 md:gap-4 flex-1"
@@ -181,6 +189,9 @@
       <!-- Discord Tab -->
       <div
         v-else-if="activeChannel === 'discord'"
+        id="panel-discord"
+        role="tabpanel"
+        aria-labelledby="tab-discord"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
         <div class="text-finished-accent w-12 h-12"><DiscordIcon /></div>
@@ -214,6 +225,9 @@
       <!-- Xing Tab -->
       <div
         v-else-if="activeChannel === 'xing'"
+        id="panel-xing"
+        role="tabpanel"
+        aria-labelledby="tab-xing"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
         <div class="text-finished-accent w-12 h-12"><XingIcon /></div>
@@ -233,6 +247,9 @@
       <!-- LinkedIn Tab -->
       <div
         v-else-if="activeChannel === 'linkedin'"
+        id="panel-linkedin"
+        role="tabpanel"
+        aria-labelledby="tab-linkedin"
         class="flex flex-col items-center justify-center flex-1 gap-4 py-8"
       >
         <div class="text-finished-accent w-12 h-12"><LinkedinIcon /></div>
