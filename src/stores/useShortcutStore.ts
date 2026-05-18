@@ -26,7 +26,7 @@ function loadFromStorage(): Record<ShortcutAction, ShortcutEntry> {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return bindings;
 
-    const parsed = JSON.parse(stored);
+    const parsed = JSON.parse(stored) as unknown;
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
       return bindings;
     }
@@ -34,16 +34,20 @@ function loadFromStorage(): Record<ShortcutAction, ShortcutEntry> {
     const validActions = Object.keys(DEFAULT_BINDINGS) as ShortcutAction[];
 
     for (const action of validActions) {
-      const entry = parsed[action];
+      if (!(action in parsed)) continue;
+
+      const entry = (parsed as Record<string, unknown>)[action];
 
       if (
         entry &&
         typeof entry === 'object' &&
         !Array.isArray(entry) &&
-        typeof entry.key === 'string' &&
-        typeof entry.label === 'string'
+        typeof (entry as Record<string, unknown>).key === 'string' &&
+        typeof (entry as Record<string, unknown>).label === 'string'
       ) {
-        const normalizedKey = entry.key.toLowerCase().trim();
+        const normalizedKey = ((entry as Record<string, unknown>).key as string)
+          .toLowerCase()
+          .trim();
 
         // Security: Validate key length and basic content to prevent malicious or malformed keys
         // Most keys are single chars or short strings like 'escape', 'arrowup'.
