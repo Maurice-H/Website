@@ -54,7 +54,7 @@ function loadFromStorage(): Record<ShortcutAction, ShortcutEntry> {
         if (normalizedKey.length > 0 && normalizedKey.length < 20) {
           bindings[action] = {
             key: normalizedKey,
-            label: entry.label,
+            label: (entry as Record<string, unknown>).label as string,
           };
         }
       }
