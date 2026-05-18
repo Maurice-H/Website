@@ -1,0 +1,17 @@
+{
+  "name": "Maurice H. Portfolio",
+  "short_name": "Maurice H.",
+  "description": "Personal portfolio of Maurice H., Junior Software Developer.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#020205",
+  "theme_color": "#020205",
+
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}
