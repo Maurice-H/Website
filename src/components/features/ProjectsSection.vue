@@ -115,14 +115,18 @@
       </template>
 
       <!-- "See More" link (always show GitHub link at bottom) -->
-      <div class="flex justify-center">
+      <div class="flex justify-center mt-2">
         <a
           href="https://github.com/Maurice-H"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-xs font-mono tracking-widest uppercase text-finished-accent/50 hover:text-finished-accent transition-colors duration-200"
+          class="group flex items-center gap-2 px-6 py-2.5 rounded-full border border-finished-text/10 bg-finished-text/[0.02] text-xs font-mono tracking-widest uppercase text-finished-accent/70 hover:text-finished-accent hover:border-finished-accent/40 hover:bg-finished-accent/10 hover:shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all duration-300 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-finished-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black backdrop-blur-sm"
         >
-          {{ $t('projects.seeMore') }}
+          <span>{{ $t('projects.seeMore') }}</span>
+          <svg class="w-3.5 h-3.5 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </a>
       </div>
     </div>
