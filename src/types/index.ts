@@ -55,4 +55,5 @@ export interface ContactMethod {
   url?: string;
 }
 
+export * from './contact';
 export * from './webgl';
