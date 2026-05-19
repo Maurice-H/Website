@@ -80,4 +80,19 @@ describe('useToast', () => {
 
     expect(toasts.value[0].id).not.toBe(toasts.value[1].id);
   });
+
+  it('clears all toasts including their timeouts', () => {
+    const { toasts, show, clearAll } = useToast();
+    show('A', 'success');
+    show('B', 'info');
+
+    expect(toasts.value).toHaveLength(2);
+
+    clearAll();
+
+    expect(toasts.value).toHaveLength(0);
+
+    // Advance timers to ensure timeouts were cleared
+    vi.advanceTimersByTime(3000);
+  });
 });

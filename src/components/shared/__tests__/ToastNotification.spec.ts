@@ -73,7 +73,7 @@ describe('ToastNotification.vue', () => {
 
   it('has role="alert" on each toast item', () => {
     const { show } = useToast();
-    show('test.msg', 'success');
+    show('contact.success', 'success');
 
     mountToast();
 

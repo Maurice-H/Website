@@ -71,6 +71,8 @@
     "subtitle": "Establish direct channel for collaboration.",
     "copied": "Copied to clipboard!",
     "copyFailed": "Copy failed — please copy manually.",
+    "success": "Transmission sent successfully!",
+    "error": "Transmission failed.",
     "discord": "Discord",
     "email": "Email",
     "linkedin": "LinkedIn",
