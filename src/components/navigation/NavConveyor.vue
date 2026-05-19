@@ -380,6 +380,12 @@ onUnmounted(() => {
   }
 }
 
+@media (max-height: 660px) and (max-width: 768px) {
+  .conveyor-track {
+    padding: 16px var(--track-px);
+  }
+}
+
 /* Ensure cards snap to center */
 :deep(.nav-window) {
   scroll-snap-align: center;

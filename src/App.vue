@@ -28,7 +28,7 @@
         <nav
           v-if="isNav"
           key="nav"
-          class="h-screen w-full relative"
+          class="h-full w-full relative"
           aria-label="Main Navigation"
         >
           <!-- Fused Background Text (Landing Page Parity) -->
