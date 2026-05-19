@@ -20,7 +20,6 @@
       class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-500 rounded-[inherit] glass-reveal"
       :style="revealStyle"
     >
-      <div class="noise-overlay" v-if="!isLowEnd"></div>
       <div class="absolute inset-0 bg-[var(--glass-reflection)] z-0 opacity-40"></div>
       
       <!-- 4-Layer Technical Stack for 3D Illusion (Disabled on Low-End) -->

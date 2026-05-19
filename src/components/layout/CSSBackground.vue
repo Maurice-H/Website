@@ -33,13 +33,15 @@
                 <div class="drone-base" />
                 <div class="drone-core" />
                 <div class="drone-ring" />
-                <div
+                <template v-if="isLightingEnabled">
+                  <div
                   v-for="n in 8"
-                  v-if="isLightingEnabled"
+                  
                   :key="n"
                   class="drone-light"
                   :style="{ '--dot-angle': n * 45 + 'deg', animationDelay: n * 0.2 + 's' }"
                 />
+                </template>
               </div>
             </div>
           </div>

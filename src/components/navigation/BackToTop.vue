@@ -36,6 +36,7 @@ const { playClick, playGlitch } = useAudio();
 
 const SCROLL_THRESHOLD = 300;
 const isVisible = ref(false);
+const scrollContainer = ref<HTMLElement | null>(null);
 let rafId: number | null = null;
 const { isMobile } = useResponsive();
 
@@ -52,25 +53,22 @@ const handleLighting = () => {
 const handleScroll = () => {
   if (rafId !== null) return;
   rafId = requestAnimationFrame(() => {
-    const scrollContainer = document.querySelector('.content-stage');
-    isVisible.value = (scrollContainer?.scrollTop ?? 0) > SCROLL_THRESHOLD;
+    isVisible.value = (scrollContainer.value?.scrollTop ?? 0) > SCROLL_THRESHOLD;
     rafId = null;
   });
 };
 
 const scrollToTop = () => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
+  scrollContainer.value?.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 onMounted(() => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
+  scrollContainer.value = document.querySelector('.content-stage') as HTMLElement;
+  scrollContainer.value?.addEventListener('scroll', handleScroll, { passive: true });
 });
 
 onUnmounted(() => {
-  const scrollContainer = document.querySelector('.content-stage');
-  scrollContainer?.removeEventListener('scroll', handleScroll);
+  scrollContainer.value?.removeEventListener('scroll', handleScroll);
   if (rafId !== null) cancelAnimationFrame(rafId);
 });
 </script>

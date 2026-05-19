@@ -83,7 +83,7 @@
             </BentoLayout>
           </div>
 
-          <backToTop />
+          <BackToTop />
         </main>
       </Transition>
     </div>

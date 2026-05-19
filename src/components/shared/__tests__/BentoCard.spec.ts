@@ -119,11 +119,9 @@ describe('BentoCard.vue', () => {
   it('respects isLowEnd prop by removing expensive layers', () => {
     let wrapper = mount(BentoCard, { props: { isLowEnd: false } });
     expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(true);
-    expect(wrapper.find('.noise-overlay').exists()).toBe(true);
 
     wrapper = mount(BentoCard, { props: { isLowEnd: true } });
     expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(false);
-    expect(wrapper.find('.noise-overlay').exists()).toBe(false);
     expect(wrapper.classes()).toContain('is-low-end');
   });
 });

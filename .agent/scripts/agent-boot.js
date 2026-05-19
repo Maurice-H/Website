@@ -25,9 +25,7 @@ function getProjectContext() {
       src: fs.readdirSync(path.join(rootDir, 'src')).filter(f => fs.statSync(path.join(rootDir, 'src', f)).isDirectory()),
       docs: fs.existsSync(path.join(rootDir, '.docs')) ? fs.readdirSync(path.join(rootDir, '.docs')) : [],
     },
-    apis: {
-      stores: fs.readFileSync(path.join(rootDir, 'src/types/stores.d.ts'), 'utf-8'),
-    }
+    apis: {}
   };
 
   return context;
