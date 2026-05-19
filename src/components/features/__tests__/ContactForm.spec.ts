@@ -14,11 +14,6 @@ vi.mock('@/utils/env', () => ({
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-type ContactFormInstance = {
-  isMobile: boolean;
-  renderTurnstile: () => void;
-};
-
 class ResizeObserverMock {
   observe = vi.fn();
   unobserve = vi.fn();
@@ -456,16 +451,6 @@ describe('ContactForm.vue', () => {
   });
 
   describe('Responsive Scaling & Turnstile', () => {
-    it('should determine mobile mode based on window width', async () => {
-      vi.stubGlobal('innerWidth', 320);
-      window.dispatchEvent(new Event('resize'));
-      const wrapper = mount(ContactForm);
-      await wrapper.vm.$nextTick();
-      expect((wrapper.vm as unknown as ContactFormInstance).isMobile).toBe(true);
-      vi.stubGlobal('innerWidth', 1024);
-      window.dispatchEvent(new Event('resize'));
-    });
-
     it('should not apply CSS transform scaling to turnstile wrapper', async () => {
       const wrapper = mount(ContactForm, { attachTo: document.body });
       await flushPromises();
@@ -476,54 +461,6 @@ describe('ContactForm.vue', () => {
       // Verify no transform style is applied (was causing hitbox misalignment)
       const style = turnstileWrapper.attributes('style');
       expect(style).toBeUndefined();
-    });
-
-    it('should use compact size for Turnstile on mobile viewports', async () => {
-      const renderSpy = vi.fn();
-      vi.stubGlobal('turnstile', { render: renderSpy, remove: vi.fn(), reset: vi.fn() });
-
-      vi.stubGlobal('innerWidth', 320);
-      window.dispatchEvent(new Event('resize'));
-
-      const wrapper = mount(ContactForm, { attachTo: document.body });
-      const vm = wrapper.vm as unknown as ContactFormInstance;
-      await wrapper.vm.$nextTick();
-
-      vm.renderTurnstile();
-      await flushPromises();
-
-      expect(renderSpy).toHaveBeenCalledWith(
-        expect.any(HTMLElement),
-        expect.objectContaining({ size: 'compact' })
-      );
-
-      wrapper.unmount();
-      vi.unstubAllGlobals();
-    });
-
-    it('should trigger turnstile re-render when switching to mobile', async () => {
-      const renderSpy = vi.fn();
-      vi.stubGlobal('turnstile', { render: renderSpy, remove: vi.fn(), reset: vi.fn() });
-
-      const wrapper = mount(ContactForm, { attachTo: document.body });
-      const vm = wrapper.vm as unknown as ContactFormInstance;
-
-      vi.stubGlobal('innerWidth', 1024);
-      window.dispatchEvent(new Event('resize'));
-      await wrapper.vm.$nextTick();
-
-      // Simulate resize to mobile
-      vi.stubGlobal('innerWidth', 320);
-      window.dispatchEvent(new Event('resize'));
-      await wrapper.vm.$nextTick();
-
-      // renderTurnstile is watched/called via ResizeObserver logic
-      vm.renderTurnstile();
-      await flushPromises();
-      expect(renderSpy).toHaveBeenCalled();
-
-      wrapper.unmount();
-      vi.unstubAllGlobals();
     });
   });
 });

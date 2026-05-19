@@ -154,13 +154,12 @@
             {{ $t(errorMessage) }}
           </p>
 
-          <!-- Cloudflare Turnstile Widget (Dynamic Size) -->
-          <div class="turnstile-wrapper mb-2">
-            <div
-              ref="turnstileContainer"
-              class="cf-turnstile"
-            ></div>
-          </div>
+          <!-- Cloudflare Turnstile Widget -->
+          <TurnstileWidget
+            @verify="setTurnstileToken"
+            @error="setTurnstileToken('')"
+            @timeout="setTurnstileToken('')"
+          />
 
           <button
             type="submit"
@@ -266,48 +265,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import TurnstileWidget from '@/components/features/TurnstileWidget.vue';
 import DiscordIcon from '@/components/icons/DiscordIcon.vue';
 import EmailIcon from '@/components/icons/EmailIcon.vue';
 import LinkedinIcon from '@/components/icons/LinkedinIcon.vue';
 import XingIcon from '@/components/icons/XingIcon.vue';
 import BentoCard from '@/components/shared/BentoCard.vue';
-import { useResponsive } from '@/composables/useResponsive';
+import { useContactForm } from '@/composables/useContactForm';
 import { useToast } from '@/composables/useToast';
 import { SOCIAL_LINKS } from '@/data/portfolio';
 import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
-import { envConfig } from '@/utils/env';
-
-// --- Types ---
-type ChannelId = 'email' | 'discord' | 'xing' | 'linkedin';
-type FormState = 'idle' | 'submitting' | 'success' | 'error';
+import type { ContactChannelId } from '@/types/contact';
 
 // --- State ---
-const performance = usePerformanceStore();
 const lightingStore = useLightingStore();
+const performance = usePerformanceStore();
 const { show: showToast } = useToast();
 const { t } = useI18n();
-const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 
-const activeChannel = ref<ChannelId>('email');
-const formState = ref<FormState>('idle');
-const errorMessage = ref('');
-const emailError = ref('');
+const activeChannel = ref<ContactChannelId>('email');
 const copyState = ref<'idle' | 'copied' | 'error'>('idle');
-const honeypot = ref('');
-const lastSubmitTime = ref<number>(0);
-const { isMobile } = useResponsive();
 
-const formData = reactive({
-  name: '',
-  email: '',
-  message: '',
-});
+const { formState, errorMessage, emailError, honeypot, formData, setTurnstileToken, submit } =
+  useContactForm();
 
 const channels: {
-  id: ChannelId;
+  id: ContactChannelId;
   label: string;
   icon: import('vue').Component;
 }[] = [
@@ -339,305 +325,8 @@ const submitLabel = computed(() => {
   }
 });
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// --- Methods ---
-interface TurnstileRenderOptions {
-  sitekey: string;
-  theme: string;
-  size?: string;
-  callback?: (token: string) => void;
-  'error-callback'?: () => void;
-  'timeout-callback'?: () => void;
-}
-
-interface TurnstileWindow extends Window {
-  turnstile?: {
-    render: (container: string | HTMLElement, options: TurnstileRenderOptions) => string;
-    reset: (id?: string) => void;
-    remove: (id: string) => void;
-  };
-}
-
-const turnstileContainer = ref<HTMLElement | null>(null);
-const widgetId = ref<string | null>(null);
-
-let turnstileRetryCount = 0;
-let isRendering = false;
-const MAX_TURNSTILE_RETRIES = 10;
-
-const renderTurnstile = () => {
-  // Prevent concurrent renders — the main cause of silent iframe failures
-  if (isRendering) return;
-
-  const win = window as TurnstileWindow;
-  if (!win.turnstile) {
-    // Script not loaded yet — retry after a short delay (max 10 attempts = 5s)
-    if (turnstileRetryCount < MAX_TURNSTILE_RETRIES) {
-      turnstileRetryCount++;
-      setTimeout(renderTurnstile, 500);
-    }
-    return;
-  }
-  turnstileRetryCount = 0;
-  isRendering = true;
-
-  nextTick(() => {
-    const container = turnstileContainer.value;
-    if (!container) {
-      isRendering = false;
-      return;
-    }
-
-    // Always clean up the previous widget before rendering a new one.
-    // This prevents the SDK's internal state from conflicting with a
-    // stale DOM reference (root cause of the missing-iframe bug).
-    if (widgetId.value && win.turnstile) {
-      try {
-        win.turnstile.remove(widgetId.value);
-      } catch {
-        // Widget may already be gone — safe to ignore
-      }
-      widgetId.value = null;
-    }
-
-    // Clear any leftover Turnstile DOM from a previous render attempt
-    container.innerHTML = '';
-
-    widgetId.value =
-      win.turnstile?.render(container, {
-        sitekey: turnstileSiteKey,
-        theme: 'dark',
-        size: isMobile.value ? 'compact' : 'normal',
-        'error-callback': () => {
-          // Turnstile hit an error — retry once after a short delay
-          isRendering = false;
-          setTimeout(renderTurnstile, 1000);
-        },
-        'timeout-callback': () => {
-          // Challenge timed out — re-render
-          isRendering = false;
-          renderTurnstile();
-        },
-      }) || null;
-
-    isRendering = false;
-  });
-};
-
-const validateEmail = (email: string): boolean => {
-  if (!EMAIL_REGEX.test(email)) {
-    emailError.value = 'contact.form.errors.emailFormat';
-    return false;
-  }
-  emailError.value = '';
-  return true;
-};
-
-interface DNSAnswer {
-  type: number;
-  data: string;
-}
-
-interface DNSResponse {
-  Status: number;
-  Answer?: DNSAnswer[];
-}
-
-const checkEmailExistence = async (email: string): Promise<boolean> => {
-  const domain = email.split('@')[1];
-  if (!domain) return false;
-
-  try {
-    // We use Cloudflare DNS-over-HTTPS to check for MX records.
-    const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=MX`, {
-      headers: {
-        Accept: 'application/dns-json',
-      },
-    });
-
-    if (!response.ok) return true;
-
-    const data = (await response.json()) as DNSResponse;
-
-    // Status 3 means NXDOMAIN (domain does not exist)
-    if (data.Status === 3) {
-      return false;
-    }
-
-    // Check if we have Answer records (MX)
-    if (data.Answer && data.Answer.length > 0) {
-      // RFC 7505: Check for "Null MX" (0 .) which means "no mail accepted here"
-      const hasValidMX = data.Answer.some((record) => {
-        const mxData = record.data.toLowerCase();
-        return mxData !== '0 .' && mxData !== '0';
-      });
-
-      if (hasValidMX) return true;
-      // If we only have Null MX records, it's a dead end.
-      return false;
-    }
-
-    // If no MX records are found, we reject it.
-    // While "Implicit MX" (A records) exists in standards, in modern practice,
-    // any legitimate mail domain (Gmail, Yahoo, etc.) will have MX records.
-    // This catches typo domains like "ahoo.de" which only have A records for parking pages.
-    return false;
-  } catch (err) {
-    console.error('DNS verification failed:', err);
-    return true; // Don't block user if verification service is down
-  }
-};
-
-const validateMessage = (msg: string): boolean => {
-  const trimmed = msg.trim();
-
-  if (trimmed.length < 15) {
-    errorMessage.value = 'contact.form.errors.tooShort';
-    formState.value = 'error';
-    return false;
-  }
-
-  // A real message usually consists of sentences.
-  // We require at least 3 words (2 spaces) to prevent single-string gibberish like "earvwscarevcaevcrw".
-  const words = trimmed.split(/\s+/);
-  if (words.length < 3) {
-    errorMessage.value = 'contact.form.errors.incomplete';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Check if any single word is unrealistically long (> 40 chars) and isn't a URL.
-  // This catches things like "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd".
-  const hasAbsurdlyLongWord = words.some((w) => w.length > 40 && !w.startsWith('http'));
-  if (hasAbsurdlyLongWord) {
-    errorMessage.value = 'contact.form.errors.invalidLength';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Check for Cyrillic characters (common in spam bots, irrelevant for this portfolio)
-  if (/[А-Яа-яЁё]/.test(trimmed)) {
-    errorMessage.value = 'contact.form.errors.unsupportedSet';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Check for SEO spam (multiple URLs)
-  const urlCount = (trimmed.match(/https?:\/\//g) || []).length;
-  if (urlCount > 1) {
-    errorMessage.value = 'contact.form.errors.tooManyLinks';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Basic keyboard mashing (e.g., "aaaaaa")
-  if (/(.)\1{5,}/.test(trimmed)) {
-    errorMessage.value = 'contact.form.errors.spamPattern';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Repeating sequences (e.g., "asdasdasd", "qwqwqwqw")
-  // We check if ANY sequence of 2 to 5 characters repeats 4 or more times in a row anywhere in the string.
-  const noSpaces = trimmed.replace(/\s+/g, '');
-  if (/(.{2,5})\1{3,}/.test(noSpaces)) {
-    errorMessage.value = 'contact.form.errors.repeatingSequence';
-    formState.value = 'error';
-    return false;
-  }
-
-  // Also check for high ratio of repeating characters (catch "asdsafasdfgdsfg" type mashing)
-  // If the string is mostly composed of 4-5 unique characters, it's probably spam.
-  const uniqueChars = new Set(noSpaces.split('')).size;
-  if (noSpaces.length >= 15 && uniqueChars < 6) {
-    errorMessage.value = 'contact.form.errors.lowVariance';
-    formState.value = 'error';
-    return false;
-  }
-
-  return true;
-};
-
 const handleSubmit = async () => {
-  if (formState.value === 'submitting') return;
-  if (honeypot.value) return;
-
-  // Enforce 15-second cooldown
-  const now = Date.now();
-  if (now - lastSubmitTime.value < 15000) {
-    errorMessage.value = 'contact.form.errors.cooldown';
-    formState.value = 'error';
-    return;
-  }
-
-  if (!validateEmail(formData.email)) return;
-  if (!validateMessage(formData.message)) return;
-
-  formState.value = 'submitting';
-  errorMessage.value = '';
-
-  // Advanced verification: Check if domain actually exists/receives mail
-  // Bypass in CI mode to avoid network dependency and flakiness
-  if (!performance.isCiMode) {
-    const isDomainValid = await checkEmailExistence(formData.email);
-    if (!isDomainValid) {
-      errorMessage.value = 'contact.form.errors.domainInvalid';
-      formState.value = 'error';
-      return;
-    }
-  }
-
-  try {
-    const turnstileResponse = (
-      document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement
-    )?.value;
-
-    if (!turnstileResponse) {
-      throw new Error('contact.form.errors.securityCheck');
-    }
-
-    const formspreeId = envConfig.VITE_FORMSPREE_ID || (performance.isCiMode ? 'ci-test-id' : '');
-    if (!formspreeId) {
-      throw new Error('contact.form.errors.configMissing');
-    }
-
-    const response = await fetch(`https://formspree.io/f/${formspreeId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-        'cf-turnstile-response': turnstileResponse,
-      }),
-    });
-
-    if (!response.ok) {
-      const data = await response.json().catch(() => null);
-      const msg =
-        data?.errors?.map((e: { message: string }) => e.message).join(', ') ||
-        data?.error ||
-        `Status: ${response.status}`;
-      throw new Error(msg);
-    }
-
-    formState.value = 'success';
-    lastSubmitTime.value = Date.now();
-    formData.name = '';
-    formData.email = '';
-    formData.message = '';
-
-    setTimeout(() => {
-      formState.value = 'idle';
-    }, 4000);
-  } catch (err) {
-    formState.value = 'error';
-    errorMessage.value = err instanceof Error ? err.message : 'Network error — please try again.';
-  }
+  await submit();
 };
 
 const copyToClipboard = async (text: string) => {
@@ -657,21 +346,6 @@ const copyToClipboard = async (text: string) => {
     }, 2000);
   }
 };
-
-// --- Lifecycle & Watchers ---
-onMounted(() => {
-  renderTurnstile();
-});
-
-watch(isMobile, () => {
-  renderTurnstile();
-});
-
-watch(activeChannel, (newChannel) => {
-  if (newChannel === 'email') {
-    renderTurnstile();
-  }
-});
 </script>
 
 <style scoped>
@@ -752,9 +426,5 @@ watch(activeChannel, (newChannel) => {
 
 .social-link-btn:active {
   transform: scale(0.98);
-}
-
-.turnstile-wrapper {
-  min-height: v-bind('isMobile ? "120px" : "65px"');
 }
 </style>
