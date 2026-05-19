@@ -43,8 +43,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useLightingStore } from '../../stores/lighting';
-import { useViewportStore } from '../../stores/viewport';
+import { useLightingStore } from '@/stores/lighting';
+import { useViewportStore } from '@/stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
 interface Props {

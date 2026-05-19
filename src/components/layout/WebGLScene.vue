@@ -180,14 +180,14 @@ Object3D.prototype.traverse = function (callback: (object: Object3D) => unknown)
 // -------------------------------------
 
 import { computed, ref, watchEffect } from 'vue';
-import fragmentShader from '../../shaders/main.frag.glsl?raw';
-import vertexShader from '../../shaders/main.vert.glsl?raw';
-import { useLightingStore } from '../../stores/lighting';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import { useThemeStore } from '../../stores/useThemeStore';
-import { useViewportStore } from '../../stores/viewport';
-import { envConfig } from '../../utils/env';
-import { projectToScreenSpace } from '../../utils/webgl';
+import fragmentShader from '@/shaders/main.frag.glsl?raw';
+import vertexShader from '@/shaders/main.vert.glsl?raw';
+import { useLightingStore } from '@/stores/lighting';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { useViewportStore } from '@/stores/viewport';
+import { envConfig } from '@/utils/env';
+import { projectToScreenSpace } from '@/utils/webgl';
 
 function grayscaleTexture(tex: Texture | null): Texture | null {
   if (!tex?.image) return tex;

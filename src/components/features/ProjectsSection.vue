@@ -135,7 +135,7 @@
 
 <script setup lang="ts">
 import { useGitHubProjects } from '@/composables/useGitHubProjects';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
 import SkeletonLoader from '../shared/SkeletonLoader.vue';
 

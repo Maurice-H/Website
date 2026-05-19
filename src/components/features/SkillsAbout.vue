@@ -54,11 +54,11 @@
             :aria-controls="`category-content-${category.name.replace(/\s+/g, '-')}`"
             @click="toggleCategory(category.name)"
           >
-            <h4
+            <h3
               class="text-[0.7rem] md:text-sm text-finished-accent uppercase tracking-widest font-mono font-bold transition-colors duration-[var(--theme-transition-duration)] group-hover:opacity-80"
             >
               {{ $t(category.name) }}
-            </h4>
+            </h3>
             <span
               class="text-finished-accent/50 group-hover:text-finished-accent transition-transform duration-300"
               :class="{ 'rotate-180': expandedCategories.has(category.name) }"
@@ -118,8 +118,8 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { SKILL_SECTIONS } from '../../data/portfolio';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
+import { SKILL_SECTIONS } from '@/data/portfolio';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import BentoCard from '../shared/BentoCard.vue';
 
 const performance = usePerformanceStore();
