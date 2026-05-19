@@ -43,7 +43,7 @@ try {
     const seo = summary.seo;
 
     // Custom threshold logic based on URL pattern and category
-    const isTier1 = url.includes('forceTier=1');
+    const isTier1 = url.toLowerCase().includes('forcetier=1');
     
     const formatScore = (val, isPerf = false, isSeo = false) => {
       if (val === undefined || val === null) return 'N/A';
