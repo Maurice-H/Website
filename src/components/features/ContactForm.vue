@@ -15,7 +15,7 @@
 
       <!-- Channel Tab Switcher -->
       <div
-        class="flex gap-1 mb-6 flex-wrap"
+        class="flex flex-col md:flex-row gap-1 mb-6"
         role="tablist"
         aria-label="Contact channels"
       >
@@ -155,16 +155,17 @@
 
           <!-- Cloudflare Turnstile Widget (Dynamic Size & Scale) -->
           <div
-            :key="isMobile ? 'mobile' : 'desktop'"
-            class="cf-turnstile mb-2"
-            :data-sitekey="turnstileSiteKey"
-            data-theme="dark"
-            :data-size="isMobile ? 'compact' : 'normal'"
-            :style="{ 
-              transform: `scale(${captchaScale})`,
-              display: widgetId ? 'block' : 'none' 
+            class="turnstile-wrapper mb-2"
+            :style="{
+              transform: captchaScale < 1 ? `scale(${captchaScale})` : undefined,
+              transformOrigin: captchaScale < 1 ? 'left top' : undefined,
             }"
-          ></div>
+          >
+            <div
+              :key="isMobile ? 'mobile' : 'desktop'"
+              class="cf-turnstile"
+            ></div>
+          </div>
 
           <button
             type="submit"
@@ -272,10 +273,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useResponsive } from '@/composables/useResponsive';
 import { useToast } from '@/composables/useToast';
-import { SOCIAL_LINKS } from '../../data/portfolio';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import { envConfig } from '../../utils/env';
+import { SOCIAL_LINKS } from '@/data/portfolio';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
+import { envConfig } from '@/utils/env';
 import DiscordIcon from '../icons/DiscordIcon.vue';
 import EmailIcon from '../icons/EmailIcon.vue';
 import LinkedinIcon from '../icons/LinkedinIcon.vue';
@@ -299,7 +301,7 @@ const emailError = ref('');
 const copyState = ref<'idle' | 'copied' | 'error'>('idle');
 const honeypot = ref('');
 const lastSubmitTime = ref<number>(0);
-const isMobile = ref(false);
+const { isMobile } = useResponsive();
 
 const formData = reactive({
   name: '',
@@ -357,32 +359,43 @@ interface TurnstileWindow extends Window {
 const widgetId = ref<string | null>(null);
 const captchaScale = ref(1);
 
+let turnstileRetryCount = 0;
+const MAX_TURNSTILE_RETRIES = 10;
+
 const renderTurnstile = () => {
   const win = window as TurnstileWindow;
-  if (win.turnstile) {
-    nextTick(() => {
-      const container = document.querySelector('.cf-turnstile');
-      // We don't need to manually remove if we use a :key on the element,
-      // as Vue replaces the element for us.
-      if (container && !container.querySelector('iframe')) {
-        widgetId.value =
-          win.turnstile?.render('.cf-turnstile', {
-            sitekey: turnstileSiteKey,
-            theme: 'dark',
-            size: isMobile.value ? 'compact' : 'normal',
-          }) || null;
-
-        updateCaptchaScale();
-      }
-    });
+  if (!win.turnstile) {
+    // Script not loaded yet — retry after a short delay (max 10 attempts = 5s)
+    if (turnstileRetryCount < MAX_TURNSTILE_RETRIES) {
+      turnstileRetryCount++;
+      setTimeout(renderTurnstile, 500);
+    }
+    return;
   }
+  turnstileRetryCount = 0;
+
+  nextTick(() => {
+    const container = document.querySelector('.cf-turnstile');
+    // We don't need to manually remove if we use a :key on the element,
+    // as Vue replaces the element for us.
+    if (container && !container.querySelector('iframe')) {
+      widgetId.value =
+        win.turnstile?.render('.cf-turnstile', {
+          sitekey: turnstileSiteKey,
+          theme: 'dark',
+          size: isMobile.value ? 'compact' : 'normal',
+        }) || null;
+
+      updateCaptchaScale();
+    }
+  });
 };
 
 const updateCaptchaScale = () => {
-  const container = document.querySelector('.cf-turnstile');
-  if (!container?.parentElement) return;
+  const wrapper = document.querySelector('.turnstile-wrapper');
+  if (!wrapper?.parentElement) return;
 
-  const parentWidth = container.parentElement.clientWidth;
+  const parentWidth = wrapper.parentElement.clientWidth;
   const targetWidth = isMobile.value ? 130 : 300;
 
   if (parentWidth < targetWidth && parentWidth > 0) {
@@ -630,23 +643,16 @@ const copyToClipboard = async (text: string) => {
 let resizeObserver: ResizeObserver | null = null;
 
 onMounted(() => {
-  isMobile.value = window.innerWidth < 480;
   renderTurnstile();
 
-  // Dynamic scaling observer
+  // Dynamic scaling observer — observe the form container, not the wrapper itself
   nextTick(() => {
-    const container = document.querySelector('.cf-turnstile');
-    if (container?.parentElement) {
+    const wrapper = document.querySelector('.turnstile-wrapper');
+    if (wrapper?.parentElement) {
       resizeObserver = new ResizeObserver(() => {
         updateCaptchaScale();
-
-        const mobile = window.innerWidth < 480;
-        if (mobile !== isMobile.value) {
-          isMobile.value = mobile;
-          // Re-render handled by watch(isMobile) below
-        }
       });
-      resizeObserver.observe(container.parentElement);
+      resizeObserver.observe(wrapper.parentElement);
     }
   });
 });
@@ -748,10 +754,8 @@ watch(activeChannel, (newChannel) => {
   transform: scale(0.98);
 }
 
-.cf-turnstile {
-  transform-origin: left top;
-  transition: transform 0.2s ease-out;
-  /* Ensure the container doesn't collapse its height when scaled */
+.turnstile-wrapper {
   min-height: v-bind('isMobile ? "120px" : "65px"');
+  transition: transform 0.2s ease-out;
 }
 </style>
