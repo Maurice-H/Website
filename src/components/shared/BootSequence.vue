@@ -6,7 +6,7 @@
 
     <div class="flex-1 overflow-y-auto custom-scrollbar">
       <div v-for="(line, index) in activeLines" :key="index" class="mb-1.5 flex items-start">
-        <span class="mr-3 opacity-30 shrink-0">[{{ getTimestamp() }}]</span>
+        <span class="mr-3 opacity-30 shrink-0">[{{ line.timestamp }}]</span>
         <span :class="getTypeClass(line.type)" class="leading-relaxed">{{ line.text }}</span>
         <span v-if="index === activeLines.length - 1" class="ml-1 animate-pulse inline-block w-1.5 h-3 bg-emerald-400/50"></span>
       </div>
@@ -29,16 +29,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import bootData from '../../data/boot-sequence.json';
 
 interface BootLine {
   text: string;
   delay: number;
   type: string;
+  timestamp?: string;
 }
 
 const activeLines = ref<BootLine[]>([]);
+const timeoutIds: ReturnType<typeof setTimeout>[] = [];
 const progress = ref(0);
 
 const getTimestamp = () => {
@@ -61,15 +63,24 @@ const getTypeClass = (type: string) => {
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   const total = bootData.length;
   let count = 0;
+  let accumulatedDelay = 0;
+
   for (const line of bootData) {
-    await new Promise((resolve) => setTimeout(resolve, line.delay));
-    activeLines.value.push(line);
-    count++;
-    progress.value = (count / total) * 100;
+    accumulatedDelay += line.delay;
+    const timeoutId = setTimeout(() => {
+      activeLines.value.push({ ...line, timestamp: getTimestamp() });
+      count++;
+      progress.value = (count / total) * 100;
+    }, accumulatedDelay);
+    timeoutIds.push(timeoutId);
   }
+});
+
+onBeforeUnmount(() => {
+  timeoutIds.forEach(clearTimeout);
 });
 </script>
 
