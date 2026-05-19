@@ -95,4 +95,29 @@ describe('useToast', () => {
     // Advance timers to ensure timeouts were cleared
     vi.advanceTimersByTime(3000);
   });
+
+  it('removeToast handles toast without timeoutId', () => {
+    const { toasts, removeToast } = useToast();
+    // Manually push a toast without timeoutId
+    toasts.value.push({ id: 9999, message: 'No timeout', type: 'info' });
+    expect(toasts.value).toHaveLength(1);
+
+    removeToast(9999);
+    expect(toasts.value).toHaveLength(0);
+  });
+
+  it('removeToast handles non-existent toast id gracefully', () => {
+    const { toasts, removeToast } = useToast();
+    removeToast(99999);
+    expect(toasts.value).toHaveLength(0);
+  });
+
+  it('clearAll handles toasts without timeoutId', () => {
+    const { toasts, clearAll } = useToast();
+    toasts.value.push({ id: 8888, message: 'No timeout', type: 'error' });
+    expect(toasts.value).toHaveLength(1);
+
+    clearAll();
+    expect(toasts.value).toHaveLength(0);
+  });
 });

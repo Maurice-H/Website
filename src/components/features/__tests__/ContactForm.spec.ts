@@ -463,4 +463,38 @@ describe('ContactForm.vue', () => {
       expect(style).toBeUndefined();
     });
   });
+
+  describe('Channel Tab Navigation', () => {
+    it('should switch to Xing tab and render profile link', async () => {
+      const wrapper = mount(ContactForm);
+      const tabs = wrapper.findAll('button.channel-tab');
+      // Xing is the 3rd tab
+      await tabs[2].trigger('click');
+      expect(wrapper.find('#panel-xing').exists()).toBe(true);
+      expect(wrapper.find('.social-link-btn').exists()).toBe(true);
+    });
+
+    it('should switch to LinkedIn tab and render profile link', async () => {
+      const wrapper = mount(ContactForm);
+      const tabs = wrapper.findAll('button.channel-tab');
+      // LinkedIn is the 4th tab
+      await tabs[3].trigger('click');
+      expect(wrapper.find('#panel-linkedin').exists()).toBe(true);
+      expect(wrapper.find('.social-link-btn').exists()).toBe(true);
+    });
+  });
+
+  describe('Submit Label States', () => {
+    it('should show retry label after error', async () => {
+      const wrapper = mount(ContactForm);
+
+      await wrapper.find('input#contact-email').setValue('test@example.com');
+      await wrapper.find('textarea#contact-message').setValue('Too short');
+      await wrapper.find('form').trigger('submit.prevent');
+      await wrapper.vm.$nextTick();
+
+      const button = wrapper.find('button[type="submit"]');
+      expect(button.text()).toContain('Retry');
+    });
+  });
 });

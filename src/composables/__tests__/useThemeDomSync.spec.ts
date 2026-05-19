@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useThemeDomSync } from '../useThemeDomSync';
@@ -58,5 +58,22 @@ describe('useThemeDomSync', () => {
     await nextTick();
     vi.runAllTimers();
     expect(getMetaContent()).toBe('#0a1628');
+  });
+
+  it('works even when no meta tags exist', async () => {
+    // Remove all meta tags
+    document.head.innerHTML = '';
+
+    const store = useThemeStore();
+    useThemeDomSync();
+    vi.runAllTimers();
+
+    // Should not crash when no meta tags to update
+    store.isBlueprintMode = true;
+    await nextTick();
+    vi.runAllTimers();
+
+    // data-theme should still be set correctly
+    expect(document.documentElement.getAttribute('data-theme')).toBe('blueprint');
   });
 });

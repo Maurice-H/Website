@@ -37,6 +37,8 @@ class MockAudio {
   pause = vi.fn().mockImplementation(() => {
     this.paused = true;
   });
+  removeAttribute = vi.fn();
+  load = vi.fn();
 }
 
 vi.stubGlobal('Audio', MockAudio);
@@ -178,5 +180,23 @@ describe('useAudio', () => {
     expect(consoleWarnSpy).toHaveBeenCalledWith('Audio play failed:', expect.any(Error));
 
     consoleWarnSpy.mockRestore();
+  });
+
+  it('cleanup() pauses and clears all cached audio pools', async () => {
+    const { useAudio } = await import('../useAudio');
+    const { playClick, cleanup } = useAudio();
+
+    // Create some audio instances in the pool
+    playClick();
+    expect(mockAudioInstances.length).toBeGreaterThan(0);
+
+    const instances = [...mockAudioInstances];
+
+    cleanup();
+
+    // All instances should have been paused
+    for (const audio of instances) {
+      expect(audio.pause).toHaveBeenCalled();
+    }
   });
 });
