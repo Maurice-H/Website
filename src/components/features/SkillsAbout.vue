@@ -1,6 +1,7 @@
 <template>
   <!-- About Tile (Discovery Path) -->
   <BentoCard
+    ref="aboutCardRef"
     id="about-discovery"
     data-testid="discovery-card"
     class="md:col-span-2 md:row-span-1"
@@ -20,6 +21,7 @@
 
   <!-- Skills Tile (STACK) -->
   <BentoCard
+    ref="skillsCardRef"
     id="skills-stack"
     class="md:col-span-2 md:row-span-1"
     with-window
@@ -119,7 +121,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import {
+  type ComponentPublicInstance,
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from 'vue';
 import BentoCard from '@/components/shared/BentoCard.vue';
 import { SKILL_SECTIONS } from '@/data/portfolio';
 import { useLightingStore } from '@/stores/lighting';
@@ -134,6 +144,8 @@ const showAll = ref(false);
 const allFit = ref(true);
 const skillsContainerRef = ref<HTMLElement | null>(null);
 const skillsWrapRef = ref<HTMLElement | null>(null);
+const aboutCardRef = ref<ComponentPublicInstance | null>(null);
+const skillsCardRef = ref<ComponentPublicInstance | null>(null);
 
 // Initialize with no categories expanded (folded by default)
 const expandedCategories = ref<Set<string>>(new Set());
@@ -159,8 +171,8 @@ function calculateVisibleSkills() {
   if (showAll.value) return;
   if (!skillsContainerRef.value || !skillsWrapRef.value) return;
 
-  const stackCard = skillsContainerRef.value.closest('#skills-stack');
-  const discoveryCard = document.getElementById('about-discovery');
+  const stackCard = skillsCardRef.value?.$el;
+  const discoveryCard = aboutCardRef.value?.$el;
 
   if (!discoveryCard || !stackCard) {
     allFit.value = true;
@@ -213,7 +225,7 @@ onMounted(() => {
     });
   });
 
-  const discoveryCard = document.getElementById('about-discovery');
+  const discoveryCard = aboutCardRef.value?.$el;
   if (discoveryCard) {
     resizeObserver = new ResizeObserver(() => {
       if (!showAll.value) {
@@ -238,3 +250,5 @@ watch(showAll, (expanded) => {
   }
 });
 </script>
+
+<style scoped></style>

@@ -48,6 +48,7 @@
             </div>
           </div>
           <NavConveyor />
+          <GlobalFooter />
         </nav>
 
         <!-- Content Phase (Fused Bento Grid) -->
@@ -106,8 +107,7 @@ const WebGLBackground = defineAsyncComponent(
 );
 
 import ResilienceLayer from '@/components/layout/ResilienceLayer.vue';
-import BackToTop from '@/components/navigation/BackToTop.vue';
-import NavConveyor from '@/components/navigation/NavConveyor.vue';
+import { BackToTop, GlobalFooter, NavConveyor } from '@/components/navigation';
 import ToastNotification from '@/components/shared/ToastNotification.vue';
 import { useAppPhase } from '@/composables/useAppPhase';
 import { useAudio } from '@/composables/useAudio';
@@ -121,6 +121,7 @@ import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { useShortcutStore } from '@/stores/useShortcutStore';
 import { useThemeStore } from '@/stores/useThemeStore';
+import { removeLcpSkeleton } from '@/utils/lcp';
 
 const { isMobile } = useResponsive();
 const { cleanup: cleanupAudio } = useAudio();
@@ -153,10 +154,7 @@ onMounted(async () => {
   initGlobalViewportService();
 
   // Remove the static LCP skeleton once Vue has taken over rendering
-  const skeleton = document.getElementById('lcp-skeleton');
-  if (skeleton && typeof skeleton.remove === 'function') {
-    skeleton.remove();
-  }
+  removeLcpSkeleton();
 
   // Run GPU performance benchmark early to determine rendering tier
   await performance.checkPerformance();
