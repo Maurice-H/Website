@@ -47,8 +47,6 @@ describe('App.vue', () => {
           // Since defineAsyncComponent is used, stub it based on the name resolving logic
           WebGLBackground: true,
           NavConveyor: true,
-          LightingToggle: true,
-          ThemeToggle: true,
           HeroSection: true,
           BentoLayout: true,
           SkillsAbout: true,
