@@ -1,7 +1,8 @@
 <template>
-  <div 
+  <section
     ref="cardRef"
     :id="id"
+    :aria-label="title || undefined"
     class="bento-card relative rounded-2xl p-4 md:p-6 overflow-hidden flex flex-col min-w-0 w-full h-full group"
     :class="[colSpanClass, rowSpanClass, { 'is-low-end': isLowEnd }]"
     :data-testid="dataTestid"
@@ -38,7 +39,7 @@
        </WindowFrame>
        <slot v-else></slot>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
