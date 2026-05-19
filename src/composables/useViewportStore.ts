@@ -1,4 +1,4 @@
-import { useViewportStore as usePiniaViewportStore } from '../stores/viewport';
+import { useViewportStore as usePiniaViewportStore } from '@/stores/viewport';
 
 export function useViewportStore() {
   return usePiniaViewportStore();

@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ContactForm from '../ContactForm.vue';
 
-vi.mock('../../../utils/env', () => ({
+vi.mock('@/utils/env', () => ({
   envConfig: {
     VITE_CI_MODE: 'false',
     isCiMode: false,
@@ -16,8 +16,6 @@ const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 type ContactFormInstance = {
   isMobile: boolean;
-  captchaScale: number;
-  updateCaptchaScale: () => void;
   renderTurnstile: () => void;
 };
 
@@ -468,56 +466,39 @@ describe('ContactForm.vue', () => {
       window.dispatchEvent(new Event('resize'));
     });
 
-    it('should initialize ResizeObserver on mount', async () => {
-      const observeSpy = vi.spyOn(ResizeObserver.prototype, 'observe');
-      mount(ContactForm, { attachTo: document.body });
+    it('should not apply CSS transform scaling to turnstile wrapper', async () => {
+      const wrapper = mount(ContactForm, { attachTo: document.body });
       await flushPromises();
-      expect(observeSpy).toHaveBeenCalled();
+
+      const turnstileWrapper = wrapper.find('.turnstile-wrapper');
+      expect(turnstileWrapper.exists()).toBe(true);
+
+      // Verify no transform style is applied (was causing hitbox misalignment)
+      const style = turnstileWrapper.attributes('style');
+      expect(style).toBeUndefined();
     });
 
-    it('should calculate captchaScale correctly for narrow containers', async () => {
-      const wrapper = mount(ContactForm, { attachTo: document.body });
-      const vm = wrapper.vm as unknown as ContactFormInstance;
+    it('should use compact size for Turnstile on mobile viewports', async () => {
+      const renderSpy = vi.fn();
+      vi.stubGlobal('turnstile', { render: renderSpy, remove: vi.fn(), reset: vi.fn() });
 
-      // Helper: safely mock clientWidth on the turnstile-wrapper's parent (form container)
-      const mockParentWidth = (width: number) => {
-        const el = document.querySelector('.turnstile-wrapper');
-        if (el?.parentElement) {
-          try {
-            Object.defineProperty(el.parentElement, 'clientWidth', {
-              value: width,
-              configurable: true,
-              writable: true,
-            });
-          } catch {
-            // Proxy element — use getter override
-            vi.spyOn(el.parentElement as HTMLElement, 'clientWidth', 'get').mockReturnValue(width);
-          }
-        }
-      };
-
-      // Compact mode (isMobile = true) -> target 130px
       vi.stubGlobal('innerWidth', 320);
       window.dispatchEvent(new Event('resize'));
-      await wrapper.vm.$nextTick();
-      mockParentWidth(100);
-      vm.updateCaptchaScale();
-      // (100 - 10) / 130 = ~0.69
-      expect(vm.captchaScale).toBeCloseTo(0.69, 1);
 
-      // Normal mode (isMobile = false) -> target 300px
-      vi.stubGlobal('innerWidth', 1024);
-      window.dispatchEvent(new Event('resize'));
+      const wrapper = mount(ContactForm, { attachTo: document.body });
+      const vm = wrapper.vm as unknown as ContactFormInstance;
       await wrapper.vm.$nextTick();
-      mockParentWidth(100);
-      vm.updateCaptchaScale();
-      // (100 - 10) / 300 = 0.3
-      expect(vm.captchaScale).toBe(0.3);
 
-      // Large container -> scale 1
-      mockParentWidth(500);
-      vm.updateCaptchaScale();
-      expect(vm.captchaScale).toBe(1);
+      vm.renderTurnstile();
+      await flushPromises();
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        expect.any(HTMLElement),
+        expect.objectContaining({ size: 'compact' })
+      );
+
+      wrapper.unmount();
+      vi.unstubAllGlobals();
     });
 
     it('should trigger turnstile re-render when switching to mobile', async () => {

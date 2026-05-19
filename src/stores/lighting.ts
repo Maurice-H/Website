@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { LightingPhase } from '../types';
+import { LightingPhase } from '@/types';
 
 export const useLightingStore = defineStore('lighting', () => {
   const phase = ref<LightingPhase>(LightingPhase.NAV);

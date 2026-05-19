@@ -1,8 +1,8 @@
 import { onMounted, onUnmounted } from 'vue';
-import { useLightingStore } from '../stores/lighting';
-import { useShortcutStore } from '../stores/useShortcutStore';
-import { useThemeStore } from '../stores/useThemeStore';
-import { LightingPhase } from '../types';
+import { useLightingStore } from '@/stores/lighting';
+import { useShortcutStore } from '@/stores/useShortcutStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { LightingPhase } from '@/types';
 import { useAudio } from './useAudio';
 
 /**

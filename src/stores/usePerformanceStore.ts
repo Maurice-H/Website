@@ -1,7 +1,7 @@
 import { getGPUTier } from 'detect-gpu';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { envConfig } from '../utils/env';
+import { envConfig } from '@/utils/env';
 
 export const usePerformanceStore = defineStore('performance', () => {
   const gpuTier = ref<number | null>(null);

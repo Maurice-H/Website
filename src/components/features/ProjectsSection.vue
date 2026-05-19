@@ -134,10 +134,10 @@
 </template>
 
 <script setup lang="ts">
+import BentoCard from '@/components/shared/BentoCard.vue';
+import SkeletonLoader from '@/components/shared/SkeletonLoader.vue';
 import { useGitHubProjects } from '@/composables/useGitHubProjects';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
-import BentoCard from '../shared/BentoCard.vue';
-import SkeletonLoader from '../shared/SkeletonLoader.vue';
 
 const performance = usePerformanceStore();
 const { projects, isLoading, error } = useGitHubProjects();

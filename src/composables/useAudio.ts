@@ -1,6 +1,6 @@
 import { ref } from 'vue';
-import { usePerformanceStore } from '../stores/usePerformanceStore';
-import { envConfig } from '../utils/env';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
+import { envConfig } from '@/utils/env';
 
 const isMuted = ref(false);
 

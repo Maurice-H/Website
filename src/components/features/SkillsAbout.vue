@@ -118,9 +118,9 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import BentoCard from '@/components/shared/BentoCard.vue';
 import { SKILL_SECTIONS } from '@/data/portfolio';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
-import BentoCard from '../shared/BentoCard.vue';
 
 const performance = usePerformanceStore();
 const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[0];

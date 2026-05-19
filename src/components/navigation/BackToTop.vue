@@ -26,11 +26,10 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
+import ChevronUpIcon from '@/components/icons/ChevronUpIcon.vue';
 import { useAudio } from '@/composables/useAudio';
 import { useResponsive } from '@/composables/useResponsive';
-
 import { useThemeStore } from '@/stores/useThemeStore';
-import ChevronUpIcon from '../icons/ChevronUpIcon.vue';
 
 const themeStore = useThemeStore();
 const { playClick, playGlitch } = useAudio();

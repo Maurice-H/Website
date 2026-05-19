@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
+import WindowFrame from '@/components/shared/WindowFrame.vue';
 import type { NavWindowTheme } from '@/types';
-import WindowFrame from '../shared/WindowFrame.vue';
 
 const props = defineProps<{
   theme: NavWindowTheme;

@@ -153,16 +153,10 @@
             {{ $t(errorMessage) }}
           </p>
 
-          <!-- Cloudflare Turnstile Widget (Dynamic Size & Scale) -->
-          <div
-            class="turnstile-wrapper mb-2"
-            :style="{
-              transform: captchaScale < 1 ? `scale(${captchaScale})` : undefined,
-              transformOrigin: captchaScale < 1 ? 'left top' : undefined,
-            }"
-          >
+          <!-- Cloudflare Turnstile Widget (Dynamic Size) -->
+          <div class="turnstile-wrapper mb-2">
             <div
-              :key="isMobile ? 'mobile' : 'desktop'"
+              ref="turnstileContainer"
               class="cf-turnstile"
             ></div>
           </div>
@@ -271,18 +265,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import DiscordIcon from '@/components/icons/DiscordIcon.vue';
+import EmailIcon from '@/components/icons/EmailIcon.vue';
+import LinkedinIcon from '@/components/icons/LinkedinIcon.vue';
+import XingIcon from '@/components/icons/XingIcon.vue';
+import BentoCard from '@/components/shared/BentoCard.vue';
 import { useResponsive } from '@/composables/useResponsive';
 import { useToast } from '@/composables/useToast';
 import { SOCIAL_LINKS } from '@/data/portfolio';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { envConfig } from '@/utils/env';
-import DiscordIcon from '../icons/DiscordIcon.vue';
-import EmailIcon from '../icons/EmailIcon.vue';
-import LinkedinIcon from '../icons/LinkedinIcon.vue';
-import XingIcon from '../icons/XingIcon.vue';
-import BentoCard from '../shared/BentoCard.vue';
 
 // --- Types ---
 type ChannelId = 'email' | 'discord' | 'xing' | 'linkedin';
@@ -345,24 +339,34 @@ const submitLabel = computed(() => {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // --- Methods ---
+interface TurnstileRenderOptions {
+  sitekey: string;
+  theme: string;
+  size?: string;
+  callback?: (token: string) => void;
+  'error-callback'?: () => void;
+  'timeout-callback'?: () => void;
+}
+
 interface TurnstileWindow extends Window {
   turnstile?: {
-    render: (
-      selector: string,
-      options: { sitekey: string; theme: string; size?: string }
-    ) => string;
+    render: (container: string | HTMLElement, options: TurnstileRenderOptions) => string;
     reset: (id?: string) => void;
     remove: (id: string) => void;
   };
 }
 
+const turnstileContainer = ref<HTMLElement | null>(null);
 const widgetId = ref<string | null>(null);
-const captchaScale = ref(1);
 
 let turnstileRetryCount = 0;
+let isRendering = false;
 const MAX_TURNSTILE_RETRIES = 10;
 
 const renderTurnstile = () => {
+  // Prevent concurrent renders — the main cause of silent iframe failures
+  if (isRendering) return;
+
   const win = window as TurnstileWindow;
   if (!win.turnstile) {
     // Script not loaded yet — retry after a short delay (max 10 attempts = 5s)
@@ -373,37 +377,49 @@ const renderTurnstile = () => {
     return;
   }
   turnstileRetryCount = 0;
+  isRendering = true;
 
   nextTick(() => {
-    const container = document.querySelector('.cf-turnstile');
-    // We don't need to manually remove if we use a :key on the element,
-    // as Vue replaces the element for us.
-    if (container && !container.querySelector('iframe')) {
-      widgetId.value =
-        win.turnstile?.render('.cf-turnstile', {
-          sitekey: turnstileSiteKey,
-          theme: 'dark',
-          size: isMobile.value ? 'compact' : 'normal',
-        }) || null;
-
-      updateCaptchaScale();
+    const container = turnstileContainer.value;
+    if (!container) {
+      isRendering = false;
+      return;
     }
+
+    // Always clean up the previous widget before rendering a new one.
+    // This prevents the SDK's internal state from conflicting with a
+    // stale DOM reference (root cause of the missing-iframe bug).
+    if (widgetId.value && win.turnstile) {
+      try {
+        win.turnstile.remove(widgetId.value);
+      } catch {
+        // Widget may already be gone — safe to ignore
+      }
+      widgetId.value = null;
+    }
+
+    // Clear any leftover Turnstile DOM from a previous render attempt
+    container.innerHTML = '';
+
+    widgetId.value =
+      win.turnstile?.render(container, {
+        sitekey: turnstileSiteKey,
+        theme: 'dark',
+        size: isMobile.value ? 'compact' : 'normal',
+        'error-callback': () => {
+          // Turnstile hit an error — retry once after a short delay
+          isRendering = false;
+          setTimeout(renderTurnstile, 1000);
+        },
+        'timeout-callback': () => {
+          // Challenge timed out — re-render
+          isRendering = false;
+          renderTurnstile();
+        },
+      }) || null;
+
+    isRendering = false;
   });
-};
-
-const updateCaptchaScale = () => {
-  const wrapper = document.querySelector('.turnstile-wrapper');
-  if (!wrapper?.parentElement) return;
-
-  const parentWidth = wrapper.parentElement.clientWidth;
-  const targetWidth = isMobile.value ? 130 : 300;
-
-  if (parentWidth < targetWidth && parentWidth > 0) {
-    // Math.max(0.3, ...) ensures it never scales to 0 and becomes invisible
-    captchaScale.value = Math.max(0.3, Math.min(1, (parentWidth - 10) / targetWidth));
-  } else {
-    captchaScale.value = 1;
-  }
 };
 
 const validateEmail = (email: string): boolean => {
@@ -640,27 +656,8 @@ const copyToClipboard = async (text: string) => {
 };
 
 // --- Lifecycle & Watchers ---
-let resizeObserver: ResizeObserver | null = null;
-
 onMounted(() => {
   renderTurnstile();
-
-  // Dynamic scaling observer — observe the form container, not the wrapper itself
-  nextTick(() => {
-    const wrapper = document.querySelector('.turnstile-wrapper');
-    if (wrapper?.parentElement) {
-      resizeObserver = new ResizeObserver(() => {
-        updateCaptchaScale();
-      });
-      resizeObserver.observe(wrapper.parentElement);
-    }
-  });
-});
-
-onUnmounted(() => {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-  }
 });
 
 watch(isMobile, () => {
@@ -756,6 +753,5 @@ watch(activeChannel, (newChannel) => {
 
 .turnstile-wrapper {
   min-height: v-bind('isMobile ? "120px" : "65px"');
-  transition: transform 0.2s ease-out;
 }
 </style>

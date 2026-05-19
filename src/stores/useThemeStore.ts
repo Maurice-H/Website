@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-import type { ThemeState } from '../types';
+import type { ThemeState } from '@/types';
 
 const LIGHTING_STORAGE_KEY = 'portfolio-lighting-enabled';
 

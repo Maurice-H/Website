@@ -210,6 +210,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import EnvelopeIcon from '@/components/icons/EnvelopeIcon.vue';
+import LocaleSwitcher from '@/components/shared/LocaleSwitcher.vue';
 import { useAudio } from '@/composables/useAudio';
 import { useGitHubProjects } from '@/composables/useGitHubProjects';
 import { useResponsive } from '@/composables/useResponsive';
@@ -218,8 +220,6 @@ import { useLightingStore } from '@/stores/lighting';
 import { type ShortcutAction, useShortcutStore } from '@/stores/useShortcutStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { LightingPhase } from '@/types';
-import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
-import LocaleSwitcher from '../shared/LocaleSwitcher.vue';
 import NavWindow from './NavWindow.vue';
 
 const lightingStore = useLightingStore();
