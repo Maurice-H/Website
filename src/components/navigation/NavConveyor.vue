@@ -210,13 +210,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useAudio } from '../../composables/useAudio';
-import { useGitHubProjects } from '../../composables/useGitHubProjects';
-import { NAV_TABS as tabs } from '../../data/portfolio';
-import { useLightingStore } from '../../stores/lighting';
-import { type ShortcutAction, useShortcutStore } from '../../stores/useShortcutStore';
-import { useThemeStore } from '../../stores/useThemeStore';
-import { LightingPhase } from '../../types/index';
+import { useAudio } from '@/composables/useAudio';
+import { useGitHubProjects } from '@/composables/useGitHubProjects';
+import { useResponsive } from '@/composables/useResponsive';
+import { NAV_TABS as tabs } from '@/data/portfolio';
+import { useLightingStore } from '@/stores/lighting';
+import { type ShortcutAction, useShortcutStore } from '@/stores/useShortcutStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { LightingPhase } from '@/types';
 import EnvelopeIcon from '../icons/EnvelopeIcon.vue';
 import LocaleSwitcher from '../shared/LocaleSwitcher.vue';
 import NavWindow from './NavWindow.vue';
@@ -227,10 +228,7 @@ const themeStore = useThemeStore();
 const { playClick, playGlitch } = useAudio();
 const { locale } = useI18n();
 
-const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 768);
-const updateMobileState = () => {
-  isMobile.value = typeof window !== 'undefined' && window.innerWidth < 768;
-};
+const { isMobile } = useResponsive();
 
 const shortcutActions = computed<ShortcutAction[]>(() =>
   isMobile.value ? ['lighting', 'theme'] : ['lighting', 'theme', 'back']
@@ -408,7 +406,6 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
 };
 
 onMounted(() => {
-  window.addEventListener('resize', updateMobileState);
   window.addEventListener('pointermove', onDrag);
   window.addEventListener('pointerup', stopDrag);
   window.addEventListener('keydown', handleGlobalKeydown);
@@ -431,7 +428,6 @@ onMounted(() => {
   }
 });
 onUnmounted(() => {
-  window.removeEventListener('resize', updateMobileState);
   window.removeEventListener('pointermove', onDrag);
   window.removeEventListener('pointerup', stopDrag);
   window.removeEventListener('keydown', handleGlobalKeydown);

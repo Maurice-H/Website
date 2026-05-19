@@ -95,30 +95,31 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue';
 import { computed, defineAsyncComponent, onMounted, onUnmounted } from 'vue';
-import ContactForm from './components/features/ContactForm.vue';
-import HeroSection from './components/features/HeroSection.vue';
-import ProjectsSection from './components/features/ProjectsSection.vue';
-import SkillsAbout from './components/features/SkillsAbout.vue';
-import BentoLayout from './components/layout/BentoLayout.vue';
+import ContactForm from '@/components/features/ContactForm.vue';
+import HeroSection from '@/components/features/HeroSection.vue';
+import ProjectsSection from '@/components/features/ProjectsSection.vue';
+import SkillsAbout from '@/components/features/SkillsAbout.vue';
+import BentoLayout from '@/components/layout/BentoLayout.vue';
 
 // Lazy load the heavy WebGL background to keep the initial bundle small
 const WebGLBackground = defineAsyncComponent(
-  () => import('./components/layout/WebGLBackground.vue')
+  () => import('@/components/layout/WebGLBackground.vue')
 );
 
-import ResilienceLayer from './components/layout/ResilienceLayer.vue';
-import BackToTop from './components/navigation/BackToTop.vue';
-import NavConveyor from './components/navigation/NavConveyor.vue';
-import ToastNotification from './components/shared/ToastNotification.vue';
-import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts';
-import { initGlobalViewportService } from './composables/useViewportStore';
-import { useLightingStore } from './stores/lighting';
-import { usePerformanceStore } from './stores/usePerformanceStore';
-import { useShortcutStore } from './stores/useShortcutStore';
-import { useThemeStore } from './stores/useThemeStore';
-import { LightingPhase } from './types';
+import ResilienceLayer from '@/components/layout/ResilienceLayer.vue';
+import BackToTop from '@/components/navigation/BackToTop.vue';
+import NavConveyor from '@/components/navigation/NavConveyor.vue';
+import ToastNotification from '@/components/shared/ToastNotification.vue';
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
+import { useResponsive } from '@/composables/useResponsive';
+import { initGlobalViewportService } from '@/composables/useViewportStore';
+import { useLightingStore } from '@/stores/lighting';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
+import { useShortcutStore } from '@/stores/useShortcutStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { LightingPhase } from '@/types';
 
-const isMobile = computed(() => typeof window !== 'undefined' && window.innerWidth < 768);
+const { isMobile } = useResponsive();
 
 // Use the stores directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
@@ -136,7 +137,7 @@ const isCustomCursorActive = computed(() => {
 
 /**
  * CSS custom properties set on root element for child access.
- * --reveal-mask is consumed by FusedReveal and App.vue slotted content.
+ * --reveal-mask is consumed by App.vue slotted content.
  * Only changes on phase transition (NAV ↔ CONTENT), not on every mouse move.
  */
 const rootCssVars = computed<CSSProperties>(() => {

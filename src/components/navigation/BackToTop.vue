@@ -26,9 +26,10 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
-import { useAudio } from '../../composables/useAudio';
+import { useAudio } from '@/composables/useAudio';
+import { useResponsive } from '@/composables/useResponsive';
 
-import { useThemeStore } from '../../stores/useThemeStore';
+import { useThemeStore } from '@/stores/useThemeStore';
 import ChevronUpIcon from '../icons/ChevronUpIcon.vue';
 
 const themeStore = useThemeStore();
@@ -37,11 +38,7 @@ const { playClick, playGlitch } = useAudio();
 const SCROLL_THRESHOLD = 300;
 const isVisible = ref(false);
 let rafId: number | null = null;
-const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 768);
-
-const updateMobileState = () => {
-  isMobile.value = typeof window !== 'undefined' && window.innerWidth < 768;
-};
+const { isMobile } = useResponsive();
 
 const handleTheme = () => {
   themeStore.toggleTheme();
@@ -68,13 +65,11 @@ const scrollToTop = () => {
 };
 
 onMounted(() => {
-  window.addEventListener('resize', updateMobileState);
   const scrollContainer = document.querySelector('.content-stage');
   scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateMobileState);
   const scrollContainer = document.querySelector('.content-stage');
   scrollContainer?.removeEventListener('scroll', handleScroll);
   if (rafId !== null) cancelAnimationFrame(rafId);
