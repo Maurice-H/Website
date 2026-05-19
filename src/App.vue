@@ -110,8 +110,12 @@ import ResilienceLayer from '@/components/layout/ResilienceLayer.vue';
 import BackToTop from '@/components/navigation/BackToTop.vue';
 import NavConveyor from '@/components/navigation/NavConveyor.vue';
 import ToastNotification from '@/components/shared/ToastNotification.vue';
+import { useAudio } from '@/composables/useAudio';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
+import { useLightingDomSync } from '@/composables/useLightingDomSync';
 import { useResponsive } from '@/composables/useResponsive';
+import { useThemeDomSync } from '@/composables/useThemeDomSync';
+import { useToast } from '@/composables/useToast';
 import { initGlobalViewportService } from '@/composables/useViewportStore';
 import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
@@ -120,6 +124,8 @@ import { useThemeStore } from '@/stores/useThemeStore';
 import { LightingPhase } from '@/types';
 
 const { isMobile } = useResponsive();
+const { cleanup: cleanupAudio } = useAudio();
+const { clearAll: clearToasts } = useToast();
 
 // Use the stores directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
@@ -129,6 +135,10 @@ const shortcutStore = useShortcutStore();
 
 // Register global keyboard shortcuts (L = lighting, T = theme)
 useKeyboardShortcuts();
+
+// Initialize DOM sync composables to decouple DOM manipulation from stores
+useThemeDomSync();
+useLightingDomSync();
 
 // Check if we use the WebGL scanner (only on Content page + light on + non-mobile)
 const isCustomCursorActive = computed(() => {
@@ -196,6 +206,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeydown);
+  cleanupAudio();
+  clearToasts();
 });
 </script>
 

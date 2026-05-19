@@ -42,7 +42,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useLightingStore } from '@/stores/lighting';
 import { useViewportStore } from '@/stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
@@ -56,6 +55,8 @@ interface Props {
   dataTestid?: string;
 }
 
+const emit = defineEmits<(e: 'hover-change', position: { x: number; y: number } | null) => void>();
+
 const props = withDefaults(defineProps<Props>(), {
   id: '',
   colSpan: 1,
@@ -68,7 +69,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
-const lighting = useLightingStore();
 let unregisterFn: (() => void) | null = null;
 
 const isHovered = ref(false);
@@ -80,15 +80,15 @@ const handleMouseEnter = () => {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  lighting.focusedElementPos = {
+  emit('hover-change', {
     x: (centerX / window.innerWidth) * 2 - 1,
     y: -((centerY / window.innerHeight) * 2 - 1),
-  };
+  });
 };
 
 const handleMouseLeave = () => {
   isHovered.value = false;
-  lighting.focusedElementPos = null;
+  emit('hover-change', null);
 };
 
 const revealStyle = computed(() => {

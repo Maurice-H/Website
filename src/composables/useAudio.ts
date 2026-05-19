@@ -70,11 +70,23 @@ export function useAudio() {
     }
   };
 
+  const cleanup = () => {
+    Object.keys(audioCache).forEach((path) => {
+      audioCache[path].forEach((audio) => {
+        audio.pause();
+        audio.removeAttribute('src'); // Optional, helps with GC
+        audio.load();
+      });
+      delete audioCache[path];
+    });
+  };
+
   return {
     isMuted,
     toggleMute,
     playClick,
     playGlitch,
     playSwoosh,
+    cleanup,
   };
 }

@@ -58,18 +58,15 @@ describe('useLightingStore', () => {
     expect(store.isFlashActive).toBe(false); // Make sure flash doesn't get stuck
   });
 
-  it('setPhase should use startViewTransition if available', () => {
+  it('setPhase should use registered transition handler if available', () => {
     const store = useLightingStore();
-    const startViewTransitionMock = vi.fn().mockImplementation((cb) => cb());
-    document.startViewTransition = startViewTransitionMock;
+    const transitionHandlerMock = vi.fn().mockImplementation((cb) => cb());
 
+    store.registerTransitionHandler(transitionHandlerMock);
     store.setPhase(LightingPhase.CONTENT);
     vi.advanceTimersByTime(300);
 
-    expect(startViewTransitionMock).toHaveBeenCalled();
+    expect(transitionHandlerMock).toHaveBeenCalled();
     expect(store.phase).toBe(LightingPhase.CONTENT);
-
-    // Cleanup
-    Reflect.deleteProperty(document, 'startViewTransition');
   });
 });

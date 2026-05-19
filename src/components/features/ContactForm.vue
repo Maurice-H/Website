@@ -5,6 +5,7 @@
     with-window
     :title="$t('contact.title')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div class="p-4 md:p-10 flex flex-col h-full">
       <p
@@ -275,6 +276,7 @@ import BentoCard from '@/components/shared/BentoCard.vue';
 import { useResponsive } from '@/composables/useResponsive';
 import { useToast } from '@/composables/useToast';
 import { SOCIAL_LINKS } from '@/data/portfolio';
+import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { envConfig } from '@/utils/env';
 
@@ -284,6 +286,7 @@ type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 // --- State ---
 const performance = usePerformanceStore();
+const lightingStore = useLightingStore();
 const { show: showToast } = useToast();
 const { t } = useI18n();
 const turnstileSiteKey = envConfig.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';

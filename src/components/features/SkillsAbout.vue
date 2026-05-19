@@ -7,6 +7,7 @@
     with-window
     :title="$t('skills.discoveryPath')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div class="p-4 md:p-6 flex flex-col">
       <p
@@ -24,6 +25,7 @@
     with-window
     :title="$t('skills.stackTitle')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div ref="skillsContainerRef" class="p-4 md:p-6 flex flex-col h-full">
       <div
@@ -120,9 +122,11 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import BentoCard from '@/components/shared/BentoCard.vue';
 import { SKILL_SECTIONS } from '@/data/portfolio';
+import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 
 const performance = usePerformanceStore();
+const lightingStore = useLightingStore();
 const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[0];
 const categories = stack.categories || [];
 
