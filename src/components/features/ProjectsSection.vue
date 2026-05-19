@@ -5,6 +5,7 @@
     with-window
     :title="$t('projects.title')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div class="p-4 md:p-8 flex flex-col gap-4 md:gap-6">
       <!-- Loading State -->
@@ -134,12 +135,14 @@
 </template>
 
 <script setup lang="ts">
+import BentoCard from '@/components/shared/BentoCard.vue';
+import SkeletonLoader from '@/components/shared/SkeletonLoader.vue';
 import { useGitHubProjects } from '@/composables/useGitHubProjects';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import BentoCard from '../shared/BentoCard.vue';
-import SkeletonLoader from '../shared/SkeletonLoader.vue';
+import { useLightingStore } from '@/stores/lighting';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
 
 const performance = usePerformanceStore();
+const lightingStore = useLightingStore();
 const { projects, isLoading, error } = useGitHubProjects();
 
 const openProject = (url?: string) => {

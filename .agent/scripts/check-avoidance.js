@@ -15,7 +15,7 @@ try {
   // We use git grep. If it finds something, it returns exit code 0.
   // If it finds nothing, it returns exit code 1.
   // We want to FAIL if it finds something.
-  const result = execSync(`git grep -n -E "${patternString}" -- ":!package.json" ":!.agent/scripts/check-avoidance.js" ":!.agent/AGENT.md" ":!openspec/**" ":!README.md"`);
+  const result = execSync(`git grep --untracked -n -E "${patternString}" -- ":!package.json" ":!.agent/scripts/check-avoidance.js" ":!.agent/AGENT.md" ":!openspec/**" ":!README.md"`);
   
   const output = result.toString().trim();
   if (output) {

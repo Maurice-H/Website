@@ -71,6 +71,8 @@
     "subtitle": "Direkten Kanal für Zusammenarbeit aufbauen.",
     "copied": "In die Zwischenablage kopiert!",
     "copyFailed": "Kopieren fehlgeschlagen — bitte manuell kopieren.",
+    "success": "Übertragung erfolgreich gesendet!",
+    "error": "Übertragung fehlgeschlagen.",
     "discord": "Discord",
     "email": "E-Mail",
     "linkedin": "LinkedIn",

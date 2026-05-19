@@ -1,7 +1,20 @@
 import { getGPUTier } from 'detect-gpu';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { envConfig } from '../utils/env';
+import { envConfig } from '@/utils/env';
+
+/**
+ * Gets a parameter value from URLSearchParams in a case-insensitive manner.
+ */
+const getParamCaseInsensitive = (params: URLSearchParams, key: string): string | null => {
+  const lowerKey = key.toLowerCase();
+  for (const k of params.keys()) {
+    if (k.toLowerCase() === lowerKey) {
+      return params.get(k);
+    }
+  }
+  return null;
+};
 
 export const usePerformanceStore = defineStore('performance', () => {
   const gpuTier = ref<number | null>(null);
@@ -12,7 +25,9 @@ export const usePerformanceStore = defineStore('performance', () => {
   const isCiMode = computed(() => {
     // Check for explicit environment variable or URL parameter
     const params = new URLSearchParams(window.location.search);
-    return envConfig.isCiMode || params.get('ciMode') === 'true' || params.get('ci') === '1';
+    const ciModeVal = getParamCaseInsensitive(params, 'ciMode');
+    const ciVal = getParamCaseInsensitive(params, 'ci');
+    return envConfig.isCiMode || ciModeVal === 'true' || ciVal === '1';
   });
 
   /**
@@ -23,7 +38,7 @@ export const usePerformanceStore = defineStore('performance', () => {
     if (isReady.value) return true;
 
     const params = new URLSearchParams(window.location.search);
-    const forcedTier = params.get('forceTier');
+    const forcedTier = getParamCaseInsensitive(params, 'forceTier');
 
     if (forcedTier) {
       const tier = Number.parseInt(forcedTier, 10);

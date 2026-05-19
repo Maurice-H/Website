@@ -26,9 +26,9 @@
       >
         <!-- Navigation Phase -->
         <nav
-          v-if="lighting.phase === 'NAV'"
+          v-if="isNav"
           key="nav"
-          class="h-screen w-full relative"
+          class="h-full w-full relative"
           aria-label="Main Navigation"
         >
           <!-- Fused Background Text (Landing Page Parity) -->
@@ -48,6 +48,7 @@
             </div>
           </div>
           <NavConveyor />
+          <GlobalFooter />
         </nav>
 
         <!-- Content Phase (Fused Bento Grid) -->
@@ -83,7 +84,7 @@
             </BentoLayout>
           </div>
 
-          <backToTop />
+          <BackToTop />
         </main>
       </Transition>
     </div>
@@ -93,32 +94,41 @@
 </template>
 
 <script setup lang="ts">
-import type { CSSProperties } from 'vue';
 import { computed, defineAsyncComponent, onMounted, onUnmounted } from 'vue';
-import ContactForm from './components/features/ContactForm.vue';
-import HeroSection from './components/features/HeroSection.vue';
-import ProjectsSection from './components/features/ProjectsSection.vue';
-import SkillsAbout from './components/features/SkillsAbout.vue';
-import BentoLayout from './components/layout/BentoLayout.vue';
+import ContactForm from '@/components/features/ContactForm.vue';
+import HeroSection from '@/components/features/HeroSection.vue';
+import ProjectsSection from '@/components/features/ProjectsSection.vue';
+import SkillsAbout from '@/components/features/SkillsAbout.vue';
+import BentoLayout from '@/components/layout/BentoLayout.vue';
 
 // Lazy load the heavy WebGL background to keep the initial bundle small
 const WebGLBackground = defineAsyncComponent(
-  () => import('./components/layout/WebGLBackground.vue')
+  () => import('@/components/layout/WebGLBackground.vue')
 );
 
-import ResilienceLayer from './components/layout/ResilienceLayer.vue';
-import BackToTop from './components/navigation/BackToTop.vue';
-import NavConveyor from './components/navigation/NavConveyor.vue';
-import ToastNotification from './components/shared/ToastNotification.vue';
-import { useKeyboardShortcuts } from './composables/useKeyboardShortcuts';
-import { initGlobalViewportService } from './composables/useViewportStore';
-import { useLightingStore } from './stores/lighting';
-import { usePerformanceStore } from './stores/usePerformanceStore';
-import { useShortcutStore } from './stores/useShortcutStore';
-import { useThemeStore } from './stores/useThemeStore';
-import { LightingPhase } from './types';
+import ResilienceLayer from '@/components/layout/ResilienceLayer.vue';
+import { BackToTop, GlobalFooter, NavConveyor } from '@/components/navigation';
+import ToastNotification from '@/components/shared/ToastNotification.vue';
+import { useAppPhase } from '@/composables/useAppPhase';
+import { useAudio } from '@/composables/useAudio';
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
+import { useLightingDomSync } from '@/composables/useLightingDomSync';
+import { useResponsive } from '@/composables/useResponsive';
+import { useThemeDomSync } from '@/composables/useThemeDomSync';
+import { useToast } from '@/composables/useToast';
+import { initGlobalViewportService } from '@/composables/useViewportStore';
+import { useLightingStore } from '@/stores/lighting';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
+import { useShortcutStore } from '@/stores/useShortcutStore';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { removeLcpSkeleton } from '@/utils/lcp';
 
-const isMobile = computed(() => typeof window !== 'undefined' && window.innerWidth < 768);
+const { isMobile } = useResponsive();
+const { cleanup: cleanupAudio } = useAudio();
+const { clearAll: clearToasts } = useToast();
+
+const { isNav, isContent, rootCssVars, handleBackToNav, handleGlobalKeydown, handleAfterEnter } =
+  useAppPhase();
 
 // Use the stores directly to avoid any destructuring reactivity caveats
 const lighting = useLightingStore();
@@ -129,54 +139,14 @@ const shortcutStore = useShortcutStore();
 // Register global keyboard shortcuts (L = lighting, T = theme)
 useKeyboardShortcuts();
 
+// Initialize DOM sync composables to decouple DOM manipulation from stores
+useThemeDomSync();
+useLightingDomSync();
+
 // Check if we use the WebGL scanner (only on Content page + light on + non-mobile)
 const isCustomCursorActive = computed(() => {
-  return themeStore.lightingEnabled && lighting.phase === 'CONTENT' && !isMobile.value;
+  return themeStore.lightingEnabled && isContent.value && !isMobile.value;
 });
-
-/**
- * CSS custom properties set on root element for child access.
- * --reveal-mask is consumed by FusedReveal and App.vue slotted content.
- * Only changes on phase transition (NAV ↔ CONTENT), not on every mouse move.
- */
-const rootCssVars = computed<CSSProperties>(() => {
-  if (!themeStore.lightingEnabled) return {};
-
-  const isNav = lighting.phase === 'NAV';
-
-  // Use a wider gradient on mobile to cover more of the smaller screen
-  const maskSize = isMobile.value ? '80% 120%' : '40% 160%';
-
-  return {
-    '--reveal-mask': isNav
-      ? `radial-gradient(ellipse ${maskSize} at 50% -10%, black 0%, rgba(0,0,0,0) 100%)`
-      : '',
-  } as CSSProperties;
-});
-
-const handleBackToNav = () => {
-  lighting.setPhase(LightingPhase.NAV);
-};
-
-const handleGlobalKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape' && lighting.phase === 'CONTENT') {
-    handleBackToNav();
-  }
-};
-
-const handleAfterEnter = () => {
-  const target = lighting.pendingScrollTarget;
-  if (!target) return;
-  lighting.pendingScrollTarget = null;
-
-  // Wait for the transition to settle and the DOM to be fully updated
-  setTimeout(() => {
-    const el = document.getElementById(target);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, 100);
-};
 
 onMounted(async () => {
   window.addEventListener('keydown', handleGlobalKeydown);
@@ -184,10 +154,7 @@ onMounted(async () => {
   initGlobalViewportService();
 
   // Remove the static LCP skeleton once Vue has taken over rendering
-  const skeleton = document.getElementById('lcp-skeleton');
-  if (skeleton && typeof skeleton.remove === 'function') {
-    skeleton.remove();
-  }
+  removeLcpSkeleton();
 
   // Run GPU performance benchmark early to determine rendering tier
   await performance.checkPerformance();
@@ -195,6 +162,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeydown);
+  cleanupAudio();
+  clearToasts();
 });
 </script>
 

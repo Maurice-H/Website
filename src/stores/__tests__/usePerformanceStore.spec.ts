@@ -61,6 +61,15 @@ describe('usePerformanceStore', () => {
       expect(store.isCiMode).toBe(true);
     });
 
+    it('returns true if ciMode URL param is true with lowercase/uppercase variations', () => {
+      Object.defineProperty(window, 'location', {
+        value: { search: '?cimode=true' },
+        writable: true,
+      });
+      const store = usePerformanceStore();
+      expect(store.isCiMode).toBe(true);
+    });
+
     it('returns false otherwise', async () => {
       const module = await import('../../utils/env');
       Object.defineProperty(module.envConfig, 'isCiMode', { value: false, writable: true });
@@ -120,6 +129,19 @@ describe('usePerformanceStore', () => {
       expect(store.initTierFromOverrides()).toBe(true);
       expect(store.gpuTier).toBe(1);
       expect(store.isWebGLSupported).toBe(false); // Tier 1 disables webgl
+      expect(store.isReady).toBe(true);
+      expect(store.isLowEnd).toBe(true);
+    });
+
+    it('sets state based on valid forceTier in lowercase (forcetier=1) and returns true', () => {
+      Object.defineProperty(window, 'location', {
+        value: { search: '?forcetier=1' },
+        writable: true,
+      });
+      const store = usePerformanceStore();
+      expect(store.initTierFromOverrides()).toBe(true);
+      expect(store.gpuTier).toBe(1);
+      expect(store.isWebGLSupported).toBe(false);
       expect(store.isReady).toBe(true);
       expect(store.isLowEnd).toBe(true);
     });

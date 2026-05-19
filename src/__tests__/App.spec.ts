@@ -47,8 +47,6 @@ describe('App.vue', () => {
           // Since defineAsyncComponent is used, stub it based on the name resolving logic
           WebGLBackground: true,
           NavConveyor: true,
-          LightingToggle: true,
-          ThemeToggle: true,
           HeroSection: true,
           BentoLayout: true,
           SkillsAbout: true,
@@ -197,15 +195,12 @@ describe('App.vue', () => {
 
     // Trigger after-enter event manually since we stubbed transition
     // Need to cast to unknown to access the bound method to respect biome rules
-    const handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => void })
+    const handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => Promise<void> })
       .handleAfterEnter;
-    handleAfterEnter();
+    await handleAfterEnter();
 
     // Verify pendingScrollTarget is reset
     expect(lightingStore.pendingScrollTarget).toBeNull();
-
-    // Fast forward setTimeout
-    vi.runAllTimers();
 
     expect(getElSpy).toHaveBeenCalledWith('test-target');
     expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
@@ -223,11 +218,9 @@ describe('App.vue', () => {
     // Test with no target
 
     lightingStore.pendingScrollTarget = null;
-    let handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => void })
+    let handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => Promise<void> })
       .handleAfterEnter;
-    handleAfterEnter();
-    // setTimeout shouldn't even be called, but we run timers to be sure
-    vi.runAllTimers();
+    await handleAfterEnter();
     // 1st call is 'lcp-skeleton' from onMounted, no other calls expected
     expect(getElSpy).toHaveBeenCalledTimes(1);
     expect(getElSpy).toHaveBeenCalledWith('lcp-skeleton');
@@ -235,10 +228,10 @@ describe('App.vue', () => {
     // Test with target but element not found
 
     lightingStore.pendingScrollTarget = 'test-target-not-found';
-    handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => void }).handleAfterEnter;
-    handleAfterEnter();
+    handleAfterEnter = (wrapper.vm as unknown as { handleAfterEnter: () => Promise<void> })
+      .handleAfterEnter;
+    await handleAfterEnter();
     expect(lightingStore.pendingScrollTarget).toBeNull();
-    vi.runAllTimers();
     expect(getElSpy).toHaveBeenCalledWith('test-target-not-found');
     expect(getElSpy).toHaveBeenCalledWith('lcp-skeleton');
 

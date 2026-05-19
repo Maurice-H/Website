@@ -2,13 +2,6 @@ export interface ThemeState {
   isBlueprint: boolean;
 }
 
-export interface BentoCardProps {
-  interactive?: boolean;
-  colSpan?: 1 | 2 | 3 | 4;
-  rowSpan?: 1 | 2 | 3 | 4;
-  className?: string;
-}
-
 export interface PortfolioProject {
   id: string;
   title: string;
@@ -42,16 +35,6 @@ export const LightingPhase = {
 
 export type LightingPhase = (typeof LightingPhase)[keyof typeof LightingPhase];
 
-export interface MousePosition {
-  x: number;
-  y: number;
-}
-
-export interface BentoGridItem {
-  colSpan?: number;
-  rowSpan?: number;
-}
-
 export type NavWindowTheme = 'career' | 'about' | 'projects' | 'contact';
 
 export interface NavTab {
@@ -63,12 +46,6 @@ export interface NavTab {
   targetSection?: string;
 }
 
-export interface HeroData {
-  name: string;
-  roles: string[];
-  tagline: string;
-}
-
 export interface ContactMethod {
   id: string;
   label: string;
@@ -78,10 +55,5 @@ export interface ContactMethod {
   url?: string;
 }
 
-export interface ToastOptions {
-  message: string;
-  type: 'success' | 'error' | 'info';
-  duration?: number;
-}
-
+export * from './contact';
 export * from './webgl';

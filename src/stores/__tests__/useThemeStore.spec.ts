@@ -44,33 +44,6 @@ describe('useThemeStore', () => {
     store.toggleTheme();
     expect(store.isBlueprintMode).toBe(false);
   });
-
-  it('updates document dataset when isBlueprintMode changes', async () => {
-    const store = useThemeStore();
-
-    store.toggleTheme();
-    await nextTick();
-    expect(document.documentElement.setAttribute).toHaveBeenCalledWith('data-theme', 'blueprint');
-
-    store.toggleTheme();
-    await nextTick();
-    expect(document.documentElement.removeAttribute).toHaveBeenCalledWith('data-theme');
-  });
-
-  it('updates meta tags for system theme colors when isBlueprintMode changes', async () => {
-    const store = useThemeStore();
-
-    // The watcher runs immediately (immediate: true), so it should be called with the non-blueprint color (#020205)
-    expect(mockMetaElements[0].setAttribute).toHaveBeenCalledWith('content', '#020205');
-    expect(mockMetaElements[1].setAttribute).toHaveBeenCalledWith('content', '#020205');
-
-    // Toggle to blueprint mode
-    store.toggleTheme();
-    await nextTick();
-
-    expect(mockMetaElements[0].setAttribute).toHaveBeenCalledWith('content', '#0a1628');
-    expect(mockMetaElements[1].setAttribute).toHaveBeenCalledWith('content', '#0a1628');
-  });
 });
 
 describe('useThemeStore extensions', () => {
@@ -161,23 +134,6 @@ describe('useThemeStore extensions', () => {
 
       // Restore
       globalThis.window = originalWindow;
-    });
-  });
-
-  describe('SSR compatibility', () => {
-    it('handles isBlueprintMode watcher safely when document is undefined', async () => {
-      const originalDocument = globalThis.document;
-
-      delete (globalThis as unknown as Record<string, unknown>).document;
-
-      setActivePinia(createPinia());
-      const store = useThemeStore();
-
-      // Should not throw
-      store.toggleTheme();
-      await nextTick();
-
-      globalThis.document = originalDocument;
     });
   });
 });

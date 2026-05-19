@@ -23,13 +23,14 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useResponsive } from '@/composables/useResponsive';
 import { useLightingStore } from '@/stores/lighting';
 import { usePerformanceStore } from '@/stores/usePerformanceStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useViewportStore } from '@/stores/viewport';
 import { LightingPhase } from '@/types';
 
-const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+const { isMobile } = useResponsive();
 
 const lighting = useLightingStore();
 const performance = usePerformanceStore();

@@ -1,12 +1,14 @@
 <template>
   <!-- About Tile (Discovery Path) -->
   <BentoCard
+    ref="aboutCardRef"
     id="about-discovery"
     data-testid="discovery-card"
     class="md:col-span-2 md:row-span-1"
     with-window
     :title="$t('skills.discoveryPath')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div class="p-4 md:p-6 flex flex-col">
       <p
@@ -19,11 +21,13 @@
 
   <!-- Skills Tile (STACK) -->
   <BentoCard
+    ref="skillsCardRef"
     id="skills-stack"
     class="md:col-span-2 md:row-span-1"
     with-window
     :title="$t('skills.stackTitle')"
     :is-low-end="performance.isLowEnd"
+    @hover-change="(pos) => { if (lightingStore) lightingStore.focusedElementPos = pos }"
   >
     <div ref="skillsContainerRef" class="p-4 md:p-6 flex flex-col h-full">
       <div
@@ -54,11 +58,11 @@
             :aria-controls="`category-content-${category.name.replace(/\s+/g, '-')}`"
             @click="toggleCategory(category.name)"
           >
-            <h4
+            <h3
               class="text-[0.7rem] md:text-sm text-finished-accent uppercase tracking-widest font-mono font-bold transition-colors duration-[var(--theme-transition-duration)] group-hover:opacity-80"
             >
               {{ $t(category.name) }}
-            </h4>
+            </h3>
             <span
               class="text-finished-accent/50 group-hover:text-finished-accent transition-transform duration-300"
               :class="{ 'rotate-180': expandedCategories.has(category.name) }"
@@ -117,12 +121,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { SKILL_SECTIONS } from '../../data/portfolio';
-import { usePerformanceStore } from '../../stores/usePerformanceStore';
-import BentoCard from '../shared/BentoCard.vue';
+import {
+  type ComponentPublicInstance,
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from 'vue';
+import BentoCard from '@/components/shared/BentoCard.vue';
+import { SKILL_SECTIONS } from '@/data/portfolio';
+import { useLightingStore } from '@/stores/lighting';
+import { usePerformanceStore } from '@/stores/usePerformanceStore';
 
 const performance = usePerformanceStore();
+const lightingStore = useLightingStore();
 const stack = SKILL_SECTIONS.find((s) => s.id === 'stack') || SKILL_SECTIONS[0];
 const categories = stack.categories || [];
 
@@ -130,6 +144,8 @@ const showAll = ref(false);
 const allFit = ref(true);
 const skillsContainerRef = ref<HTMLElement | null>(null);
 const skillsWrapRef = ref<HTMLElement | null>(null);
+const aboutCardRef = ref<ComponentPublicInstance | null>(null);
+const skillsCardRef = ref<ComponentPublicInstance | null>(null);
 
 // Initialize with no categories expanded (folded by default)
 const expandedCategories = ref<Set<string>>(new Set());
@@ -155,8 +171,8 @@ function calculateVisibleSkills() {
   if (showAll.value) return;
   if (!skillsContainerRef.value || !skillsWrapRef.value) return;
 
-  const stackCard = skillsContainerRef.value.closest('#skills-stack');
-  const discoveryCard = document.getElementById('about-discovery');
+  const stackCard = skillsCardRef.value?.$el;
+  const discoveryCard = aboutCardRef.value?.$el;
 
   if (!discoveryCard || !stackCard) {
     allFit.value = true;
@@ -209,7 +225,7 @@ onMounted(() => {
     });
   });
 
-  const discoveryCard = document.getElementById('about-discovery');
+  const discoveryCard = aboutCardRef.value?.$el;
   if (discoveryCard) {
     resizeObserver = new ResizeObserver(() => {
       if (!showAll.value) {
@@ -234,3 +250,5 @@ watch(showAll, (expanded) => {
   }
 });
 </script>
+
+<style scoped></style>

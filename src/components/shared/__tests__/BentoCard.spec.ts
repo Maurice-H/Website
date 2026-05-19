@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useLightingStore } from '../../../stores/lighting';
 import { useViewportStore } from '../../../stores/viewport';
 import BentoCard from '../BentoCard.vue';
 
@@ -79,8 +78,7 @@ describe('BentoCard.vue', () => {
     expect(unregisterMock).toHaveBeenCalled();
   });
 
-  it('updates lighting store on mouse enter and clear on leave', async () => {
-    const lightingStore = useLightingStore();
+  it('emits hover-change on mouse enter and clear on leave', async () => {
     const wrapper = mount(BentoCard, {
       props: { id: 'hover-test' },
     });
@@ -107,11 +105,16 @@ describe('BentoCard.vue', () => {
 
     // centerX = 100 + 100 = 200. (200 / 1000) * 2 - 1 = 0.4 - 1 = -0.6
     // centerY = 100 + 100 = 200. (200 / 1000) * 2 - 1 = -0.6. Negated = 0.6
-    expect(lightingStore.focusedElementPos).toEqual({ x: -0.6, y: 0.6 });
+    const emittedEnter = wrapper.emitted('hover-change');
+    expect(emittedEnter).toBeTruthy();
+    expect(emittedEnter?.[0]).toEqual([{ x: -0.6, y: 0.6 }]);
 
     await wrapper.trigger('mouseleave');
     expect((wrapper.vm as unknown as BentoCardInstance).isHovered).toBe(false);
-    expect(lightingStore.focusedElementPos).toBeNull();
+
+    const emittedLeave = wrapper.emitted('hover-change');
+    expect(emittedLeave).toBeTruthy();
+    expect(emittedLeave?.[1]).toEqual([null]);
 
     vi.unstubAllGlobals();
   });
@@ -119,11 +122,9 @@ describe('BentoCard.vue', () => {
   it('respects isLowEnd prop by removing expensive layers', () => {
     let wrapper = mount(BentoCard, { props: { isLowEnd: false } });
     expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(true);
-    expect(wrapper.find('.noise-overlay').exists()).toBe(true);
 
     wrapper = mount(BentoCard, { props: { isLowEnd: true } });
     expect(wrapper.find('.bento-card-stack-layer').exists()).toBe(false);
-    expect(wrapper.find('.noise-overlay').exists()).toBe(false);
     expect(wrapper.classes()).toContain('is-low-end');
   });
 });

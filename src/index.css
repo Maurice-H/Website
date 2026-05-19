@@ -61,7 +61,7 @@ body {
   transition: background-color var(--theme-transition-duration) ease-in-out;
 }
 
-/* Blueprint mode overrides — applied via ThemeToggle */
+/* Blueprint mode overrides */
 [data-theme="blueprint"] {
   --finished-bg: #0a1628; /* Deeper technical blue */
   --finished-text: #e0f2fe;
@@ -69,20 +69,6 @@ body {
   --finished-border: rgba(56, 189, 248, 0.2);
   --finished-glow: 0 0 40px rgba(56, 189, 248, 0.15);
   --accent-bright: #67e8f9;
-}
-
-/* Flash Transition Effect */
-.flash-overlay {
-  position: fixed;
-  inset: 0;
-  background: white;
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 150ms ease-out;
-}
-.flash-active {
-  opacity: 0.5;
 }
 
 /* Zwingt das WebGL-Canvas, Klicks und Scrolls an das DOM durchzulassen */

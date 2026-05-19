@@ -1,4 +1,4 @@
-import type { NavTab, SkillSection } from '../types';
+import type { NavTab, SkillSection } from '@/types';
 
 export const NAV_TABS: NavTab[] = [
   {
@@ -95,8 +95,6 @@ export const SKILL_SECTIONS: SkillSection[] = [
     ],
   },
 ];
-
-export const SKILLS_DEFAULT_VISIBLE = 10;
 
 export interface SocialLink {
   id: string;

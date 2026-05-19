@@ -20,7 +20,6 @@
       class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-500 rounded-[inherit] glass-reveal"
       :style="revealStyle"
     >
-      <div class="noise-overlay" v-if="!isLowEnd"></div>
       <div class="absolute inset-0 bg-[var(--glass-reflection)] z-0 opacity-40"></div>
       
       <!-- 4-Layer Technical Stack for 3D Illusion (Disabled on Low-End) -->
@@ -43,8 +42,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useLightingStore } from '../../stores/lighting';
-import { useViewportStore } from '../../stores/viewport';
+import { useViewportStore } from '@/stores/viewport';
 import WindowFrame from './WindowFrame.vue';
 
 interface Props {
@@ -56,6 +54,8 @@ interface Props {
   isLowEnd?: boolean;
   dataTestid?: string;
 }
+
+const emit = defineEmits<(e: 'hover-change', position: { x: number; y: number } | null) => void>();
 
 const props = withDefaults(defineProps<Props>(), {
   id: '',
@@ -69,7 +69,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cardRef = ref<HTMLElement | null>(null);
 const viewport = useViewportStore();
-const lighting = useLightingStore();
 let unregisterFn: (() => void) | null = null;
 
 const isHovered = ref(false);
@@ -81,15 +80,15 @@ const handleMouseEnter = () => {
   const centerX = rect.left + rect.width / 2;
   const centerY = rect.top + rect.height / 2;
 
-  lighting.focusedElementPos = {
+  emit('hover-change', {
     x: (centerX / window.innerWidth) * 2 - 1,
     y: -((centerY / window.innerHeight) * 2 - 1),
-  };
+  });
 };
 
 const handleMouseLeave = () => {
   isHovered.value = false;
-  lighting.focusedElementPos = null;
+  emit('hover-change', null);
 };
 
 const revealStyle = computed(() => {

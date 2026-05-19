@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
-import type { NavWindowTheme } from '../../types';
-import WindowFrame from '../shared/WindowFrame.vue';
+import WindowFrame from '@/components/shared/WindowFrame.vue';
+import type { NavWindowTheme } from '@/types';
 
 const props = defineProps<{
   theme: NavWindowTheme;
@@ -135,15 +135,19 @@ onUnmounted(() => {
   backface-visibility: hidden;
 }
 
+.nav-window.is-active {
+  transform: scale(1.15);
+}
+
 @media (max-width: 768px) {
   .nav-window {
     width: 280px;
     gap: 12px;
   }
-}
 
-.nav-window.is-active {
-  transform: scale(1.15);
+  .nav-window.is-active {
+    transform: scale(1.05);
+  }
 }
 
 @media (hover: hover) {

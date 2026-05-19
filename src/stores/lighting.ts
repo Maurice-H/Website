@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { LightingPhase } from '../types';
+import { LightingPhase } from '@/types';
 
 export const useLightingStore = defineStore('lighting', () => {
   const phase = ref<LightingPhase>(LightingPhase.NAV);
@@ -10,6 +10,11 @@ export const useLightingStore = defineStore('lighting', () => {
   // ── Interaction Points ──
   // Normalized screen coordinates (-1 to 1) of the currently hovered/focused UI element
   const focusedElementPos = ref<{ x: number; y: number } | null>(null);
+
+  let _transitionHandler: ((callback: () => void) => void) | null = null;
+  const registerTransitionHandler = (handler: (callback: () => void) => void) => {
+    _transitionHandler = handler;
+  };
 
   const setPhase = (newPhase: LightingPhase) => {
     if (!Object.values(LightingPhase).includes(newPhase)) {
@@ -27,10 +32,8 @@ export const useLightingStore = defineStore('lighting', () => {
     isFlashActive.value = true;
 
     const applyPhase = () => {
-      const isCiMode = typeof document !== 'undefined' && document.querySelector('.is-ci-mode');
-
-      if (typeof document !== 'undefined' && document.startViewTransition && !isCiMode) {
-        document.startViewTransition(() => {
+      if (_transitionHandler) {
+        _transitionHandler(() => {
           phase.value = newPhase;
         });
       } else {
@@ -48,5 +51,6 @@ export const useLightingStore = defineStore('lighting', () => {
     pendingScrollTarget,
     focusedElementPos,
     setPhase,
+    registerTransitionHandler,
   };
 });
