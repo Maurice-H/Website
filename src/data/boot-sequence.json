@@ -1,8 +1,0 @@
-[
-  { "text": "> system.boot_sequence(91)...", "delay": 200, "type": "info" },
-  { "text": "SYNCING WITH COSMIC VOID...", "delay": 400, "type": "warning" },
-  { "text": "CORE SYSTEMS: ONLINE", "delay": 100, "type": "success" },
-  { "text": "LOADING DATA...", "delay": 600, "type": "info" },
-  { "text": "2024: FRONTEND DEV - SYSTEM ARCHITECT", "delay": 300, "type": "info" },
-  { "text": "ACCESS GRANTED: WELCOME MAURICE", "delay": 800, "type": "success" }
-]
